@@ -121,25 +121,19 @@ export const PatternCelebration = ({ patterns, onComplete }) => {
             top: '80px',
             right: '10px',
             zIndex: 120, // Lower z-index
-            background: `linear-gradient(45deg, ${pattern.color}, ${pattern.color}cc)`,
-            padding: '6px 10px', // Smaller padding
-            borderRadius: '4px',
             color: '#fff',
             fontFamily: "'Courier New', monospace",
             fontWeight: 'bold',
             fontSize: '10px', // Smaller text
             textAlign: 'center',
-            border: `1px solid ${pattern.color}`,
-            boxShadow: `0 0 15px ${pattern.color}44`,
-            cursor: 'pointer',
-            pointerEvents: 'auto',
-            maxWidth: '150px' // Smaller width
+            textShadow: `0 0 15px ${pattern.color}`,
+            pointerEvents: 'none',
+            maxWidth: '150px'
           }}
-          onClick={() => onComplete && onComplete()} // Click to dismiss
         >
           <div>
             🎯 {pattern.type.replace('_', ' ').toUpperCase()}!
-            <div style={{ fontSize: '8px', marginTop: '2px' }}>
+            <div style={{ fontSize: '8px', marginTop: '2px', textShadow: `0 0 10px ${pattern.color}` }}>
               +{pattern.bonus} BONUS POINTS!
             </div>
           </div>

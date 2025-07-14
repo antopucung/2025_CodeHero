@@ -49,21 +49,18 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
         top: '15%',
         right: '20px',
         zIndex: 1000,
-        background: `linear-gradient(45deg, ${streakColor}, ${streakColor}cc)`,
-        padding: '15px 25px',
-        borderRadius: '25px',
         color: streak >= 30 ? '#000' : '#fff',
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
         fontSize: '14px',
         textAlign: 'center',
-        border: `2px solid ${streakColor}`,
-        borderRadius: '8px'
+        textShadow: `0 0 15px ${streakColor}`,
+        pointerEvents: 'none'
       }}
     >
       🔥 {streak} STREAK!
       {multiplier > 1 && (
-        <div style={{ fontSize: '10px', marginTop: '2px' }}>
+        <div style={{ fontSize: '10px', marginTop: '2px', textShadow: `0 0 10px ${streakColor}` }}>
           x{multiplier} COMBO ACTIVE
         </div>
       )}
@@ -122,28 +119,19 @@ export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, t
         top: '25%',
         right: '20px',
         zIndex: 1000,
-        background: style.bg,
-        padding: '25px',
-        borderRadius: '50%',
         color: style.color,
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
         fontSize: '16px',
         textAlign: 'center',
-        minWidth: '70px',
-        minHeight: '70px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        border: `2px solid ${style.glow}`,
-        borderRadius: '8px'
+        textShadow: `0 0 20px ${style.glow}`,
+        pointerEvents: 'none'
       }}
     >
-      <div>x{multiplier}</div>
-      <div style={{ fontSize: '10px', marginTop: '2px' }}>COMBO</div>
+      <div style={{ textShadow: `0 0 25px ${style.glow}` }}>x{multiplier}</div>
+      <div style={{ fontSize: '10px', marginTop: '2px', textShadow: `0 0 15px ${style.glow}` }}>COMBO</div>
       {typingSpeed !== 'lame' && (
-        <div style={{ fontSize: '8px', marginTop: '1px', opacity: 0.8 }}>
+        <div style={{ fontSize: '8px', marginTop: '1px', opacity: 0.8, textShadow: `0 0 10px ${style.glow}` }}>
           {typingSpeed.toUpperCase()}
         </div>
       )}
@@ -216,13 +204,8 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
         left: '50%',
         transform: 'translate(-50%, -50%)',
         zIndex: 10000,
-        background: 'linear-gradient(135deg, #000, #111)',
-        border: '4px solid #ffd93d',
-        borderRadius: '20px',
-        padding: '40px',
         textAlign: 'center',
-        minWidth: '300px',
-        boxShadow: '0 0 60px #ffd93d'
+        pointerEvents: 'none'
       }}
     >
       {phase === 'buildup' && (
@@ -236,20 +219,23 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
           transition={{ duration: 0.8 }}
           style={{
             textAlign: 'center',
-            color: '#ffd93d'
+            color: '#ffd93d',
+            textShadow: '0 0 20px #ffd93d'
           }}
         >
           <div style={{
-            fontSize: '3xl',
+            fontSize: '36px',
             fontWeight: 'bold',
-            marginBottom: '20px'
+            marginBottom: '20px',
+            textShadow: '0 0 25px #ffd93d'
           }}>
             ⚡ POWER SURGE! ⚡
           </div>
           
           <div style={{
-            fontSize: '2xl',
-            color: '#4ecdc4'
+            fontSize: '24px',
+            color: '#4ecdc4',
+            textShadow: '0 0 15px #4ecdc4'
           }}>
             Preparing Level {newLevel}...
           </div>
@@ -283,7 +269,8 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
               fontSize: '4xl',
               fontWeight: 'bold',
               color: '#ff6b6b',
-              marginBottom: '20px'
+              marginBottom: '20px',
+              textShadow: '0 0 30px #ff6b6b'
             }}>
               🎉 LEVEL UP! 🎉
             </div>
@@ -303,7 +290,8 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
             <div style={{
               fontSize: '6xl',
               fontWeight: 'bold',
-              color: '#ffd93d'
+              color: '#ffd93d',
+              textShadow: '0 0 40px #ffd93d'
             }}>
               {newLevel}
             </div>
@@ -317,7 +305,8 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
             <div style={{
               fontSize: 'xl',
               color: '#4ecdc4',
-              marginTop: '20px'
+              marginTop: '20px',
+              textShadow: '0 0 20px #4ecdc4'
             }}>
               🚀 SKILLS ENHANCED! 🚀
             </div>

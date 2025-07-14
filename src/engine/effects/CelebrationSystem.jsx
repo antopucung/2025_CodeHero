@@ -75,10 +75,7 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
         transform: 'translate(-50%, -50%)',
         zIndex: 10000,
         textAlign: 'center',
-        background: 'rgba(0, 0, 0, 0.95)',
-        padding: '50px',
-        borderRadius: '12px',
-        boxShadow: '0 0 40px rgba(0, 255, 0, 0.3)'
+        pointerEvents: 'none'
       }}
     >
       <motion.div
@@ -95,11 +92,11 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
           duration: 1.5 
         }}
       >
-        <div style={{ fontSize: '4xl', color: '#00ff00', fontWeight: 'bold', marginBottom: '20px' }}>
+        <div style={{ fontSize: '48px', color: '#00ff00', fontWeight: 'bold', marginBottom: '20px', textShadow: '0 0 20px #00ff00' }}>
           🎉 LEVEL UP! 🎉
         </div>
         
-        <div style={{ fontSize: '6xl', color: '#ffff00', fontWeight: 'bold', textShadow: '0 0 35px #ffff00' }}>
+        <div style={{ fontSize: '72px', color: '#ffff00', fontWeight: 'bold', textShadow: '0 0 35px #ffff00' }}>
           {newLevel}
         </div>
         
@@ -108,10 +105,10 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8 }}
         >
-          <div style={{ fontSize: '2xl', color: '#ffd93d', marginTop: '20px', fontWeight: 'bold' }}>
+          <div style={{ fontSize: '24px', color: '#ffd93d', marginTop: '20px', fontWeight: 'bold', textShadow: '0 0 15px #ffd93d' }}>
             🚀 INCREDIBLE PROGRESS! 🚀
           </div>
-          <div style={{ fontSize: 'lg', color: '#4ecdc4', marginTop: '10px' }}>
+          <div style={{ fontSize: '18px', color: '#4ecdc4', marginTop: '10px', textShadow: '0 0 10px #4ecdc4' }}>
             Your typing skills are evolving!
           </div>
         </motion.div>
@@ -215,12 +212,8 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 10000,
-        background: `rgba(0, 0, 0, 0.95)`,
-        borderRadius: '12px',
-        padding: '30px',
         textAlign: 'center',
-        minWidth: '350px',
-        boxShadow: `0 0 30px ${data.color}66`
+        pointerEvents: 'none'
       }}
     >
       {/* Rarity indicator */}
@@ -229,7 +222,8 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
         fontSize: '12px',
         fontWeight: 'bold',
         marginBottom: '10px',
-        letterSpacing: '2px'
+        letterSpacing: '2px',
+        textShadow: `0 0 10px ${data.color}`
       }}>
         {data.rarity} ACHIEVEMENT
       </div>
@@ -237,7 +231,8 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
       {/* Achievement icon */}
       <div style={{
         fontSize: '60px',
-        marginBottom: '15px'
+        marginBottom: '15px',
+        filter: `drop-shadow(0 0 20px ${data.color})`
       }}>
         {data.icon}
       </div>
@@ -248,7 +243,8 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
         fontSize: '24px',
         fontWeight: 'bold',
         marginBottom: '10px',
-        fontFamily: "'Courier New', monospace"
+        fontFamily: "'Courier New', monospace",
+        textShadow: `0 0 15px ${data.color}`
       }}>
         {data.title}
       </div>
@@ -258,7 +254,8 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
         style={{
           color: '#ccc',
           fontSize: '14px',
-          fontFamily: "'Courier New', monospace"
+          fontFamily: "'Courier New', monospace",
+          textShadow: '0 0 8px #ccc'
         }}
       >
         {data.desc}

@@ -95,7 +95,7 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
       }
       
       setCombo(newCombo);
-      setComboLevel(newCombo);
+      setComboLevel(newCombo); // This should be passed to BlockLetterTyping
       setMaxCombo(prev => Math.max(prev, newCombo));
       setLastCorrectTime(now);
       

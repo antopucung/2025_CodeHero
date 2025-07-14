@@ -15,41 +15,59 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
   }, []);
 
   const getComboColors = (combo) => {
+    // GOD COMBO (50+) - Legendary Red Hot
     if (combo >= 50) return {
-      bg: 'linear-gradient(45deg, #ff6b6b, #ff8e8e, #ff6b6b)',
-      border: '#ff6b6b',
-      glow: '#ff6b6b',
-      shadow: '0 0 25px #ff6b6b, inset 0 0 15px rgba(255, 107, 107, 0.3)'
+      bg: 'linear-gradient(135deg, #ff1744 0%, #ff6b6b 25%, #ff8a80 50%, #ff6b6b 75%, #ff1744 100%)',
+      border: '#ff1744',
+      glow: '#ff1744',
+      shadow: '0 0 40px #ff1744, 0 0 20px #ff6b6b, inset 0 0 20px rgba(255, 23, 68, 0.4)',
+      textColor: '#fff',
+      intensity: 3
     };
+    // PERFECT COMBO (30-49) - Golden Glory
     if (combo >= 30) return {
-      bg: 'linear-gradient(45deg, #ffd93d, #ffed4e, #ffd93d)',
-      border: '#ffd93d',
+      bg: 'linear-gradient(135deg, #ffc107 0%, #ffd93d 25%, #ffeb3b 50%, #ffd93d 75%, #ffc107 100%)',
+      border: '#ffc107',
       glow: '#ffd93d',
-      shadow: '0 0 25px #ffd93d, inset 0 0 15px rgba(255, 217, 61, 0.3)'
+      shadow: '0 0 35px #ffd93d, 0 0 15px #ffc107, inset 0 0 15px rgba(255, 217, 61, 0.4)',
+      textColor: '#000',
+      intensity: 2.5
     };
+    // TRIPLE COMBO (20-29) - Emerald Excellence
     if (combo >= 20) return {
-      bg: 'linear-gradient(45deg, #6bcf7f, #7dd87f, #6bcf7f)',
-      border: '#6bcf7f',
+      bg: 'linear-gradient(135deg, #4caf50 0%, #6bcf7f 25%, #81c784 50%, #6bcf7f 75%, #4caf50 100%)',
+      border: '#4caf50',
       glow: '#6bcf7f',
-      shadow: '0 0 25px #6bcf7f, inset 0 0 15px rgba(107, 207, 127, 0.3)'
+      shadow: '0 0 30px #6bcf7f, 0 0 12px #4caf50, inset 0 0 12px rgba(107, 207, 127, 0.3)',
+      textColor: '#000',
+      intensity: 2
     };
+    // DOUBLE COMBO (10-19) - Cyan Power
     if (combo >= 10) return {
-      bg: 'linear-gradient(45deg, #4ecdc4, #5ed9d1, #4ecdc4)',
-      border: '#4ecdc4',
+      bg: 'linear-gradient(135deg, #00bcd4 0%, #4ecdc4 25%, #80deea 50%, #4ecdc4 75%, #00bcd4 100%)',
+      border: '#00bcd4',
       glow: '#4ecdc4',
-      shadow: '0 0 25px #4ecdc4, inset 0 0 15px rgba(78, 205, 196, 0.3)'
+      shadow: '0 0 25px #4ecdc4, 0 0 10px #00bcd4, inset 0 0 10px rgba(78, 205, 196, 0.3)',
+      textColor: '#000',
+      intensity: 1.8
     };
+    // COMBO START (5-9) - Blue Boost
     if (combo >= 5) return {
-      bg: 'linear-gradient(45deg, #45b7d1, #5bc3d7, #45b7d1)',
-      border: '#45b7d1',
+      bg: 'linear-gradient(135deg, #2196f3 0%, #45b7d1 25%, #64b5f6 50%, #45b7d1 75%, #2196f3 100%)',
+      border: '#2196f3',
       glow: '#45b7d1',
-      shadow: '0 0 25px #45b7d1, inset 0 0 15px rgba(69, 183, 209, 0.3)'
+      shadow: '0 0 20px #45b7d1, 0 0 8px #2196f3, inset 0 0 8px rgba(69, 183, 209, 0.3)',
+      textColor: '#fff',
+      intensity: 1.5
     };
+    // BASIC (1-4) - Fresh Green
     return {
-      bg: 'linear-gradient(45deg, #00ff00, #33ff33, #00ff00)',
-      border: '#00ff00',
+      bg: 'linear-gradient(135deg, #00e676 0%, #00ff00 25%, #69f0ae 50%, #00ff00 75%, #00e676 100%)',
+      border: '#00e676',
       glow: '#00ff00',
-      shadow: '0 0 20px #00ff00, inset 0 0 10px rgba(0, 255, 0, 0.3)'
+      shadow: '0 0 15px #00ff00, 0 0 6px #00e676, inset 0 0 6px rgba(0, 255, 0, 0.3)',
+      textColor: '#000',
+      intensity: 1
     };
   };
 
@@ -61,20 +79,23 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
   });
 
   const getCurrentColors = () => ({
-    bg: 'linear-gradient(45deg, #ffeb3b, #fff176, #ffeb3b)',
+    bg: 'linear-gradient(135deg, #ffeb3b 0%, #fff176 25%, #ffff8d 50%, #fff176 75%, #ffeb3b 100%)',
     border: '#ffeb3b',
     glow: '#ffeb3b',
-    shadow: '0 0 25px #ffeb3b, inset 0 0 15px rgba(255, 235, 59, 0.4)'
+    shadow: '0 0 25px #ffeb3b, inset 0 0 15px rgba(255, 235, 59, 0.4)',
+    textColor: '#000',
+    intensity: 1.2
   });
 
   const renderCharacter = (char, index) => {
     const status = getCharacterStatus(index);
     const isActive = index === currentIndex;
+    const currentCombo = combo || 1;
     
     let colors;
     if (status === 'incorrect') colors = getErrorColors();
     else if (status === 'current') colors = getCurrentColors();
-    else if (status === 'correct') colors = getComboColors(comboLevel);
+    else if (status === 'correct') colors = getComboColors(currentCombo);
     else colors = { bg: 'transparent', border: '#333', glow: 'transparent', shadow: 'none' };
     
     // Wave effect for active character
@@ -91,15 +112,22 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
         y: waveY,
         background: colors.bg,
         borderColor: colors.border,
-        boxShadow: colors.shadow
+        boxShadow: colors.shadow,
+        color: colors.textColor || '#000'
       };
 
       if (status === 'correct') {
+        const intensity = colors.intensity || 1;
         return {
           ...baseProps,
-          scale: [1, 1.3, 1.1, 1.2, 1.1],
-          rotate: [0, 5, -3, 2, 0],
-          y: [waveY, waveY - 8, waveY - 4, waveY - 6, waveY - 2]
+          scale: [1, 1.2 + (intensity * 0.1), 1.1 + (intensity * 0.05)],
+          rotate: [0, 3 * intensity, 0],
+          y: [waveY, waveY - (4 * intensity), waveY - (2 * intensity)],
+          boxShadow: [
+            colors.shadow,
+            `${colors.shadow}, 0 0 ${30 * intensity}px ${colors.glow}`,
+            colors.shadow
+          ]
         };
       }
 
@@ -152,22 +180,25 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
           cursor: 'pointer',
           position: 'relative',
           userSelect: 'none',
-          color: status === 'pending' ? '#666' : 
-                 status === 'incorrect' ? '#fff' : 
-                 status === 'current' ? '#000' : '#000'
+          color: colors.textColor || (status === 'pending' ? '#666' : '#000')
         }}
       >
         {char === ' ' ? '' : char === '\n' ? '↵' : char}
         
-        {/* Blinking gradient effect for current character */}
+        {/* Enhanced blinking gradient effect for current character */}
         {isActive && (
           <motion.div
             animate={{
-              opacity: [0.3, 0.8, 0.3],
-              scale: [1, 1.1, 1]
+              opacity: [0.2, 0.8, 0.2],
+              scale: [1, 1.15, 1],
+              boxShadow: [
+                `0 0 10px ${colors.glow}`,
+                `0 0 30px ${colors.glow}, 0 0 15px ${colors.border}`,
+                `0 0 10px ${colors.glow}`
+              ]
             }}
             transition={{
-              duration: 0.8,
+              duration: 0.6,
               repeat: Infinity,
               ease: "easeInOut"
             }}
@@ -177,7 +208,7 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
               left: '-4px',
               right: '-4px',
               bottom: '-4px',
-              background: 'linear-gradient(45deg, #ffeb3b, #fff176, #ffeb3b)',
+              background: colors.bg,
               borderRadius: '8px',
               zIndex: -1,
               filter: 'blur(2px)'
@@ -185,25 +216,27 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
           />
         )}
         
-        {/* Combo celebration effect */}
-        {status === 'correct' && comboLevel > 1 && (
+        {/* Enhanced combo celebration effect */}
+        {status === 'correct' && currentCombo > 1 && (
           <motion.div
             initial={{ scale: 0, opacity: 1 }}
             animate={{
-              scale: [0, 1.5, 0],
+              scale: [0, 1.5 + (currentCombo * 0.05), 0],
               opacity: [1, 0.8, 0],
-              rotate: [0, 180, 360]
+              rotate: [0, 180 + (currentCombo * 10), 360 + (currentCombo * 10)]
             }}
-            transition={{ duration: 0.8 }}
+            transition={{ 
+              duration: 0.8 + (currentCombo * 0.02)
+            }}
             style={{
               position: 'absolute',
               top: '-10px',
               right: '-10px',
-              width: '16px',
-              height: '16px',
+              width: `${12 + (currentCombo * 0.5)}px`,
+              height: `${12 + (currentCombo * 0.5)}px`,
               background: colors.glow,
               borderRadius: '50%',
-              boxShadow: `0 0 15px ${colors.glow}`
+              boxShadow: `0 0 ${15 + (currentCombo * 2)}px ${colors.glow}`
             }}
           />
         )}
@@ -238,25 +271,50 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
 
         {/* Wave ripple effect for correct typing */}
         {status === 'correct' && (
+          <>
           <motion.div
             initial={{ scale: 0, opacity: 0.8 }}
             animate={{
-              scale: [0, 2, 3],
+              scale: [0, 2 + (currentCombo * 0.1), 3 + (currentCombo * 0.15)],
               opacity: [0.8, 0.4, 0]
             }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1 + (currentCombo * 0.05) }}
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '40px',
-              height: '40px',
+              width: `${40 + (currentCombo * 2)}px`,
+              height: `${40 + (currentCombo * 2)}px`,
               border: `2px solid ${colors.glow}`,
               borderRadius: '50%',
               pointerEvents: 'none'
             }}
           />
+          
+          {/* Additional ripple for high combos */}
+          {currentCombo >= 10 && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0.6 }}
+              animate={{
+                scale: [0, 1.5, 2.5],
+                opacity: [0.6, 0.3, 0]
+              }}
+              transition={{ duration: 1.2, delay: 0.2 }}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: `${60 + (currentCombo * 3)}px`,
+                height: `${60 + (currentCombo * 3)}px`,
+                border: `3px solid ${colors.glow}`,
+                borderRadius: '50%',
+                pointerEvents: 'none'
+              }}
+            />
+          )}
+          </>
         )}
       </motion.div>
     );

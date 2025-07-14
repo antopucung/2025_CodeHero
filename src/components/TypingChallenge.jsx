@@ -329,7 +329,6 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           text={challenge.code}
           currentIndex={currentIndex}
           getCharacterStatus={getCharacterStatus}
-          combo={comboLevel}
           combo={combo}
           onCharacterClick={(index) => {
             console.log('Clicked character at index:', index);

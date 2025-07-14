@@ -11,10 +11,10 @@ import {
   JuicyFloatingScore, 
   JuicyCharacterExplosion, 
   JuicyComboBurst, 
-  BackgroundWaveEffect,
   ScreenFlashEffect,
   PatternCelebration
 } from '../effects/RewardSystem';
+import { BackgroundWaveEffect } from '../effects/BackgroundEffects';
 import { AnticipationCursor } from '../effects/CursorEffects';
 import { MegaLevelUpCelebration, MegaAchievementUnlock } from '../effects/CelebrationSystem';
 import { colors, colorPsychology } from '../../design/tokens/colors';

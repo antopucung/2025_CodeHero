@@ -342,6 +342,258 @@ export const CreatorCard = ({
   );
 };
 
+// Enhanced Project Card for Showcase
+export const EnhancedProjectCard = ({ 
+  project, 
+  onViewDetails, 
+  onDonate, 
+  onCollaborate 
+}) => {
+  const getDifficultyColor = (difficulty) => {
+    const colors = {
+      beginner: designSystem.colors.status.success,
+      intermediate: designSystem.colors.status.warning,
+      advanced: designSystem.colors.status.error
+    };
+    return colors[difficulty] || designSystem.colors.status.info;
+  };
+
+  const getLanguageIcon = (language) => {
+    const icons = {
+      javascript: '🟨',
+      typescript: '🔷',
+      python: '🐍',
+      java: '☕',
+      csharp: '🔵',
+      php: '🐘'
+    };
+    return icons[language] || '💻';
+  };
+
+  // Enhanced project data with funding/collaboration info
+  const fundingGoal = project.fundingGoal || 1000;
+  const currentFunding = project.donations || 0;
+  const fundingProgress = (currentFunding / fundingGoal) * 100;
+  const collaborationSlots = project.collaborationSlots || 2;
+  const filledSlots = project.currentCollaborators || 0;
+
+  return (
+    <Card
+      variant="elevated"
+      display="flex"
+      flexDirection="column"
+      h="100%"
+      overflow="hidden"
+      cursor="pointer"
+      onClick={onViewDetails}
+    >
+      {/* Project Thumbnail */}
+      <Box 
+        position="relative" 
+        h="200px" 
+        overflow="hidden"
+        backgroundImage={project.thumbnail_url}
+        backgroundSize="cover"
+        backgroundPosition="center"
+      >
+        {/* Project Type Badges */}
+        <Box
+          position="absolute"
+          top={designSystem.spacing[2]}
+          left={designSystem.spacing[2]}
+          display="flex"
+          flexDirection="column"
+          gap={designSystem.spacing[1]}
+        >
+          {project.acceptsDonations && (
+            <Badge 
+              bg="rgba(255, 215, 0, 0.9)" 
+              color="#000" 
+              fontWeight="bold"
+            >
+              💰 DONATIONS OPEN
+            </Badge>
+          )}
+          {project.seekingCollaborators && (
+            <Badge 
+              bg="rgba(76, 205, 196, 0.9)" 
+              color="#000" 
+              fontWeight="bold"
+            >
+              🤝 SEEKING COLLABORATORS
+            </Badge>
+          )}
+        </Box>
+        
+        {/* Language & Difficulty */}
+        <Box
+          position="absolute"
+          top={designSystem.spacing[2]}
+          right={designSystem.spacing[2]}
+          display="flex"
+          flexDirection="column"
+          gap={designSystem.spacing[1]}
+        >
+          <Badge bg={getDifficultyColor(project.difficulty)} color={designSystem.colors.text.inverse}>
+            {project.difficulty?.toUpperCase()}
+          </Badge>
+          <Badge bg={designSystem.colors.backgrounds.overlay} color={designSystem.colors.text.primary}>
+            {getLanguageIcon(project.language)} {project.language?.toUpperCase()}
+          </Badge>
+        </Box>
+        
+        {/* Funding Progress Overlay */}
+        {project.acceptsDonations && (
+          <Box
+            position="absolute"
+            bottom="0"
+            left="0"
+            right="0"
+            bg="rgba(0,0,0,0.8)"
+            p={designSystem.spacing[2]}
+          >
+            <VStack spacing={designSystem.spacing[1]} align="stretch">
+              <HStack justify="space-between">
+                <Text size="xs" color="#FFD700" fontWeight="bold">
+                  ${currentFunding.toLocaleString()}
+                </Text>
+                <Text size="xs" color="white">
+                  of ${fundingGoal.toLocaleString()}
+                </Text>
+              </HStack>
+              <Box bg="rgba(255,255,255,0.2)" h="4px" borderRadius="2px">
+                <Box 
+                  bg="#FFD700" 
+                  h="100%" 
+                  w={`${Math.min(fundingProgress, 100)}%`} 
+                  borderRadius="2px"
+                  transition="width 0.3s"
+                />
+              </Box>
+            </VStack>
+          </Box>
+        )}
+        
+        {/* Collaboration Slots */}
+        {project.seekingCollaborators && (
+          <Box
+            position="absolute"
+            bottom="0"
+            left="0"
+            right="0"
+            bg="rgba(0,0,0,0.8)"
+            p={designSystem.spacing[2]}
+          >
+            <HStack justify="space-between">
+              <Text size="xs" color="#4ECDC4" fontWeight="bold">
+                {collaborationSlots - filledSlots} slots open
+              </Text>
+              <Text size="xs" color="white">
+                {filledSlots}/{collaborationSlots} filled
+              </Text>
+            </HStack>
+          </Box>
+        )}
+      </Box>
+
+      {/* Project Content */}
+      <Box 
+        display="flex" 
+        flexDirection="column" 
+        flex={1}
+        gap={designSystem.spacing[3]}
+        p={designSystem.spacing[4]}
+      >
+        <VStack align="start" spacing={designSystem.spacing[2]}>
+          <Text
+            fontSize={designSystem.typography.sizes.lg}
+            fontWeight={designSystem.typography.weights.bold}
+            color={designSystem.colors.brand.primary}
+            noOfLines={2}
+          >
+            {project.title}
+          </Text>
+          
+          <HStack spacing={designSystem.spacing[2]}>
+            <Text size="sm" color="secondary">
+              by {project.creator}
+            </Text>
+            <Badge bg={designSystem.colors.status.success} color="white">
+              ⭐ Verified
+            </Badge>
+          </HStack>
+        </VStack>
+
+        <Text
+          fontSize={designSystem.typography.sizes.sm}
+          color={designSystem.colors.text.secondary}
+          noOfLines={3}
+          flex={1}
+        >
+          {project.description}
+        </Text>
+
+        {/* Tags */}
+        <HStack spacing={designSystem.spacing[1]} flexWrap="wrap">
+          {project.tags?.slice(0, 3).map((tag, i) => (
+            <Badge 
+              key={i} 
+              bg={designSystem.colors.backgrounds.surface} 
+              color={designSystem.colors.text.secondary}
+              size="sm"
+            >
+              {tag}
+            </Badge>
+          ))}
+        </HStack>
+
+        {/* Action Buttons */}
+        <HStack spacing={designSystem.spacing[2]} mt={designSystem.spacing[2]}>
+          {project.acceptsDonations && (
+            <Button
+              bg="#FFD700"
+              color="#000"
+              size="sm"
+              flex={1}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDonate?.(project);
+              }}
+            >
+              💰 Donate
+            </Button>
+          )}
+          {project.seekingCollaborators && (
+            <Button
+              bg="#4ECDC4"
+              color="#000"
+              size="sm"
+              flex={1}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCollaborate?.(project);
+              }}
+            >
+              🤝 Collaborate
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            size="sm"
+            flex={project.acceptsDonations || project.seekingCollaborators ? 0 : 1}
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewDetails?.(project);
+            }}
+          >
+            👁️ View
+          </Button>
+        </HStack>
+      </Box>
+    </Card>
+  );
+};
+
 // Featured Creators Sidebar
 export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
   return (

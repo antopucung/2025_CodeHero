@@ -306,12 +306,12 @@ const CommunityPage = () => {
           </Box>
 
           <TabPanels>
-            {/* PROJECT SHOWCASE TAB */}
+            {/* ENHANCED PROJECT SHOWCASE TAB */}
             <TabPanel p={0} pt={designSystem.spacing[6]}>
               <SectionLayout spacing="loose">
                 <Box display="flex" justifyContent="space-between" alignItems="center" w="100%">
                   <Text size="xl" color="brand" fontWeight={designSystem.typography.weights.bold}>
-                    Featured Community Projects
+                    Community Project Showcase
                   </Text>
                   <Button
                     bg={designSystem.colors.brand.primary}
@@ -334,11 +334,11 @@ const CommunityPage = () => {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.6, delay: index * 0.1 }}
                     >
-                      <CourseCard
-                        course={project}
-                        onView={() => handleProjectView(project)}
-                        onEnroll={() => handleProjectDonate(project)}
-                        isEnrolled={false}
+                      <EnhancedProjectCard
+                        project={project}
+                        onViewDetails={() => navigate(`/project/${project.id}`)}
+                        onDonate={() => handleProjectDonate(project)}
+                        onCollaborate={() => handleProjectCollaborate(project)}
                       />
                     </MotionBox>
                   ))}

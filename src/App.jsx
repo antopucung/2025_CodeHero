@@ -9,6 +9,7 @@ import CommunityPage from './pages/CommunityPage';
 import CommissionDetailPage from './pages/CommissionDetailPage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
 import LessonPage from './pages/LessonPage';
+import ProjectDetailPage from './pages/ProjectDetailPage';
 import ProfilePage from './pages/ProfilePage';
 
 const MotionBox = motion(Box);
@@ -42,6 +43,7 @@ function App() {
             <Route path="/commission/:id" element={<CommissionDetailPage />} />
             <Route path="/modules/:id" element={<ModuleDetailPage />} />
             <Route path="/learn/:courseId/:lessonId" element={<LessonPage />} />
+            <Route path="/project/:id" element={<ProjectDetailPage />} />
             <Route path="/submit-project" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Project Submission - Coming Soon!</div>} />
             <Route path="/post-commission" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Post Commission - Coming Soon!</div>} />
             <Route path="/creator-profile" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Creator Profile - Coming Soon!</div>} />

@@ -99,7 +99,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         Date.now() - exp.id > 1000
       ));
     }, 1000);
-  });
+  }, currentLevel);
 
   // Handle bonus effects
   useEffect(() => {

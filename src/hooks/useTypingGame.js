@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import confetti from 'canvas-confetti';
 
-export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyped = null) => {
+export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyped = null, currentLevel = 1) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [typedText, setTypedText] = useState('');
   const [errors, setErrors] = useState(0);
@@ -189,7 +189,7 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
         y: 0
       }]);
     }
-  }, [characterUpgrades]);
+  }, [characterUpgrades, currentLevel]);
 
   // Achievement system
   const checkAchievements = useCallback((stats) => {

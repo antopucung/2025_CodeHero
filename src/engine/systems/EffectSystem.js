@@ -1,7 +1,7 @@
 // Effect System - Manages all visual effects
-import { EventEmitter } from 'events';
+import { CustomEventEmitter } from '../core/TypingEngine.js';
 
-export class EffectSystem extends EventEmitter {
+export class EffectSystem extends CustomEventEmitter {
   constructor() {
     super();
     

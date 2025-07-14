@@ -1,7 +1,7 @@
 // Typing Gamification Engine - Core Engine
 
 // Browser-compatible EventEmitter implementation
-class CustomEventEmitter {
+export class CustomEventEmitter {
   constructor() {
     this.events = {};
   }

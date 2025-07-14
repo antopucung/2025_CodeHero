@@ -636,6 +636,7 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
       variant="default" 
       bg={designSystem.colors.backgrounds.elevated}
       borderColor={designSystem.colors.borders.default}
+      p={designSystem.spacing[6]}
     >
       <Text size="md" color="brand" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[3]}>
         🌟 Featured Creators
@@ -678,9 +679,16 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
                 <Text size="xs" color="muted">
                   ⭐ {creator.rating} • {creator.completedProjects} projects
                 </Text>
+                <Box 
+                  bg={designSystem.colors.backgrounds.surface} 
+                  borderRadius={designSystem.radii.sm}
+                  px={designSystem.spacing[2]}
+                  py={designSystem.spacing[1]}
+                >
                 <Text size="xs" color="secondary">
                   {creator.hourlyRate}/hr
                 </Text>
+                </Box>
                 <HStack spacing={designSystem.spacing[1]} flexWrap="wrap">
                   {creator.specialties.slice(0, 2).map((skill, i) => (
                     <Badge 
@@ -708,15 +716,18 @@ export const TipsCard = ({ title, tips, icon }) => {
       variant="default"
       bg={designSystem.colors.backgrounds.elevated}
       borderColor={designSystem.colors.borders.default}
+      p={designSystem.spacing[6]}
     >
       <Text size="md" color="accent" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[3]}>
         {icon} {title}
       </Text>
       <VStack spacing={designSystem.spacing[2]} align="start">
         {tips.map((tip, index) => (
+          <Box key={index} px={designSystem.spacing[2]}>
           <Text key={index} size="xs" color="secondary">
             {tip}
           </Text>
+          </Box>
         ))}
       </VStack>
     </Card>

@@ -1252,6 +1252,66 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
   );
 };
 
+// Pattern Match Celebration
+export const PatternCelebration = ({ patterns, onComplete }) => {
+  if (!patterns || patterns.length === 0) return null;
+
+  return (
+    <AnimatePresence>
+      {patterns.map((pattern, index) => (
+        <motion.div
+          key={pattern.id}
+          initial={{ scale: 0, opacity: 0, y: 50 }}
+          animate={{ 
+            scale: [1, 1.5, 1.2],
+            opacity: [1, 1, 0],
+            y: [0, -100, -150]
+          }}
+          exit={{ opacity: 0 }}
+          transition={{ 
+            duration: 3,
+            delay: index * 0.2
+          }}
+          onAnimationComplete={() => index === patterns.length - 1 && onComplete && onComplete()}
+          style={{
+            position: 'fixed',
+            top: '40%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1001,
+            background: `linear-gradient(45deg, ${pattern.color}, ${pattern.color}cc)`,
+            padding: '20px 30px',
+            borderRadius: '15px',
+            color: '#fff',
+            fontFamily: "'Courier New', monospace",
+            fontWeight: 'bold',
+            fontSize: '18px',
+            textAlign: 'center',
+            border: `3px solid ${pattern.color}`,
+            boxShadow: `0 0 30px ${pattern.color}`
+          }}
+        >
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{
+              duration: 0.8,
+              repeat: Infinity
+            }}
+          >
+            🎯 {pattern.type.replace('_', ' ').toUpperCase()}!
+            <div style={{ fontSize: '14px', marginTop: '5px' }}>
+              +{pattern.bonus} BONUS POINTS!
+            </div>
+          </motion.div>
+        </motion.div>
+      ))}
+    </AnimatePresence>
+  );
+};
+
 // Enhanced combo multiplier with anticipation effects
 export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, typingSpeed = 'lame' }) => {
   if (!isActive || multiplier <= 1) return null;

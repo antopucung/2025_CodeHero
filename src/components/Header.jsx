@@ -11,9 +11,8 @@ const Header = () => {
 
   const navigationItems = [
     { path: '/', label: 'HOME', icon: '🏠' },
-    { path: '/editor', label: 'EDITOR', icon: '⌨️' },
-    { path: '/typing', label: 'TYPING', icon: '🎯' },
-    { path: '/hybrid', label: 'HYBRID', icon: '🚀' }
+    { path: '/marketplace', label: 'MARKETPLACE', icon: '🛒' },
+    { path: '/community', label: 'COMMUNITY', icon: '🎨' }
   ];
 
   return (

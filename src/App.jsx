@@ -4,9 +4,8 @@ import { Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
-import CodeEditorPage from './pages/CodeEditorPage';
-import TypingChallengePage from './pages/TypingChallengePage';
-import HybridModePage from './pages/HybridModePage';
+import MarketplacePage from './pages/MarketplacePage';
+import CommunityPage from './pages/CommunityPage';
 
 const MotionBox = motion(Box);
 
@@ -43,9 +42,9 @@ function App() {
         >
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/editor" element={<CodeEditorPage />} />
-            <Route path="/typing" element={<TypingChallengePage />} />
-            <Route path="/hybrid" element={<HybridModePage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/modules/:id" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Module Detail Page - Coming Soon!</div>} />
           </Routes>
         </MotionBox>
       </Box>

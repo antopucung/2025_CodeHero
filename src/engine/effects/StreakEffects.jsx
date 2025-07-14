@@ -176,16 +176,14 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
     <motion.div
       style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        zIndex: 9997, // Lower z-index
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.8)', // Less opaque
-        backdropFilter: 'blur(2px)',
+        top: '60px',
+        right: '10px',
+        zIndex: 150,
+        maxWidth: '250px',
+        background: 'linear-gradient(135deg, #000, #111)',
+        border: '2px solid #ffd93d',
+        borderRadius: '8px',
+        padding: '12px',
         cursor: 'pointer'
       }}
       onClick={() => onComplete && onComplete()} // Click to dismiss
@@ -194,10 +192,10 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ 
-            scale: [0, 0.5, 1.2, 1],
+            scale: [0, 1],
             opacity: [0, 0.5, 1, 1]
           }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.5 }}
           style={{
             textAlign: 'center',
             color: '#ffd93d'
@@ -211,21 +209,19 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
                 '0 0 20px #ffd93d'
               ]
             }}
-            transition={{ duration: 0.8, repeat: Infinity }}
+            transition={{ duration: 1.5, repeat: Infinity }}
             style={{
-              fontSize: '48px',
+              fontSize: '16px',
               fontWeight: 'bold',
-              marginBottom: '20px'
+              marginBottom: '8px'
             }}
           >
-            LEVEL UP INCOMING...
+            LEVEL UP!
           </motion.div>
           
           <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
             style={{
-              fontSize: '80px',
+              fontSize: '20px',
               color: '#4ecdc4'
             }}
           >
@@ -238,42 +234,39 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ 
-            scale: [0, 2, 1.5],
-            rotate: [0, 180, 360]
+            scale: [0, 1.2, 1]
           }}
-          transition={{ duration: 1.5 }}
+          transition={{ duration: 0.8 }}
           style={{
             textAlign: 'center'
           }}
         >
           <motion.div
             animate={{
-              scale: [1, 1.3, 1],
               textShadow: [
                 '0 0 30px #ff6b6b',
                 '0 0 60px #ff6b6b',
                 '0 0 30px #ff6b6b'
               ]
             }}
-            transition={{ duration: 1, repeat: Infinity }}
+            transition={{ duration: 1.5, repeat: Infinity }}
             style={{
-              fontSize: '72px',
+              fontSize: '18px',
               fontWeight: 'bold',
               color: '#ff6b6b',
-              marginBottom: '20px'
+              marginBottom: '8px'
             }}
           >
-            💥 LEVEL UP! 💥
+            LEVEL UP!
           </motion.div>
           
           <motion.div
             animate={{
-              scale: [1, 1.5, 1],
               color: ['#ffd93d', '#ff6b6b', '#4ecdc4', '#ffd93d']
             }}
             transition={{ duration: 2, repeat: Infinity }}
             style={{
-              fontSize: '120px',
+              fontSize: '28px',
               fontWeight: 'bold'
             }}
           >
@@ -293,33 +286,30 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
         >
           <motion.div
             animate={{
-              scale: [1, 1.1, 1],
               textShadow: [
                 '0 0 25px #4ecdc4',
                 '0 0 50px #4ecdc4',
                 '0 0 25px #4ecdc4'
               ]
             }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            transition={{ duration: 2, repeat: Infinity }}
             style={{
-              fontSize: '36px',
+              fontSize: '14px',
               fontWeight: 'bold',
-              marginBottom: '20px'
+              marginBottom: '6px'
             }}
           >
-            🚀 INCREDIBLE PROGRESS! 🚀
+            🚀 PROGRESS! 🚀
           </motion.div>
           
           <ChakraText fontSize="18px" color="#ffd93d">
-            Your typing skills have evolved to Level {newLevel}!
+            Level {newLevel}!
           </ChakraText>
           
           <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
             style={{
-              fontSize: '60px',
-              marginTop: '20px'
+              fontSize: '16px',
+              marginTop: '6px'
             }}
           >
             🎉

@@ -151,37 +151,32 @@ export const PatternCelebration = ({ patterns, onComplete }) => {
           onAnimationComplete={() => index === patterns.length - 1 && onComplete && onComplete()}
           style={{
             position: 'fixed',
-            top: '25%', // Higher position
-            left: '50%',
-            transform: 'translateX(-50%)',
+            top: '120px',
+            right: '10px',
             zIndex: 200, // Lower z-index
             background: `linear-gradient(45deg, ${pattern.color}, ${pattern.color}cc)`,
-            padding: '15px 25px', // Smaller padding
-            borderRadius: '15px',
+            padding: '10px 15px',
+            borderRadius: '8px',
             color: '#fff',
             fontFamily: "'Courier New', monospace",
             fontWeight: 'bold',
-            fontSize: '16px', // Smaller font
+            fontSize: '12px',
             textAlign: 'center',
-            border: `3px solid ${pattern.color}`,
+            border: `2px solid ${pattern.color}`,
             boxShadow: `0 0 30px ${pattern.color}`,
             cursor: 'pointer',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            maxWidth: '200px'
           }}
           onClick={() => onComplete && onComplete()} // Click to dismiss
         >
           <motion.div
-            animate={{
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{
-              duration: 0.8,
-              repeat: Infinity
+            style={{
+              fontSize: '10px'
             }}
           >
             🎯 {pattern.type.replace('_', ' ').toUpperCase()}!
-            <div style={{ fontSize: '14px', marginTop: '5px' }}>
+            <div style={{ fontSize: '10px', marginTop: '3px' }}>
               +{pattern.bonus} BONUS POINTS!
             </div>
           </motion.div>

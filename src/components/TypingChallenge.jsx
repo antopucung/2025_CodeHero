@@ -314,16 +314,16 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             boxShadow: { repeat: Infinity, duration: 1.5 }
           }}
           position="fixed"
-          top="30%" // Moved up to be less intrusive
+          top="10px"
           left="50%"
-          transform="translate(-50%, -50%)"
+          transform="translateX(-50%)"
           zIndex={999} // Lower z-index
           bg={colors.terminal.surface}
           border={`2px solid ${colors.primary[500]}`}
           borderRadius="8px"
-          p={4}
-          maxW="350px" // Smaller
-          w="85%" // Less wide
+          p={3}
+          maxW="300px"
+          w="80%"
           cursor="pointer"
           onClick={() => {
             // Allow clicking to dismiss or continue
@@ -336,19 +336,19 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             }
           }}
         >
-          <VStack spacing={3}>
+          <VStack spacing={2}>
             <Box
               {...createPulseAnimation(1.5)}
               color={colors.primary[500]}
               fontWeight={typography.weights.bold}
-              fontSize="xl"
+              fontSize="md"
               textAlign="center"
             >
               🎉 COMPLETED! 🎉
             </Box>
             
             <Box textAlign="center">
-              <Text color={colors.combo.perfect} fontSize="md">
+              <Text color={colors.combo.perfect} fontSize="sm">
                 Score: {engineState.totalScore}
               </Text>
               <Text color={colors.terminal.textSecondary} fontSize="xs" mt={1}>
@@ -360,7 +360,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               <Box
                 bg={colors.performance.perfect.primary}
                 color="#fff"
-                p={2}
+                p={1}
                 textAlign="center"
                 fontWeight={typography.weights.bold}
                 fontSize="xs"

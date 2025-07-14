@@ -83,7 +83,6 @@ export const DonationModal = ({ isOpen, onClose, project }) => {
                   </Button>
                 ))}
               </Grid>
-              </Box>
               
               <HStack>
                 <Button

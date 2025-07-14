@@ -12,11 +12,11 @@ import {
   JuicyCharacterExplosion, 
   JuicyComboBurst, 
   ScreenFlashEffect,
-  PatternCelebration
 } from '../effects/RewardSystem';
 import { BackgroundWaveEffect } from '../effects/BackgroundEffects';
 import { AnticipationCursor } from '../effects/CursorEffects';
 import { MegaLevelUpCelebration, MegaAchievementUnlock } from '../effects/CelebrationSystem';
+import { PatternCelebration } from '../effects/FloatingEffects';
 import { colors, colorPsychology } from '../../design/tokens/colors';
 
 export const ConceptualTypingDisplay = memo(({

@@ -519,7 +519,7 @@ export const JuicyProgressBar = ({ progress, color = '#00ff00', combo = 1, antic
         }}
         transition={{ 
           width: { duration: 0.5, ease: "easeOut" },
-          boxShadow: { duration: 1 / anticipationLevel, repeat: Infinity }
+          boxShadow: { duration: 1 / Math.max(1, anticipationLevel), repeat: Infinity }
         }}
         style={{
           height: '100%',
@@ -533,7 +533,7 @@ export const JuicyProgressBar = ({ progress, color = '#00ff00', combo = 1, antic
           animate={{ x: [-200, 400] }}
           transition={{ 
             repeat: Infinity, 
-            duration: 3 / anticipationLevel, 
+            duration: 3 / Math.max(1, anticipationLevel), 
             ease: "linear" 
           }}
           style={{
@@ -559,7 +559,7 @@ export const JuicyProgressBar = ({ progress, color = '#00ff00', combo = 1, antic
             opacity: [0.2, 0.6 + (anticipationLevel * 0.2), 0.2]
           }}
           transition={{
-            duration: 1.8 / anticipationLevel,
+            duration: 1.8 / Math.max(1, anticipationLevel),
             repeat: Infinity,
             ease: "easeInOut"
           }}

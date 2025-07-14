@@ -119,7 +119,7 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, getC
     const getTransitionProps = () => {
       if (status === 'current') {
         return {
-          duration: 0.6,
+          duration: 0.6 / Math.max(1, anticipationLevel),
           repeat: Infinity,
           ease: "easeInOut"
         };

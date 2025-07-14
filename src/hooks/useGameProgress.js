@@ -14,6 +14,11 @@ export const useGameProgress = () => {
       achievements: [],
       dailyStreak: 0,
       lastPlayDate: null,
+      optimizations: {
+        performance: { mode: 'auto', fps: 60 },
+        mobile: { isMobile: false, touchSupport: false },
+        effects: { particleCount: 1, animationDuration: 1 }
+      },
       languageProgress: {
         javascript: { level: 1, xp: 0 },
         python: { level: 1, xp: 0 },

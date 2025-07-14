@@ -2,43 +2,61 @@ import { Box, Text, HStack, VStack, Progress } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { JuicyProgressBar } from "./TypingEffects";
 import { PulseAnimation } from "./BlockLetterEffect";
+import { colors } from "../design/tokens/colors";
+import { typography } from "../design/tokens/typography";
+import { spacing } from "../design/tokens/spacing";
 
 const MotionBox = motion(Box);
 
 const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
   const xpForNextLevel = progress.level * 100;
   const xpProgress = (progress.xp / xpForNextLevel) * 100;
+  
+  // Get optimization data if available
+  const optimizations = progress.optimizations || {};
+  const performanceMode = optimizations.performance?.mode || 'auto';
+  const fps = optimizations.performance?.fps || 60;
 
   return (
     <MotionBox 
-      bg="#111" 
-      border="1px solid #333" 
-      p={3} 
-      mb={4}
+      bg={colors.terminal.surface}
+      border={`1px solid ${colors.terminal.border}`}
+      p={spacing[3]}
+      mb={spacing[4]}
       whileHover={{ 
-        borderColor: "#00ff00",
-        boxShadow: "0 0 10px rgba(0, 255, 0, 0.3)"
+        borderColor: colors.primary[500],
+        boxShadow: `0 0 10px ${colors.primary[500]}33`
       }}
       transition={{ duration: 0.3 }}
     >
-      <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
+      <Text fontSize={typography.sizes.xs} color={colors.terminal.textSecondary} mb={spacing[2]} fontFamily={typography.fonts.mono}>
         │ PLAYER STATS
       </Text>
       
-      <VStack spacing={2} align="stretch">
+      <VStack spacing={spacing[2]} align="stretch">
         {/* Level and XP */}
         <HStack justify="space-between" align="center">
-          <PulseAnimation isActive={true} color="#00ff00" intensity={1.5}>
-            <Text fontSize="sm" color="#00ff00" fontFamily="'Courier New', monospace" fontWeight="bold">
+          <PulseAnimation isActive={true} color={colors.primary[500]} intensity={1.5}>
+            <Text fontSize={typography.sizes.sm} color={colors.primary[500]} fontFamily={typography.fonts.mono} fontWeight={typography.weights.bold}>
               LEVEL {progress.level}
             </Text>
           </PulseAnimation>
-          <Text fontSize="xs" color="#666">
+          <Text fontSize={typography.sizes.xs} color={colors.terminal.textSecondary}>
             {progress.xp}/{xpForNextLevel} XP
           </Text>
         </HStack>
         
-        <JuicyProgressBar progress={xpProgress} color="#00ff00" />
+        <JuicyProgressBar progress={xpProgress} color={colors.primary[500]} />
+        
+        {/* Performance indicator */}
+        {performanceMode !== 'auto' && (
+          <HStack justify="space-between" fontSize={typography.sizes.xs}>
+            <Text color={colors.terminal.textSecondary}>PERFORMANCE</Text>
+            <Text color={fps >= 55 ? colors.performance.good.primary : fps >= 45 ? colors.performance.best.primary : colors.performance.error.primary}>
+              {performanceMode.toUpperCase()} ({fps} FPS)
+            </Text>
+          </HStack>
+        )}
 
         {/* Current Session Stats */}
         {currentStats && (

@@ -28,9 +28,20 @@ export class CustomEventEmitter {
   }
 }
 
+import { PerformanceOptimizer } from './PerformanceOptimizer.js';
+import { MobileOptimizer } from './MobileOptimizer.js';
+import { SoundManager } from './SoundManager.js';
+import { AnalyticsTracker } from './AnalyticsTracker.js';
+
 export class TypingEngine extends CustomEventEmitter {
   constructor(config = {}) {
     super();
+    
+    // Initialize optimization systems
+    this.performanceOptimizer = new PerformanceOptimizer();
+    this.mobileOptimizer = new MobileOptimizer();
+    this.soundManager = new SoundManager();
+    this.analyticsTracker = new AnalyticsTracker();
     
     this.config = {
       speedThresholds: {
@@ -47,6 +58,9 @@ export class TypingEngine extends CustomEventEmitter {
         god: 30,
         legendary: 50
       },
+      enableSounds: true,
+      enableAnalytics: true,
+      performanceMode: 'auto',
       ...config
     };
     
@@ -66,6 +80,8 @@ export class TypingEngine extends CustomEventEmitter {
       maxCombo: 1,
       perfectStreak: 0,
       totalScore: 0,
+      level: 1,
+      xp: 0,
       
       // Timing data
       lastCorrectTime: null,
@@ -80,16 +96,43 @@ export class TypingEngine extends CustomEventEmitter {
       // Pattern matching
       patternMatches: [],
       achievements: [],
+      newAchievements: [],
+      newLevel: null,
       
       // Effects
       explosions: [],
       floatingScores: [],
-      bonusEffects: []
+      bonusEffects: [],
+      
+      // Optimization data
+      performanceStats: {},
+      mobileOptimizations: {}
     };
     
     this.targetText = '';
     this.onComplete = null;
     this.onCharacterTyped = null;
+    
+    // Initialize systems
+    this.initializeSystems();
+  }
+  
+  // Initialize optimization systems
+  async initializeSystems() {
+    // Start performance monitoring
+    this.performanceOptimizer.startMonitoring();
+    
+    // Initialize sound system (requires user interaction)
+    if (this.config.enableSounds) {
+      // Will be initialized on first user interaction
+      document.addEventListener('click', () => {
+        this.soundManager.initialize();
+      }, { once: true });
+    }
+    
+    // Update state with optimization data
+    this.state.performanceStats = this.performanceOptimizer.getStats();
+    this.state.mobileOptimizations = this.mobileOptimizer.getOptimizations();
   }
   
   // Initialize engine with target text
@@ -165,6 +208,17 @@ export class TypingEngine extends CustomEventEmitter {
     this.state.typedText = newTypedText;
     this.state.currentIndex++;
     
+    // Track analytics
+    if (this.config.enableAnalytics) {
+      this.analyticsTracker.trackKeystroke(char, true, speed, this.state.combo, this.state.streak);
+    }
+    
+    // Play sound feedback
+    if (this.config.enableSounds && this.soundManager.isInitialized) {
+      this.soundManager.playKeypressSound(speed);
+      this.soundManager.playCorrectSound(this.state.combo);
+    }
+    
     // Update speed tracking
     this.updateAnticipationLevel(speed);
     
@@ -172,6 +226,14 @@ export class TypingEngine extends CustomEventEmitter {
     this.state.streak++;
     this.updateCombo(speed, timeDiff);
     this.state.lastCorrectTime = now;
+    
+    // Check for perfect streak milestones
+    if (speed === 'perfect') {
+      this.state.perfectStreak++;
+      if (this.state.perfectStreak >= 10 && this.config.enableSounds) {
+        this.soundManager.playPerfectStreakSound(this.state.perfectStreak);
+      }
+    }
     
     // Track character performance
     const charData = {
@@ -189,16 +251,43 @@ export class TypingEngine extends CustomEventEmitter {
     const patterns = this.checkPatterns(newTypedText, this.state.combo);
     this.state.patternMatches = [...this.state.patternMatches, ...patterns];
     
+    // Play pattern match sounds
+    if (patterns.length > 0 && this.config.enableSounds && this.soundManager.isInitialized) {
+      patterns.forEach(pattern => {
+        this.soundManager.playPatternMatchSound(pattern.bonus);
+      });
+    }
+    
+    // Track patterns in analytics
+    if (this.config.enableAnalytics) {
+      patterns.forEach(pattern => {
+        this.analyticsTracker.trackPatternMatch(pattern);
+      });
+    }
+    
     // Calculate and add score
     const score = this.calculateScore(speed, this.state.combo, this.state.streak, patterns);
     this.state.totalScore += score;
     
+    // Update XP and check for level up
+    this.updateXP(score);
+    
     // Add visual effects
-    this.addFloatingScore(score, speed, this.state.combo, patterns.length);
-    this.addCharacterExplosion(char, true, speed, this.state.combo, patterns.length);
+    if (this.performanceOptimizer.shouldCreateEffect('floatingScore')) {
+      this.addFloatingScore(score, speed, this.state.combo, patterns.length);
+    }
+    
+    if (this.performanceOptimizer.shouldCreateEffect('explosion')) {
+      this.addCharacterExplosion(char, true, speed, this.state.combo, patterns.length);
+    }
     
     // Update character upgrade
     this.upgradeCharacter(this.state.currentIndex - 1, speed, this.state.combo);
+    
+    // Check for combo milestones
+    if (this.state.combo > 0 && this.state.combo % 10 === 0 && this.config.enableSounds) {
+      this.soundManager.playComboSound(this.state.combo);
+    }
     
     // Emit character typed event
     if (this.onCharacterTyped) {
@@ -222,6 +311,16 @@ export class TypingEngine extends CustomEventEmitter {
   
   // Process incorrect character
   processIncorrectChar(char) {
+    // Track analytics
+    if (this.config.enableAnalytics) {
+      this.analyticsTracker.trackKeystroke(char, false, 'error', this.state.combo, this.state.streak);
+    }
+    
+    // Play error sound
+    if (this.config.enableSounds && this.soundManager.isInitialized) {
+      this.soundManager.playErrorSound();
+    }
+    
     this.state.errors++;
     this.state.streak = 0;
     this.state.combo = 1;
@@ -229,8 +328,13 @@ export class TypingEngine extends CustomEventEmitter {
     this.state.typingSpeed = 'lame';
     
     // Add error effects
-    this.addCharacterExplosion(char, false, 'error', 0, 0);
-    this.addBonusEffect('error_shake', 1);
+    if (this.performanceOptimizer.shouldCreateEffect('explosion')) {
+      this.addCharacterExplosion(char, false, 'error', 0, 0);
+    }
+    
+    if (this.performanceOptimizer.shouldCreateEffect('bonusEffect')) {
+      this.addBonusEffect('error_shake', 1);
+    }
     
     // Emit character typed event
     if (this.onCharacterTyped) {
@@ -243,6 +347,33 @@ export class TypingEngine extends CustomEventEmitter {
         score: 0,
         totalScore: this.state.totalScore
       });
+    }
+  }
+  
+  // Update XP and handle level ups
+  updateXP(score) {
+    const xpGained = Math.floor(score / 10); // 10 points = 1 XP
+    this.state.xp += xpGained;
+    
+    // Check for level up
+    const xpForNextLevel = this.state.level * 100;
+    if (this.state.xp >= xpForNextLevel) {
+      const oldLevel = this.state.level;
+      this.state.level++;
+      this.state.xp -= xpForNextLevel;
+      this.state.newLevel = this.state.level;
+      
+      // Play level up sound
+      if (this.config.enableSounds && this.soundManager.isInitialized) {
+        this.soundManager.playLevelUpSound(this.state.level);
+      }
+      
+      // Track level up
+      if (this.config.enableAnalytics) {
+        this.analyticsTracker.trackAchievement(`level_${this.state.level}`);
+      }
+      
+      this.emit('levelUp', { oldLevel, newLevel: this.state.level });
     }
   }
   
@@ -260,10 +391,26 @@ export class TypingEngine extends CustomEventEmitter {
       maxCombo: this.state.maxCombo,
       totalScore: this.state.totalScore,
       perfectStreak: this.state.perfectStreak,
-      achievements: this.state.achievements.length
+      achievements: this.state.achievements.length,
+      level: this.state.level,
+      xp: this.state.xp
     };
     
     this.checkAchievements(finalStats);
+    
+    // Track completion in analytics
+    if (this.config.enableAnalytics) {
+      this.analyticsTracker.trackChallengeComplete(finalStats, {
+        language: 'javascript', // TODO: Get from challenge
+        difficulty: 'intermediate', // TODO: Get from challenge
+        title: 'Challenge' // TODO: Get from challenge
+      });
+    }
+    
+    // Play completion sound
+    if (this.config.enableSounds && this.soundManager.isInitialized) {
+      this.soundManager.playChallengeComplete(this.state.totalScore);
+    }
     
     if (this.onComplete) {
       this.onComplete(finalStats);
@@ -476,7 +623,28 @@ export class TypingEngine extends CustomEventEmitter {
       newAchievements.push('perfectionist');
     }
     
+    if (stats.wpm >= 60 && !this.state.achievements.includes('speed_racer')) {
+      newAchievements.push('speed_racer');
+    }
+    
+    if (stats.totalScore >= 5000 && !this.state.achievements.includes('high_scorer')) {
+      newAchievements.push('high_scorer');
+    }
+    
+    // Add new achievements to state
     this.state.achievements = [...this.state.achievements, ...newAchievements];
+    this.state.newAchievements = newAchievements;
+    
+    // Play achievement sounds and track analytics
+    newAchievements.forEach(achievement => {
+      if (this.config.enableSounds && this.soundManager.isInitialized) {
+        this.soundManager.playAchievementSound('legendary');
+      }
+      
+      if (this.config.enableAnalytics) {
+        this.analyticsTracker.trackAchievement(achievement);
+      }
+    });
   }
   
   updateStats() {
@@ -491,6 +659,10 @@ export class TypingEngine extends CustomEventEmitter {
   
   // Effect management
   addFloatingScore(score, speed, combo, patterns) {
+    if (!this.performanceOptimizer.addEffect({ type: 'floatingScore' })) {
+      return; // Skip if performance is poor
+    }
+    
     const effect = {
       id: Date.now() + Math.random(),
       score,
@@ -512,6 +684,10 @@ export class TypingEngine extends CustomEventEmitter {
   }
   
   addCharacterExplosion(char, isCorrect, speed, combo, patterns) {
+    if (!this.performanceOptimizer.addEffect({ type: 'explosion' })) {
+      return; // Skip if performance is poor
+    }
+    
     const effect = {
       id: Date.now() + Math.random(),
       char,
@@ -545,6 +721,10 @@ export class TypingEngine extends CustomEventEmitter {
   }
   
   addBonusEffect(type, intensity, data = null) {
+    if (!this.performanceOptimizer.addEffect({ type: 'bonusEffect' })) {
+      return; // Skip if performance is poor
+    }
+    
     const effect = {
       id: Date.now() + Math.random(),
       type,
@@ -554,6 +734,34 @@ export class TypingEngine extends CustomEventEmitter {
     };
     
     this.state.bonusEffects = [...this.state.bonusEffects, effect];
+  }
+  
+  // Get optimization settings
+  getOptimizationSettings() {
+    return {
+      performance: this.performanceOptimizer.getStats(),
+      mobile: this.mobileOptimizer.getOptimizations(),
+      effects: this.mobileOptimizer.getEffectSettings()
+    };
+  }
+  
+  // Get analytics data
+  getAnalyticsData() {
+    if (!this.config.enableAnalytics) return null;
+    
+    return {
+      session: this.analyticsTracker.getSessionStats(),
+      progress: this.analyticsTracker.getProgressStats(),
+      heatmap: this.analyticsTracker.getHeatmapData(),
+      insights: this.analyticsTracker.getInsights()
+    };
+  }
+  
+  // Get sound hooks for UI components
+  getSoundHooks() {
+    if (!this.config.enableSounds) return {};
+    
+    return this.soundManager.getSoundHooks();
   }
   
   getPerformanceColor(speed) {
@@ -572,6 +780,9 @@ export class TypingEngine extends CustomEventEmitter {
   cleanupEffects() {
     const now = Date.now();
     
+    // Use performance optimizer for cleanup
+    this.performanceOptimizer.optimizeActiveEffects();
+    
     this.state.floatingScores = this.state.floatingScores.filter(
       effect => now - effect.id < 2000
     );
@@ -587,6 +798,9 @@ export class TypingEngine extends CustomEventEmitter {
     this.state.bonusEffects = this.state.bonusEffects.filter(
       effect => now - effect.id < 1000
     );
+    
+    // Update performance stats
+    this.state.performanceStats = this.performanceOptimizer.getStats();
   }
   
   // Getters
@@ -610,5 +824,16 @@ export class TypingEngine extends CustomEventEmitter {
   
   getProgress() {
     return (this.state.currentIndex / this.targetText.length) * 100;
+  }
+  
+  // Cleanup and destroy
+  destroy() {
+    // Cleanup systems
+    this.performanceOptimizer.destroy();
+    this.soundManager.destroy();
+    this.analyticsTracker.destroy();
+    
+    // Clear state
+    this.removeAllListeners();
   }
 }

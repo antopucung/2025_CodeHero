@@ -123,8 +123,9 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   useEffect(() => {
     return () => {
       effectSystem.destroy();
+      engine.destroy();
     };
-  }, [effectSystem]);
+  }, [effectSystem, engine]);
 
   const startChallenge = () => {
     setIsStarted(true);

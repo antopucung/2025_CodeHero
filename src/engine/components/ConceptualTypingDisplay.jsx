@@ -11,9 +11,8 @@ import {
   JuicyFloatingScore, 
   JuicyCharacterExplosion, 
   JuicyComboBurst, 
-  ScreenFlashEffect,
 } from '../effects/RewardSystem';
-import { BackgroundWaveEffect } from '../effects/BackgroundEffects';
+import { BackgroundWaveEffect, ScreenFlashEffect } from '../effects/BackgroundEffects';
 import { AnticipationCursor } from '../effects/CursorEffects';
 import { MegaLevelUpCelebration, MegaAchievementUnlock } from '../effects/CelebrationSystem';
 import { PatternCelebration } from '../effects/FloatingEffects';

@@ -1,75 +1,50 @@
 // Reward System - Manages all juicy effects and addictive feedback
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import confetti from 'canvas-confetti';
 
-// Enhanced floating score with maximum juice
+// Juicy floating score with proper performance
 export const JuicyFloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed = 'lame', patterns = 0, onComplete }) => {
   const getScoreSize = (combo, patterns) => {
-    const baseSize = 18;
-    const comboBonus = Math.min(combo / 8, 12);
-    const patternBonus = patterns * 3;
+    const baseSize = 14;
+    const comboBonus = Math.min(combo / 10, 8);
+    const patternBonus = patterns * 2;
     return `${baseSize + comboBonus + patternBonus}px`;
   };
 
   const getJuicyEffect = (combo, speed, patterns) => {
-    const speedMultiplier = { perfect: 2.5, best: 2, good: 1.5, lame: 1 }[speed];
-    const patternMultiplier = 1 + (patterns * 0.5);
+    const speedMultiplier = { perfect: 1.8, best: 1.5, good: 1.2, lame: 1 }[speed];
+    const patternMultiplier = 1 + (patterns * 0.3);
     
-    if (combo >= 50) return {
-      scale: [0.3, 3.5 * speedMultiplier * patternMultiplier, 2.2],
-      rotate: [0, 720 + (patterns * 180), 360],
+    if (combo >= 30) return {
+      scale: [0.5, 2.2 * speedMultiplier * patternMultiplier, 1.5],
       textShadow: [
         `0 0 15px ${color}`,
-        `0 0 60px ${color}, 0 0 30px #ffff00`,
-        `0 0 40px ${color}`
-      ],
-      filter: [
-        'brightness(1)',
-        'brightness(2) saturate(2)',
-        'brightness(1.5)'
+        `0 0 35px ${color}`,
+        `0 0 20px ${color}`
       ]
     };
-    if (combo >= 30) return {
-      scale: [0.3, 2.8 * speedMultiplier * patternMultiplier, 1.8],
-      rotate: [0, 540 + (patterns * 120), 270],
+    if (combo >= 15) return {
+      scale: [0.5, 1.8 * speedMultiplier * patternMultiplier, 1.3],
       textShadow: [
         `0 0 12px ${color}`,
-        `0 0 50px ${color}, 0 0 25px #ffd93d`,
-        `0 0 30px ${color}`
-      ],
-      filter: [
-        'brightness(1)',
-        'brightness(1.8) saturate(1.8)',
-        'brightness(1.3)'
+        `0 0 25px ${color}`,
+        `0 0 15px ${color}`
       ]
     };
-    if (combo >= 10) return {
-      scale: [0.3, 2.2 * speedMultiplier * patternMultiplier, 1.5],
-      rotate: [0, 360 + (patterns * 90), 180],
+    if (combo >= 5) return {
+      scale: [0.5, 1.5 * speedMultiplier * patternMultiplier, 1.2],
       textShadow: [
         `0 0 10px ${color}`,
-        `0 0 40px ${color}, 0 0 20px #4ecdc4`,
-        `0 0 25px ${color}`
-      ],
-      filter: [
-        'brightness(1)',
-        'brightness(1.6) saturate(1.6)',
-        'brightness(1.2)'
+        `0 0 20px ${color}`,
+        `0 0 12px ${color}`
       ]
     };
     return {
-      scale: [0.3, 1.8 * speedMultiplier * patternMultiplier, 1.2],
-      rotate: [0, 180 + (patterns * 60), 90],
+      scale: [0.5, 1.3 * speedMultiplier * patternMultiplier, 1.1],
       textShadow: [
         `0 0 8px ${color}`,
-        `0 0 30px ${color}`,
-        `0 0 15px ${color}`
-      ],
-      filter: [
-        'brightness(1)',
-        'brightness(1.4) saturate(1.4)',
-        'brightness(1.1)'
+        `0 0 18px ${color}`,
+        `0 0 10px ${color}`
       ]
     };
   };
@@ -80,24 +55,20 @@ export const JuicyFloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, 
     <motion.div
       initial={{ 
         opacity: 1, 
-        scale: 0.3, 
+        scale: 0.5, 
         x: x, 
         y: y,
-        rotate: 0,
-        filter: 'brightness(1)'
       }}
       animate={{ 
-        opacity: [1, 1, 1, 0], 
+        opacity: [1, 1, 0], 
         scale: effects.scale,
-        rotate: effects.rotate,
         textShadow: effects.textShadow,
-        filter: effects.filter,
-        y: y - 150 - (patterns * 30),
-        x: x + (-30 + Math.random() * 60)
+        y: y - 80 - (patterns * 15),
+        x: x + (-15 + Math.random() * 30)
       }}
       exit={{ opacity: 0 }}
       transition={{ 
-        duration: 3 + (patterns * 0.8), 
+        duration: 2 + (patterns * 0.3), 
         ease: "easeOut"
       }}
       onAnimationComplete={onComplete}
@@ -112,86 +83,66 @@ export const JuicyFloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, 
         textAlign: 'center'
       }}
     >
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          textShadow: [
-            `0 0 10px ${color}`,
-            `0 0 25px ${color}`,
-            `0 0 10px ${color}`
-          ]
-        }}
-        transition={{
-          duration: 0.6,
-          repeat: Infinity
-        }}
-      >
-        +{score}
-      </motion.div>
+      +{score}
       
-      {combo > 5 && (
+      {combo > 10 && (
         <motion.span
           animate={{
             opacity: [0, 1, 1, 0],
-            scale: [0.5, 1.5, 1.2, 0]
+            scale: [0.8, 1.2, 1, 0]
           }}
-          transition={{ duration: 2, delay: 0.3 }}
+          transition={{ duration: 1.5, delay: 0.2 }}
           style={{
             display: 'block',
-            fontSize: '12px',
-            marginTop: '4px',
-            color: '#ffff00',
-            textShadow: '0 0 15px #ffff00'
+            fontSize: '10px',
+            marginTop: '2px',
+            color: '#ffd93d'
           }}
         >
           x{combo} COMBO!
         </motion.span>
       )}
       
-      {speed !== 'lame' && (
+      {speed === 'perfect' && (
         <motion.span
           animate={{
             opacity: [0, 1, 1, 0],
-            scale: [0.3, 1.4, 1.1, 0],
-            rotate: [0, 360, 180, 0]
+            scale: [0.8, 1.2, 1, 0]
           }}
-          transition={{ duration: 1.8, delay: 0.5 }}
+          transition={{ duration: 1.2, delay: 0.3 }}
           style={{
             display: 'block',
-            fontSize: '10px',
+            fontSize: '8px',
             marginTop: '2px',
-            color: speed === 'perfect' ? '#ff6b6b' : speed === 'best' ? '#ffd93d' : '#4ecdc4',
-            textShadow: `0 0 12px ${speed === 'perfect' ? '#ff6b6b' : speed === 'best' ? '#ffd93d' : '#4ecdc4'}`
+            color: '#ff6b6b'
           }}
         >
-          {speed.toUpperCase()}!
+          PERFECT!
         </motion.span>
       )}
       
-      {patterns > 0 && (
+      {patterns > 1 && (
         <motion.span
           animate={{
             opacity: [0, 1, 1, 0],
-            scale: [0.2, 1.6, 1.3, 0],
-            rotate: [0, 720, 360, 0]
+            scale: [0.8, 1.3, 1, 0]
           }}
-          transition={{ duration: 2.5, delay: 0.2 }}
+          transition={{ duration: 1.5, delay: 0.1 }}
           style={{
             display: 'block',
-            fontSize: '14px',
-            marginTop: '3px',
-            color: '#ff6b6b',
-            textShadow: '0 0 20px #ff6b6b'
+            fontSize: '8px',
+            marginTop: '2px',
+            color: '#ff6b6b'
           }}
         >
-          ⭐ PATTERN BONUS! ⭐
+          ⭐ BONUS!
         </motion.span>
       )}
     </motion.div>
   );
 };
 
-// Enhanced character explosion with maximum satisfaction
+// Character explosion with proper juice
 export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = 'lame', patterns = 0, onComplete }) => {
   const getExplosionColor = (isCorrect, speed, combo) => {
     if (!isCorrect) return '#ff1744';
@@ -207,48 +158,23 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
   };
 
   const explosionColor = getExplosionColor(isCorrect, speed, combo);
-  const particleCount = isCorrect ? Math.min(6 + combo / 4, 12) : 8; // Much fewer particles
-  const explosionSize = isCorrect ? Math.min(30 + combo * 1, 60) : 25; // Smaller explosions
-  const speedMultiplier = { perfect: 2, best: 1.7, good: 1.4, lame: 1 }[speed] || 1;
+  const particleCount = isCorrect ? Math.min(8 + combo / 3, 16) : 6;
+  const explosionSize = isCorrect ? Math.min(35 + combo * 1.5, 80) : 30;
+  const speedMultiplier = { perfect: 1.5, best: 1.3, good: 1.1, lame: 1 }[speed] || 1;
   
   const particles = Array.from({ length: particleCount }, (_, i) => ({
     id: i,
     angle: (i * (360 / particleCount)) * (Math.PI / 180),
-    velocity: (25 + Math.random() * explosionSize) * speedMultiplier,
-    size: isCorrect ? 2 + Math.random() * 3 : 2 + Math.random() * 2, // Smaller particles
+    velocity: (20 + Math.random() * explosionSize) * speedMultiplier,
+    size: isCorrect ? 2 + Math.random() * (3 + patterns) : 2 + Math.random() * 2,
     delay: Math.random() * 0.4
   }));
-
-  // MUCH more selective confetti - only for exceptional performance
-  React.useEffect(() => {
-    if (isCorrect && (combo >= 30 || (speed === 'perfect' && combo >= 10) || patterns > 1)) {
-      const colors = [explosionColor, '#ffff00', '#ff6b6b', '#4ecdc4'];
-      
-      if (combo >= 50 || patterns > 2) {
-        // Only major celebrations for very high performance
-        confetti({
-          particleCount: 40,
-          spread: 50,
-          origin: { x: x / window.innerWidth, y: y / window.innerHeight },
-          colors
-        });
-      } else if (combo >= 30 || (speed === 'perfect' && combo >= 15)) {
-        // Medium celebration for good performance
-        confetti({
-          particleCount: 20,
-          spread: 40,
-          origin: { x: x / window.innerWidth, y: y / window.innerHeight },
-          colors
-        });
-      }
-    }
-  }, [isCorrect, combo, speed, patterns, explosionColor, x, y]);
 
   return (
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
-      transition={{ duration: 2.5 + (patterns * 0.5) }}
+      transition={{ duration: 1.5 + (patterns * 0.2) }}
       onAnimationComplete={onComplete}
       style={{
         position: 'absolute',
@@ -258,7 +184,7 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
         zIndex: 999
       }}
     >
-      {/* Simpler particle explosion */}
+      {/* Particle explosion */}
       {particles.map((particle) => (
         <motion.div
           key={particle.id}
@@ -271,11 +197,11 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
           animate={{ 
             x: Math.cos(particle.angle) * particle.velocity,
             y: Math.sin(particle.angle) * particle.velocity,
-            scale: [1, 1.8, 0], // Simpler scaling
+            scale: [1, 1.8 + (patterns * 0.2), 0],
             opacity: [1, 0.9, 0]
           }}
           transition={{ 
-            duration: 1.2, // Faster
+            duration: 1.2 + (patterns * 0.1),
             ease: "easeOut",
             delay: particle.delay
           }}
@@ -285,26 +211,25 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
             height: `${particle.size}px`,
             background: `radial-gradient(circle, ${explosionColor}, ${explosionColor}88)`,
             borderRadius: '50%',
-            boxShadow: `0 0 ${particle.size * 2}px ${explosionColor}44`
+            boxShadow: `0 0 ${particle.size * 3}px ${explosionColor}`
           }}
         />
       ))}
       
-      {/* Simpler main character explosion - NO ROTATION */}
+      {/* Main character explosion */}
       <motion.div
         initial={{ scale: 1 }}
         animate={{ 
-          scale: isCorrect ? [1, 2.2, 0] : [1, 2, 0], // Much simpler scaling
+          scale: isCorrect ? [1, 3 + (patterns * 0.3), 0] : [1, 2.5, 0],
           opacity: [1, 0.9, 0],
-          // NO ROTATION - just simple scale and fade
         }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 0.8 + (patterns * 0.1) }}
         style={{
           color: explosionColor,
           fontFamily: "'Courier New', monospace",
           fontWeight: 'bold',
-          fontSize: isCorrect && combo > 20 ? '20px' : '16px',
-          textShadow: `0 0 15px ${explosionColor}`,
+          fontSize: isCorrect && (combo > 10 || patterns > 0) ? '20px' : '16px',
+          textShadow: `0 0 ${15 + patterns * 3}px ${explosionColor}`,
           position: 'absolute',
           transform: 'translate(-50%, -50%)'
         }}
@@ -312,105 +237,127 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
         {char}
       </motion.div>
 
-      {/* Only show speed indicator for perfect speed */}
-      {isCorrect && speed === 'perfect' && (
+      {/* Speed indicator */}
+      {isCorrect && speed !== 'lame' && (
         <motion.div
-          initial={{ scale: 0.8, y: -10, opacity: 0 }}
+          initial={{ scale: 0, y: -10, opacity: 0 }}
           animate={{ 
-            scale: 1,
-            y: -25,
-            opacity: [1, 1, 0],
-            rotate: [0, 360, 180]
-          }}
-          transition={{ 
-            duration: 1,
-            opacity: { delay: 0.5, duration: 0.5 }
-          }}
-          style={{
-            position: 'absolute',
-            top: '-25px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            color: explosionColor,
-            fontSize: '10px',
-            fontWeight: 'bold',
-            textShadow: `0 0 8px ${explosionColor}`
-          }}
-        >
-          PERFECT!
-        </motion.div>
-      )}
-
-      {/* Only show pattern bonus for multiple patterns */}
-      {patterns > 1 && (
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ 
-            scale: 1,
+            scale: [1, 1.3, 1.1],
+            y: [-25, -35, -30],
             opacity: [1, 1, 0]
           }}
           transition={{ 
-            duration: 1,
-            opacity: { delay: 0.5, duration: 0.5 }
+            duration: 1.2,
+            opacity: { delay: 0.8, duration: 0.4 }
           }}
           style={{
             position: 'absolute',
-            top: '-40px',
+            top: '-30px',
             left: '50%',
             transform: 'translateX(-50%)',
-            color: '#ff6b6b',
-            fontSize: '10px',
+            color: explosionColor,
+            fontSize: '11px',
             fontWeight: 'bold',
-            textShadow: '0 0 8px #ff6b6b'
+            textShadow: `0 0 10px ${explosionColor}`
           }}
         >
-          BONUS!
+          {speed.toUpperCase()}!
         </motion.div>
       )}
 
-      {/* Only show celebration rings for high combos */}
-      {isCorrect && combo > 15 && (
+      {/* Pattern bonus indicator */}
+      {patterns > 0 && (
+        <motion.div
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ 
+            scale: [1, 1.5, 1.2],
+            rotate: [0, 180, 90],
+            opacity: [1, 1, 0]
+          }}
+          transition={{ 
+            duration: 1.3,
+            opacity: { delay: 0.9, duration: 0.4 }
+          }}
+          style={{
+            position: 'absolute',
+            top: '-45px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            color: '#ff6b6b',
+            fontSize: '12px',
+            fontWeight: 'bold',
+            textShadow: '0 0 12px #ff6b6b'
+          }}
+        >
+          ⭐ BONUS!
+        </motion.div>
+      )}
+
+      {/* Celebration rings for high performance */}
+      {isCorrect && (combo > 5 || patterns > 0) && (
         <>
           <motion.div
             initial={{ scale: 0, opacity: 1 }}
             animate={{
-              scale: [0, 2.5, 3.5],
-              opacity: [1, 0.8, 0]
+              scale: [0, 2.5 + patterns, 4 + patterns],
+              opacity: [1, 0.7, 0]
             }}
-            transition={{ duration: 1.5 }}
+            transition={{ duration: 1.8 }}
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '60px',
-              height: '60px',
-              border: `3px solid ${explosionColor}`,
+              width: '70px',
+              height: '70px',
+              border: `4px solid ${explosionColor}`,
               borderRadius: '50%',
-              boxShadow: `0 0 20px ${explosionColor}44`
+              boxShadow: `0 0 25px ${explosionColor}`
             }}
           />
+          
+          {patterns > 0 && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0.8 }}
+              animate={{
+                scale: [0, 3 + patterns, 5 + patterns],
+                opacity: [0.8, 0.5, 0]
+              }}
+              transition={{ duration: 2.2, delay: 0.3 }}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '90px',
+                height: '90px',
+                border: `5px solid ${explosionColor}`,
+                borderRadius: '50%',
+                boxShadow: `0 0 35px ${explosionColor}`
+              }}
+            />
+          )}
         </>
       )}
     </motion.div>
   );
 };
 
-// Enhanced combo burst effect
+// Combo burst effect
 export const JuicyComboBurst = ({ isActive, combo, x, y, patterns = [] }) => {
-  if (!isActive || combo <= 15) return null; // Higher threshold
+  if (!isActive || combo <= 5) return null;
 
   const getComboColor = (combo) => {
     if (combo >= 50) return '#ff6b6b';
     if (combo >= 30) return '#ffd93d';
     if (combo >= 20) return '#6bcf7f';
-    if (combo >= 15) return '#4ecdc4';
+    if (combo >= 10) return '#4ecdc4';
     return '#45b7d1';
   };
 
   const burstColor = getComboColor(combo);
-  const particleCount = Math.min(Math.floor(combo / 4), 8); // Much fewer particles
-  const burstSize = Math.min(combo * 1.5, 40); // Smaller burst
+  const particleCount = Math.min(Math.floor(combo / 3) + patterns.length * 2, 12);
+  const burstSize = Math.min(combo * 2 + patterns.length * 8, 50);
 
   return (
     <motion.div
@@ -427,76 +374,50 @@ export const JuicyComboBurst = ({ isActive, combo, x, y, patterns = [] }) => {
           key={i}
           initial={{ scale: 0, opacity: 1 }}
           animate={{
-            scale: [0, 1.8, 0], // Simpler scaling
+            scale: [0, 1.5 + (patterns.length * 0.2), 0],
             x: Math.cos((i * (360 / particleCount)) * Math.PI / 180) * burstSize,
             y: Math.sin((i * (360 / particleCount)) * Math.PI / 180) * burstSize,
             opacity: [1, 0.8, 0]
           }}
           transition={{
-            duration: 1.5, // Faster
+            duration: 1.2 + (patterns.length * 0.2),
             delay: i * 0.05,
-            // No repeat to reduce clutter
+            repeat: Infinity,
+            repeatDelay: 0.8
           }}
           style={{
             position: 'absolute',
-            width: '6px',
-            height: '6px',
+            width: `${6 + patterns.length}px`,
+            height: `${6 + patterns.length}px`,
             background: `radial-gradient(circle, ${burstColor}, ${burstColor}88)`,
             borderRadius: '50%',
-            boxShadow: `0 0 10px ${burstColor}44`
+            boxShadow: `0 0 ${10 + patterns.length * 2}px ${burstColor}`
           }}
         />
       ))}
       
-      {/* Simpler central burst - NO ROTATION */}
+      {/* Central burst */}
       <motion.div
         animate={{
-          scale: [1, 1.8, 1],
+          scale: [1, 1.5 + (patterns.length * 0.2), 1],
           opacity: [0.8, 0.4, 0.8],
-          // NO ROTATION
+          rotate: [0, 180 + (patterns.length * 30), 360 + (patterns.length * 60)]
         }}
         transition={{
-          duration: 1.5,
-          // No repeat
+          duration: 1 + (patterns.length * 0.2),
+          repeat: Infinity,
           ease: "easeInOut"
         }}
         style={{
           position: 'absolute',
-          width: '15px',
-          height: '15px',
+          width: `${12 + patterns.length * 2}px`,
+          height: `${12 + patterns.length * 2}px`,
           background: `radial-gradient(circle, ${burstColor}, transparent)`,
           borderRadius: '50%',
           transform: 'translate(-50%, -50%)',
-          boxShadow: `0 0 20px ${burstColor}44`
+          boxShadow: `0 0 ${20 + patterns.length * 5}px ${burstColor}`
         }}
       />
     </motion.div>
-  );
-};
-
-// Screen shake effect for major achievements
-export const ScreenShakeEffect = ({ isActive, intensity = 1 }) => {
-  if (!isActive) return null;
-
-  return (
-    <motion.div
-      animate={{
-        x: [0, -2 * intensity, 2 * intensity, -1 * intensity, 1 * intensity, 0],
-        y: [0, 1 * intensity, -1 * intensity, 2 * intensity, -2 * intensity, 0]
-      }}
-      transition={{
-        duration: 0.5,
-        ease: "easeInOut"
-      }}
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        pointerEvents: 'none',
-        zIndex: 9998
-      }}
-    />
   );
 };

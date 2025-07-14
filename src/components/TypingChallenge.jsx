@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Text, VStack, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import confetti from 'canvas-confetti';
 import { TypingEngine } from "../engine/core/TypingEngine";
 import { EffectSystem } from "../engine/systems/EffectSystem";
 import { TypingDisplay } from "../engine/components/TypingDisplay";
@@ -69,6 +70,9 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   // Handle keyboard input
   useEffect(() => {
     if (!isActive || !isStarted || engineState?.isComplete) return;
+
+    // Make confetti available globally for engine
+    window.confetti = confetti;
 
     const handleKeyDown = (e) => {
       // Only prevent default for typing characters

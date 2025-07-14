@@ -447,10 +447,16 @@ export class TypingEngine extends CustomEventEmitter {
       patterns,
       x: Math.random() * 200,
       y: Math.random() * 50,
-      color: this.getPerformanceColor(speed).glow
+      color: this.getPerformanceColor(speed).glow,
+      createdAt: Date.now()
     };
     
     this.state.floatingScores = [...this.state.floatingScores, effect];
+    
+    // Trigger confetti for high scores
+    if (score > 100 || combo >= 20) {
+      this.triggerConfetti(combo);
+    }
   }
   
   addCharacterExplosion(char, isCorrect, speed, combo, patterns) {
@@ -462,10 +468,28 @@ export class TypingEngine extends CustomEventEmitter {
       isCorrect,
       speed,
       combo,
-      patterns
+      patterns,
+      createdAt: Date.now()
     };
     
     this.state.explosions = [...this.state.explosions, effect];
+  }
+  
+  // Trigger confetti celebrations
+  triggerConfetti(combo) {
+    if (typeof window !== 'undefined' && window.confetti) {
+      const colors = combo >= 50 ? ['#ff6b6b'] : 
+                   combo >= 30 ? ['#ffd93d'] :
+                   combo >= 20 ? ['#6bcf7f'] :
+                   ['#4ecdc4'];
+      
+      window.confetti({
+        particleCount: Math.min(combo, 100),
+        spread: 45,
+        origin: { y: 0.7 },
+        colors
+      });
+    }
   }
   
   addBonusEffect(type, intensity, data = null) {
@@ -473,7 +497,8 @@ export class TypingEngine extends CustomEventEmitter {
       id: Date.now() + Math.random(),
       type,
       intensity,
-      data
+      data,
+      createdAt: Date.now()
     };
     
     this.state.bonusEffects = [...this.state.bonusEffects, effect];

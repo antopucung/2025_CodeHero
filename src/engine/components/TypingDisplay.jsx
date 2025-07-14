@@ -1,44 +1,17 @@
-// Enhanced Typing Display Component - Optimized for responsiveness
 import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
 import { Box } from '@chakra-ui/react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { TypingBlock } from './TypingBlock';
 import { TerminalPanel } from '../../design/components/TerminalPanel';
+import { 
+  FloatingScore, 
+  CharacterExplosion, 
+  ComboBurstEffect, 
+  AnticipationCursor,
+  BackgroundWaveEffect
+} from './TypingEffects';
 import { colors } from '../../design/tokens/colors';
 import { spacing } from '../../design/tokens/spacing';
-
-// Optimized cursor component
-const TypingCursor = memo(({ isVisible, position }) => {
-  if (!isVisible) return null;
-  
-  return (
-    <motion.div
-      animate={{
-        opacity: [1, 0.3, 1],
-        scaleY: [1, 1.1, 1]
-      }}
-      transition={{
-        duration: 0.8,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
-      style={{
-        position: 'absolute',
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: '2px',
-        height: '20px',
-        background: colors.primary[500],
-        borderRadius: '1px',
-        zIndex: 1000,
-        pointerEvents: 'none',
-        boxShadow: `0 0 8px ${colors.primary[500]}`
-      }}
-    />
-  );
-});
-
-TypingCursor.displayName = 'TypingCursor';
 
 export const TypingDisplay = memo(({
   text,
@@ -48,6 +21,11 @@ export const TypingDisplay = memo(({
   const containerRef = useRef(null);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [errorPositions, setErrorPositions] = useState(new Set());
+  const [activeEffects, setActiveEffects] = useState({
+    floatingScores: [],
+    explosions: [],
+    comboBursts: []
+  });
   
   // Optimized cursor position calculation
   const updateCursorPosition = useCallback(() => {
@@ -101,6 +79,77 @@ export const TypingDisplay = memo(({
       }
     }
   }, [engine.state?.errors, engine.state?.currentIndex]);
+
+  // Handle visual effects from engine state
+  useEffect(() => {
+    if (!engine.state) return;
+
+    // Add floating scores
+    if (engine.state.floatingScores && engine.state.floatingScores.length > 0) {
+      const newScores = engine.state.floatingScores.filter(
+        score => !activeEffects.floatingScores.some(active => active.id === score.id)
+      );
+      
+      if (newScores.length > 0) {
+        setActiveEffects(prev => ({
+          ...prev,
+          floatingScores: [...prev.floatingScores, ...newScores]
+        }));
+      }
+    }
+
+    // Add explosions
+    if (engine.state.explosions && engine.state.explosions.length > 0) {
+      const newExplosions = engine.state.explosions.filter(
+        explosion => !activeEffects.explosions.some(active => active.id === explosion.id)
+      );
+      
+      if (newExplosions.length > 0) {
+        setActiveEffects(prev => ({
+          ...prev,
+          explosions: [...prev.explosions, ...newExplosions]
+        }));
+      }
+    }
+
+    // Add combo bursts for high combos
+    if (engine.state.combo >= 10 && engine.state.combo % 5 === 0) {
+      const burstId = `combo-${engine.state.combo}-${Date.now()}`;
+      if (!activeEffects.comboBursts.some(burst => burst.combo === engine.state.combo)) {
+        setActiveEffects(prev => ({
+          ...prev,
+          comboBursts: [...prev.comboBursts, {
+            id: burstId,
+            combo: engine.state.combo,
+            x: cursorPosition.x,
+            y: cursorPosition.y,
+            patterns: engine.state.patternMatches || []
+          }]
+        }));
+      }
+    }
+  }, [engine.state, activeEffects, cursorPosition]);
+
+  // Cleanup expired effects
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      setActiveEffects(prev => ({
+        floatingScores: prev.floatingScores.filter(effect => now - effect.id < 3000),
+        explosions: prev.explosions.filter(effect => now - effect.id < 2000),
+        comboBursts: prev.comboBursts.filter(effect => now - effect.id < 2000)
+      }));
+    }, 1000);
+
+    return () => clearInterval(cleanup);
+  }, []);
+
+  const removeEffect = useCallback((type, id) => {
+    setActiveEffects(prev => ({
+      ...prev,
+      [type]: prev[type].filter(effect => effect.id !== id)
+    }));
+  }, []);
   
   const renderCharacter = useCallback((char, index) => {
     const status = engine.getCharacterStatus(index);
@@ -124,7 +173,7 @@ export const TypingDisplay = memo(({
   }, [engine, errorPositions, onCharacterClick]);
   
   return (
-    <TerminalPanel title="CODE TYPING INTERFACE" variant="primary">
+    <TerminalPanel title="ADDICTIVE TYPING INTERFACE" variant="primary">
       <Box
         ref={containerRef}
         bg={colors.terminal.bg}
@@ -138,13 +187,25 @@ export const TypingDisplay = memo(({
         fontSize="12px"
         lineHeight="22px"
       >
-        {/* Optimized Typing Cursor */}
-        <TypingCursor
+        {/* Background Wave Effect */}
+        <BackgroundWaveEffect
+          isActive={engine.state?.isActive && !engine.state?.isComplete}
+          intensity={0.3}
+          combo={engine.state?.combo || 1}
+          anticipationLevel={engine.state?.anticipationLevel || 1}
+          typingSpeed={engine.state?.typingSpeed || 'lame'}
+        />
+
+        {/* Dynamic Anticipation Cursor */}
+        <AnticipationCursor
           isVisible={engine.state?.isActive && !engine.state?.isComplete}
           position={cursorPosition}
+          typingSpeed={engine.state?.typingSpeed || 'lame'}
+          anticipationLevel={engine.state?.anticipationLevel || 1}
+          combo={engine.state?.combo || 1}
         />
         
-        {/* Character Blocks - Optimized rendering */}
+        {/* Character Blocks */}
         <Box
           style={{
             wordWrap: 'break-word',
@@ -154,6 +215,54 @@ export const TypingDisplay = memo(({
         >
           {text.split('').map(renderCharacter)}
         </Box>
+
+        {/* Floating Scores */}
+        <AnimatePresence>
+          {activeEffects.floatingScores.map((score) => (
+            <FloatingScore
+              key={score.id}
+              score={score.score}
+              x={score.x}
+              y={score.y}
+              color={score.color}
+              combo={score.combo}
+              speed={score.speed}
+              patterns={score.patterns}
+              onComplete={() => removeEffect('floatingScores', score.id)}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Character Explosions */}
+        <AnimatePresence>
+          {activeEffects.explosions.map((explosion) => (
+            <CharacterExplosion
+              key={explosion.id}
+              char={explosion.char}
+              x={explosion.x}
+              y={explosion.y}
+              isCorrect={explosion.isCorrect}
+              combo={explosion.combo}
+              speed={explosion.speed}
+              patterns={explosion.patterns}
+              onComplete={() => removeEffect('explosions', explosion.id)}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Combo Burst Effects */}
+        <AnimatePresence>
+          {activeEffects.comboBursts.map((burst) => (
+            <ComboBurstEffect
+              key={burst.id}
+              isActive={true}
+              combo={burst.combo}
+              x={burst.x}
+              y={burst.y}
+              patterns={burst.patterns}
+            />
+          ))}
+        </AnimatePresence>
       </Box>
     </TerminalPanel>
   );

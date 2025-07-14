@@ -9,15 +9,20 @@ import { spacing } from '../tokens/spacing';
 const PatternBonus = ({ pattern, onComplete }) => {
   const getPatternInfo = (type) => {
     const patterns = {
-      perfect_streak: { icon: '⚡', name: 'PERFECT STREAK' },
-      function_declaration: { icon: '🔧', name: 'FUNCTION MASTER' },
-      bracket_combo: { icon: '🎯', name: 'BRACKET COMBO' },
-      speed_consistency: { icon: '🚀', name: 'SPEED DEMON' },
-      line_completion: { icon: '✅', name: 'LINE COMPLETE' },
-      combo_milestone: { icon: '🔥', name: 'COMBO MILESTONE' }
+      perfect_streak: { icon: '⚡', name: 'LIGHTNING FAST' },
+      function_declaration: { icon: '🔧', name: 'CODE WIZARD' },
+      advanced_syntax: { icon: '🎓', name: 'SYNTAX MASTER' },
+      module_syntax: { icon: '📦', name: 'MODULE EXPERT' },
+      bracket_combo: { icon: '🎯', name: 'BRACKET MASTER' },
+      speed_consistency: { icon: '🚀', name: 'UNSTOPPABLE' },
+      line_completion: { icon: '✅', name: 'CLEAN CODE' },
+      string_mastery: { icon: '📝', name: 'STRING NINJA' },
+      arrow_function: { icon: '🏹', name: 'ARROW MASTER' },
+      combo_milestone: { icon: '🔥', name: 'ON FIRE' },
+      flawless_execution: { icon: '💎', name: 'FLAWLESS' }
     };
     
-    return patterns[type] || { icon: '⭐', name: 'BONUS' };
+    return patterns[type] || { icon: '⭐', name: 'AMAZING' };
   };
   
   const patternInfo = getPatternInfo(pattern.type);

@@ -8,7 +8,10 @@ import {
   CharacterExplosion, 
   ComboBurstEffect, 
   AnticipationCursor,
-  BackgroundWaveEffect
+  BackgroundWaveEffect,
+  ProgressiveBackgroundEffect,
+  ScreenFlashEffect,
+  PatternCelebration
 } from './TypingEffects';
 import { colors } from '../../design/tokens/colors';
 import { spacing } from '../../design/tokens/spacing';
@@ -21,6 +24,8 @@ export const TypingDisplay = memo(({
   const containerRef = useRef(null);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [errorPositions, setErrorPositions] = useState(new Set());
+  const [screenFlash, setScreenFlash] = useState({ active: false, type: 'success', intensity: 1 });
+  const [patternCelebrations, setPatternCelebrations] = useState([]);
   const [activeEffects, setActiveEffects] = useState({
     floatingScores: [],
     explosions: [],
@@ -84,6 +89,28 @@ export const TypingDisplay = memo(({
   useEffect(() => {
     if (!engine.state) return;
 
+    // Handle screen flash effects for major events
+    if (engine.state.combo >= 50 && engine.state.combo % 10 === 0) {
+      setScreenFlash({ active: true, type: 'combo', intensity: Math.min(engine.state.combo / 50, 2) });
+      setTimeout(() => setScreenFlash({ active: false, type: 'success', intensity: 1 }), 300);
+    }
+    
+    if (engine.state.perfectStreak >= 15) {
+      setScreenFlash({ active: true, type: 'perfect', intensity: 1.5 });
+      setTimeout(() => setScreenFlash({ active: false, type: 'success', intensity: 1 }), 400);
+    }
+
+    // Handle pattern celebrations
+    if (engine.state.patternMatches && engine.state.patternMatches.length > 0) {
+      const newPatterns = engine.state.patternMatches.filter(
+        pattern => !patternCelebrations.some(active => active.id === pattern.id)
+      );
+      
+      if (newPatterns.length > 0) {
+        setPatternCelebrations(prev => [...prev, ...newPatterns]);
+      }
+    }
+
     // Add floating scores
     if (engine.state.floatingScores && engine.state.floatingScores.length > 0) {
       const newScores = engine.state.floatingScores.filter(
@@ -128,7 +155,7 @@ export const TypingDisplay = memo(({
         }));
       }
     }
-  }, [engine.state, activeEffects, cursorPosition]);
+  }, [engine.state, activeEffects, cursorPosition, patternCelebrations]);
 
   // Cleanup expired effects
   useEffect(() => {
@@ -140,6 +167,9 @@ export const TypingDisplay = memo(({
         comboBursts: prev.comboBursts.filter(effect => now - effect.id < 2000)
       }));
     }, 1000);
+    
+    // Cleanup pattern celebrations
+    setPatternCelebrations(prev => prev.filter(pattern => now - pattern.id < 4000));
 
     return () => clearInterval(cleanup);
   }, []);
@@ -149,6 +179,10 @@ export const TypingDisplay = memo(({
       ...prev,
       [type]: prev[type].filter(effect => effect.id !== id)
     }));
+  }, []);
+  
+  const removePatternCelebration = useCallback((patternId) => {
+    setPatternCelebrations(prev => prev.filter(pattern => pattern.id !== patternId));
   }, []);
   
   const renderCharacter = useCallback((char, index) => {
@@ -187,13 +221,20 @@ export const TypingDisplay = memo(({
         fontSize="12px"
         lineHeight="22px"
       >
-        {/* Background Wave Effect */}
-        <BackgroundWaveEffect
+        {/* Progressive Background Effect with Intensity Scaling */}
+        <ProgressiveBackgroundEffect
           isActive={engine.state?.isActive && !engine.state?.isComplete}
-          intensity={0.3}
           combo={engine.state?.combo || 1}
-          anticipationLevel={engine.state?.anticipationLevel || 1}
+          perfectStreak={engine.state?.perfectStreak || 0}
           typingSpeed={engine.state?.typingSpeed || 'lame'}
+          anticipationLevel={engine.state?.anticipationLevel || 1}
+        />
+        
+        {/* Screen Flash Effects */}
+        <ScreenFlashEffect 
+          isActive={screenFlash.active}
+          intensity={screenFlash.intensity}
+          type={screenFlash.type}
         />
 
         {/* Dynamic Anticipation Cursor */}
@@ -260,6 +301,17 @@ export const TypingDisplay = memo(({
               x={burst.x}
               y={burst.y}
               patterns={burst.patterns}
+            />
+          ))}
+        </AnimatePresence>
+        
+        {/* Pattern Celebrations */}
+        <AnimatePresence>
+          {patternCelebrations.map((pattern) => (
+            <PatternCelebration
+              key={pattern.id}
+              pattern={pattern}
+              onComplete={() => removePatternCelebration(pattern.id)}
             />
           ))}
         </AnimatePresence>

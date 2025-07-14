@@ -598,3 +598,420 @@ export const BackgroundWaveEffect = ({ isActive, intensity = 1, combo = 1, antic
     />
   );
 };
+
+// Enhanced Screen Flash Effect for Major Events
+export const ScreenFlashEffect = ({ isActive, intensity = 1, color = '#ffffff', type = 'success' }) => {
+  if (!isActive) return null;
+
+  const flashColors = {
+    success: '#00ff00',
+    perfect: '#ff6b6b', 
+    combo: '#ffd93d',
+    error: '#ff1744',
+    achievement: '#ff6b6b'
+  };
+
+  const flashColor = flashColors[type] || color;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ 
+        opacity: [0, 0.4 * intensity, 0.6 * intensity, 0]
+      }}
+      transition={{ 
+        duration: type === 'error' ? 0.15 : 0.3,
+        ease: "easeInOut"
+      }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: `radial-gradient(circle, ${flashColor}22, ${flashColor}11, transparent)`,
+        zIndex: 999,
+        pointerEvents: 'none'
+      }}
+    />
+  );
+};
+
+// Progressive Intensity Background Effect
+export const ProgressiveBackgroundEffect = ({ 
+  isActive, 
+  combo = 1, 
+  perfectStreak = 0, 
+  typingSpeed = 'lame',
+  anticipationLevel = 1 
+}) => {
+  const [time, setTime] = useState(0);
+  const [particles, setParticles] = useState([]);
+
+  useEffect(() => {
+    if (!isActive) return;
+    
+    const interval = setInterval(() => {
+      setTime(prev => prev + (0.1 * anticipationLevel));
+    }, 50);
+    
+    return () => clearInterval(interval);
+  }, [isActive, anticipationLevel]);
+
+  // Generate floating particles for high performance
+  useEffect(() => {
+    if (combo >= 20 || perfectStreak >= 10) {
+      const particleCount = Math.min(Math.floor(combo / 5) + Math.floor(perfectStreak / 3), 15);
+      const newParticles = Array.from({ length: particleCount }, (_, i) => ({
+        id: Date.now() + i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 2 + Math.random() * 4,
+        speed: 0.5 + Math.random() * 1.5,
+        color: combo >= 50 ? '#ff6b6b' : combo >= 30 ? '#ffd93d' : '#4ecdc4'
+      }));
+      setParticles(newParticles);
+    } else {
+      setParticles([]);
+    }
+  }, [combo, perfectStreak]);
+
+  if (!isActive) return null;
+
+  const getIntensityLevel = () => {
+    if (combo >= 50 || perfectStreak >= 15) return 'legendary';
+    if (combo >= 30 || perfectStreak >= 10) return 'epic';
+    if (combo >= 20 || perfectStreak >= 7) return 'rare';
+    if (combo >= 10 || perfectStreak >= 5) return 'uncommon';
+    return 'common';
+  };
+
+  const intensityLevel = getIntensityLevel();
+  const baseOpacity = {
+    legendary: 0.25,
+    epic: 0.2,
+    rare: 0.15,
+    uncommon: 0.1,
+    common: 0.05
+  }[intensityLevel];
+
+  const pulseOpacity = baseOpacity + Math.sin(time * 2) * (baseOpacity * 0.5);
+
+  const getGradientByIntensity = () => {
+    const speedColors = {
+      perfect: ['255, 107, 107', '255, 20, 147'],
+      best: ['255, 217, 61', '255, 193, 7'],
+      good: ['78, 205, 196', '0, 188, 212'],
+      lame: ['0, 255, 0', '0, 255, 255']
+    };
+    
+    const [color1, color2] = speedColors[typingSpeed] || speedColors.lame;
+    
+    switch (intensityLevel) {
+      case 'legendary':
+        return `
+          radial-gradient(circle at ${50 + Math.sin(time) * 30}% ${50 + Math.cos(time * 1.5) * 30}%, 
+            rgba(${color1}, ${pulseOpacity * 2}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 1.5}) 20%, 
+            rgba(255, 107, 107, ${pulseOpacity}) 40%,
+            transparent 70%),
+          linear-gradient(${time * 60}deg, 
+            rgba(${color1}, ${pulseOpacity * 0.6}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 0.4}) 50%, 
+            rgba(255, 107, 107, ${pulseOpacity * 0.3}) 100%)
+        `;
+      case 'epic':
+        return `
+          radial-gradient(circle at ${50 + Math.sin(time * 1.3) * 25}% ${50 + Math.cos(time) * 25}%, 
+            rgba(${color1}, ${pulseOpacity * 1.5}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 1.2}) 30%, 
+            transparent 60%),
+          linear-gradient(${time * 45}deg, 
+            rgba(${color1}, ${pulseOpacity * 0.4}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 0.3}) 50%, 
+            rgba(${color1}, ${pulseOpacity * 0.4}) 100%)
+        `;
+      case 'rare':
+        return `
+          radial-gradient(circle at ${50 + Math.sin(time * 0.8) * 20}% ${50 + Math.cos(time * 1.2) * 20}%, 
+            rgba(${color1}, ${pulseOpacity * 1.2}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 0.9}) 40%, 
+            transparent 70%),
+          linear-gradient(${time * 30}deg, 
+            rgba(${color1}, ${pulseOpacity * 0.3}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 0.2}) 50%, 
+            rgba(${color1}, ${pulseOpacity * 0.3}) 100%)
+        `;
+      default:
+        return `
+          radial-gradient(circle at ${50 + Math.sin(time * 0.5) * 10}% ${50 + Math.cos(time * 0.7) * 10}%, 
+            rgba(${color1}, ${pulseOpacity}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 0.7}) 60%, 
+            transparent 80%),
+          linear-gradient(${time * 20}deg, 
+            rgba(${color1}, ${pulseOpacity * 0.2}) 0%, 
+            rgba(${color2}, ${pulseOpacity * 0.15}) 50%, 
+            rgba(${color1}, ${pulseOpacity * 0.2}) 100%)
+        `;
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: getGradientByIntensity(),
+        pointerEvents: 'none',
+        zIndex: -1
+      }}
+    >
+      {/* Floating Performance Particles */}
+      <AnimatePresence>
+        {particles.map((particle) => (
+          <motion.div
+            key={particle.id}
+            initial={{ 
+              x: `${particle.x}%`, 
+              y: `${particle.y}%`,
+              opacity: 0,
+              scale: 0
+            }}
+            animate={{ 
+              y: [`${particle.y}%`, `${particle.y - 20}%`, `${particle.y - 40}%`],
+              opacity: [0, 0.8, 0],
+              scale: [0, 1, 0.5],
+              rotate: [0, 180, 360]
+            }}
+            transition={{ 
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2
+            }}
+            style={{
+              position: 'absolute',
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              background: `radial-gradient(circle, ${particle.color}, ${particle.color}88)`,
+              borderRadius: '50%',
+              boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
+              pointerEvents: 'none'
+            }}
+          />
+        ))}
+      </AnimatePresence>
+      
+      {/* Intensity Level Indicator */}
+      {intensityLevel !== 'common' && (
+        <motion.div
+          animate={{
+            opacity: [0.3, 0.7, 0.3],
+            scale: [1, 1.05, 1]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity
+          }}
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            background: `linear-gradient(45deg, ${particles[0]?.color || '#4ecdc4'}, ${particles[0]?.color || '#4ecdc4'}88)`,
+            color: '#fff',
+            padding: '5px 10px',
+            borderRadius: '15px',
+            fontSize: '10px',
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            border: `1px solid ${particles[0]?.color || '#4ecdc4'}`,
+            boxShadow: `0 0 15px ${particles[0]?.color || '#4ecdc4'}`,
+            zIndex: 10
+          }}
+        >
+          {intensityLevel} MODE
+        </motion.div>
+      )}
+    </motion.div>
+  );
+};
+
+// Enhanced Pattern Celebration with Screen Effects
+export const PatternCelebration = ({ pattern, onComplete }) => {
+  const [showScreenFlash, setShowScreenFlash] = useState(false);
+
+  useEffect(() => {
+    if (pattern.bonus >= 100) {
+      setShowScreenFlash(true);
+      setTimeout(() => setShowScreenFlash(false), 300);
+    }
+  }, [pattern.bonus]);
+
+  const getPatternInfo = (type) => {
+    const patterns = {
+      perfect_streak: { 
+        icon: '⚡', 
+        name: 'PERFECT STREAK',
+        color: '#ff6b6b',
+        celebration: 'LIGHTNING FAST!'
+      },
+      function_declaration: { 
+        icon: '🔧', 
+        name: 'FUNCTION MASTER',
+        color: '#4ecdc4',
+        celebration: 'CODE WIZARD!'
+      },
+      bracket_combo: { 
+        icon: '🎯', 
+        name: 'BRACKET COMBO',
+        color: '#ffd93d',
+        celebration: 'SYNTAX MASTER!'
+      },
+      speed_consistency: { 
+        icon: '🚀', 
+        name: 'SPEED DEMON',
+        color: '#6bcf7f',
+        celebration: 'UNSTOPPABLE!'
+      },
+      line_completion: { 
+        icon: '✅', 
+        name: 'LINE COMPLETE',
+        color: '#45b7d1',
+        celebration: 'CLEAN CODE!'
+      },
+      combo_milestone: { 
+        icon: '🔥', 
+        name: 'COMBO MILESTONE',
+        color: '#ff6b6b',
+        celebration: 'ON FIRE!'
+      }
+    };
+    
+    return patterns[type] || { 
+      icon: '⭐', 
+      name: 'BONUS',
+      color: '#ffaa00',
+      celebration: 'AMAZING!'
+    };
+  };
+  
+  const patternInfo = getPatternInfo(pattern.type);
+  
+  return (
+    <>
+      {/* Screen Flash for Major Patterns */}
+      <ScreenFlashEffect 
+        isActive={showScreenFlash}
+        intensity={Math.min(pattern.bonus / 100, 2)}
+        type="achievement"
+      />
+      
+      {/* Main Pattern Celebration */}
+      <motion.div
+        initial={{ scale: 0, opacity: 0, y: 100, rotate: -45 }}
+        animate={{ 
+          scale: [0, 1.5, 1.2, 1],
+          opacity: [0, 1, 1, 1, 0],
+          y: [100, 20, 0, -20, -150],
+          rotate: [0, 15, -10, 5, 0]
+        }}
+        transition={{ 
+          duration: 3,
+          times: [0, 0.2, 0.4, 0.8, 1],
+          ease: "easeOut"
+        }}
+        onAnimationComplete={onComplete}
+        style={{
+          position: 'fixed',
+          top: '25%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 1001,
+          background: `linear-gradient(135deg, ${patternInfo.color}, ${patternInfo.color}cc, ${patternInfo.color}88)`,
+          padding: '20px 30px',
+          borderRadius: '20px',
+          color: '#fff',
+          fontFamily: "'Courier New', monospace",
+          fontWeight: 'bold',
+          fontSize: '18px',
+          textAlign: 'center',
+          border: `3px solid ${patternInfo.color}`,
+          boxShadow: `0 0 40px ${patternInfo.color}, inset 0 0 20px rgba(255,255,255,0.2)`,
+          minWidth: '250px'
+        }}
+      >
+        {/* Orbiting particles around the celebration */}
+        {Array.from({ length: 6 }).map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              rotate: [0, 360],
+              scale: [0.5, 1.2, 0.8, 1]
+            }}
+            transition={{
+              rotate: { duration: 2, repeat: Infinity, delay: i * 0.2 },
+              scale: { duration: 1, repeat: Infinity, delay: i * 0.1 }
+            }}
+            style={{
+              position: 'absolute',
+              width: '8px',
+              height: '8px',
+              background: patternInfo.color,
+              borderRadius: '50%',
+              top: '50%',
+              left: '50%',
+              transformOrigin: `${40 + i * 8}px 0px`,
+              boxShadow: `0 0 10px ${patternInfo.color}`
+            }}
+          />
+        ))}
+        
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 10, -10, 0]
+          }}
+          transition={{
+            duration: 0.8,
+            repeat: 2
+          }}
+        >
+          <div style={{ fontSize: '24px', marginBottom: '8px' }}>
+            {patternInfo.icon}
+          </div>
+          <div style={{ fontSize: '16px', marginBottom: '5px' }}>
+            {patternInfo.name}
+          </div>
+          <div style={{ fontSize: '12px', color: '#ffff00', marginBottom: '8px' }}>
+            +{pattern.bonus} BONUS POINTS!
+          </div>
+          <motion.div 
+            animate={{
+              opacity: [0, 1, 0],
+              scale: [0.8, 1.1, 0.9]
+            }}
+            transition={{
+              duration: 1.5,
+              delay: 0.5
+            }}
+            style={{ 
+              fontSize: '14px', 
+              color: '#fff',
+              textShadow: `0 0 10px ${patternInfo.color}`
+            }}
+          >
+            {patternInfo.celebration}
+          </motion.div>
+        </motion.div>
+      </motion.div>
+    </>
+  );
+};
+
+// Enhanced combo multiplier with anticipation effects
+export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, typingSpeed = 'lame' }) => {

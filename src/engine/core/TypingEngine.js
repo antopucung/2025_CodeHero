@@ -319,72 +319,123 @@ export class TypingEngine extends CustomEventEmitter {
   checkPatterns(newTypedText, currentCombo) {
     const patterns = [];
     
-    // Enhanced pattern detection for bonus combos
+    // Enhanced pattern detection for addictive bonus combos
     const recentChars = this.state.recentlyTyped.slice(-5);
     const perfectCount = recentChars.filter(char => char.speed === 'perfect').length;
     
-    // Perfect streak pattern
+    // Perfect streak pattern - Lightning Fast Bonus
     if (perfectCount >= 3) {
       patterns.push({
         type: 'perfect_streak',
         count: perfectCount,
-        bonus: perfectCount * 50,
+        bonus: perfectCount * 75, // Increased bonus for addiction
         color: '#ff6b6b',
         id: Date.now() + Math.random()
       });
     }
     
-    // Function/method pattern detection
+    // Function/method pattern detection - Code Wizard Bonus
     const recentText = newTypedText.slice(-10);
     if (recentText.includes('function') || recentText.includes('const ') || recentText.includes('let ')) {
       patterns.push({
         type: 'function_declaration',
-        bonus: 100,
+        bonus: 150, // Major bonus for coding patterns
         color: '#4ecdc4',
         id: Date.now() + Math.random()
       });
     }
     
-    // Bracket/parentheses matching pattern
-    const brackets = recentText.match(/[\(\)\[\]\{\}]/g);
-    if (brackets && brackets.length >= 2) {
+    // Advanced coding pattern detection
+    if (recentText.includes('class ') || recentText.includes('interface ') || recentText.includes('type ')) {
       patterns.push({
-        type: 'bracket_combo',
-        bonus: 75,
-        color: '#ffd93d',
+        type: 'advanced_syntax',
+        bonus: 200, // Premium bonus for advanced syntax
+        color: '#ff6b6b',
         id: Date.now() + Math.random()
       });
     }
     
-    // Speed consistency pattern
-    const speeds = recentChars.map(char => char.speed);
-    const uniqueSpeeds = [...new Set(speeds)];
-    if (uniqueSpeeds.length === 1 && speeds.length >= 4 && uniqueSpeeds[0] !== 'lame') {
+    // Import/export pattern
+    if (recentText.includes('import ') || recentText.includes('export ') || recentText.includes('from ')) {
       patterns.push({
-        type: 'speed_consistency',
-        speed: uniqueSpeeds[0],
+        type: 'module_syntax',
         bonus: 120,
         color: '#6bcf7f',
         id: Date.now() + Math.random()
       });
     }
     
-    // Line completion pattern
+    // Bracket/parentheses matching pattern - Syntax Master
+    const brackets = recentText.match(/[\(\)\[\]\{\}]/g);
+    if (brackets && brackets.length >= 2) {
+      patterns.push({
+        type: 'bracket_combo',
+        bonus: 100, // Increased for better feedback
+        color: '#ffd93d',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Speed consistency pattern - Unstoppable Bonus
+    const speeds = recentChars.map(char => char.speed);
+    const uniqueSpeeds = [...new Set(speeds)];
+    if (uniqueSpeeds.length === 1 && speeds.length >= 4 && uniqueSpeeds[0] !== 'lame') {
+      patterns.push({
+        type: 'speed_consistency',
+        speed: uniqueSpeeds[0],
+        bonus: 180, // Major bonus for consistency
+        color: '#6bcf7f',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Line completion pattern - Clean Code Bonus
     if (recentText.includes('\n') || recentText.includes(';')) {
       patterns.push({
         type: 'line_completion',
-        bonus: 80,
+        bonus: 100,
         color: '#45b7d1',
         id: Date.now() + Math.random()
       });
     }
-    // Check for combo milestones
+    
+    // String/template literal patterns
+    if (recentText.includes('`') || recentText.includes('"') || recentText.includes("'")) {
+      patterns.push({
+        type: 'string_mastery',
+        bonus: 90,
+        color: '#ffaa00',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Arrow function pattern
+    if (recentText.includes('=>') || recentText.includes('() =>')) {
+      patterns.push({
+        type: 'arrow_function',
+        bonus: 130,
+        color: '#ff6b6b',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Check for combo milestones - On Fire Bonus
     if (currentCombo > 0 && currentCombo % 10 === 0) {
       patterns.push({
         type: 'combo_milestone',
         combo: currentCombo,
-        bonus: currentCombo * 10,
+        bonus: currentCombo * 15, // Escalating milestone rewards
         color: '#ffd93d',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Perfect typing streak (no errors for extended period)
+    if (this.state.streak >= 20 && this.state.errors === 0) {
+      patterns.push({
+        type: 'flawless_execution',
+        bonus: 250,
+        color: '#ff1744',
         id: Date.now() + Math.random()
       });
     }

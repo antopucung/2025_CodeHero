@@ -1,0 +1,97 @@
+import { useState } from "react";
+import { Box, Button, Text, useToast } from "@chakra-ui/react";
+import { executeCode } from "../api";
+
+const Output = ({ editorRef, language, onExecutionComplete }) => {
+  const toast = useToast();
+  const [output, setOutput] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  const runCode = async () => {
+    const sourceCode = editorRef.current.getValue();
+    if (!sourceCode) return;
+    try {
+      setIsLoading(true);
+      const { run: result } = await executeCode(language, sourceCode);
+      setOutput(result.output.split("\n"));
+      result.stderr ? setIsError(true) : setIsError(false);
+      
+      // Notify parent component about execution
+      if (onExecutionComplete) {
+        onExecutionComplete({
+          success: !result.stderr,
+          output: result.output,
+          error: result.stderr
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: "An error occurred.",
+        description: error.message || "Unable to run code",
+        status: "error",
+        duration: 6000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Box w="50%" bg="#111" border="1px solid #333" p={3}>
+      <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
+        │ TERMINAL OUTPUT
+      </Text>
+      <Button
+        bg="#000"
+        color="#00ff00"
+        border="1px solid #00ff00"
+        borderRadius="0"
+        fontFamily="'Courier New', monospace"
+        fontSize="sm"
+        _hover={{ bg: "#003300", color: "#00ff41" }}
+        _active={{ bg: "#001100" }}
+        mb={4}
+        isLoading={isLoading}
+        onClick={runCode}
+      >
+        {isLoading ? "EXECUTING..." : "$ ./run"}
+      </Button>
+      <Box
+        height="75vh"
+        height="60vh"
+        p={3}
+        bg="#000"
+        color={isError ? "#ff4444" : "#00ff00"}
+        border="1px solid"
+        borderRadius="0"
+        borderColor={isError ? "#ff4444" : "#333"}
+        fontFamily="'Courier New', monospace"
+        fontSize="sm"
+        overflowY="auto"
+      >
+        <Text color="#666" fontSize="xs" mb={2}>
+          arnab@terminal-ide:~$ {language} execution
+        </Text>
+        {output
+          ? output.map((line, i) => (
+              <Text key={i} fontFamily="'Courier New', monospace" fontSize="sm">
+                {line || " "}
+              </Text>
+            ))
+          : (
+              <Text color="#666" fontSize="sm">
+                Waiting for execution... Type your code and run $ ./run
+              </Text>
+            )}
+        {output && (
+          <Text color="#666" fontSize="xs" mt={2}>
+            [Process completed - Exit code: {isError ? "1" : "0"}]
+          </Text>
+        )}
+      </Box>
+    </Box>
+  );
+};
+export default Output;

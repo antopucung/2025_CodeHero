@@ -236,23 +236,29 @@ export const TypingDisplay = memo(({
   }, [engine, errorPositions, onCharacterClick]);
   
   return (
-    <TerminalPanel 
-      title={fullScreen ? "FULL SCREEN TYPING CHALLENGE" : "ADDICTIVE TYPING INTERFACE"} 
-      variant="primary"
-      padding="small"
+    <Box
+      w="100%"
+      h="100%"
+      bg={colors.terminal.surface}
+      border={`1px solid ${colors.terminal.border}`}
+      display="flex"
+      flexDirection="column"
+      overflow="hidden"
     >
+      <Text fontSize="xs" color={colors.terminal.textSecondary} p={2} borderBottom="1px solid #333">
+        │ TYPING INTERFACE
+      </Text>
+      
       <Box
         ref={containerRef}
         bg={colors.terminal.bg}
-        border={`1px solid ${colors.terminal.border}`}
-        p={fullScreen ? spacing[2] : spacing[3]}
-        minH={fullScreen ? "300px" : "200px"}
-        h={fullScreen ? "100%" : "auto"}
-        overflowY="auto"
+        flex={1}
+        overflow="auto"
+        p={3}
         position="relative"
         fontFamily="monospace"
-        fontSize={fullScreen ? "14px" : "12px"}
-        lineHeight={fullScreen ? "28px" : "22px"}
+        fontSize="14px"
+        lineHeight="28px"
       >
         {/* Progressive Background Effect with Intensity Scaling */}
         <BackgroundWaveEffect
@@ -409,7 +415,7 @@ export const TypingDisplay = memo(({
           ))}
         </AnimatePresence>
       </Box>
-    </TerminalPanel>
+    </Box>
   );
 });
 

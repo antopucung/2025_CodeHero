@@ -116,10 +116,10 @@ export const TypingBlock = memo(({
   
   // Fixed dimensions for consistent spacing
   const isSpace = char === ' ';
-  const width = isSpace ? (fullScreen ? '10px' : '8px') : (fullScreen ? '20px' : '16px');
-  const height = fullScreen ? '26px' : '20px';
-  const fontSize = fullScreen ? '14px' : '12px';
-  const lineHeight = fullScreen ? '24px' : '18px';
+  const width = isSpace ? '10px' : '20px';
+  const height = '26px';
+  const fontSize = '14px';
+  const lineHeight = '24px';
   
   return (
     <motion.div

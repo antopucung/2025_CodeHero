@@ -201,10 +201,11 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   }
 
   return (
-    <VStack 
-      spacing={fullScreen ? 2 : spacing[4]} 
-      align="stretch"
-      h={fullScreen ? "100%" : "auto"}
+    <Box 
+      w="100%"
+      h="100%"
+      display="flex"
+      flexDirection="column"
       overflow="hidden"
     >
       {/* Pattern Bonus Display */}
@@ -216,11 +217,19 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       />
       
       {/* Progress Bar */}
-      <TerminalPanel title="CHALLENGE PROGRESS" variant="primary">
+      <Box
+        bg={colors.terminal.surface}
+        border={`1px solid ${colors.terminal.border}`}
+        p={2}
+        flexShrink={0}
+      >
+        <Text fontSize="xs" color={colors.terminal.textSecondary} mb={2}>
+          │ PROGRESS
+        </Text>
         <Box 
           bg={colors.terminal.bg}
           border={`1px solid ${colors.terminal.border}`}
-          h={fullScreen ? "16px" : "12px"}
+          h="12px"
           borderRadius="0"
           overflow="hidden"
           position="relative"
@@ -238,17 +247,17 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         </Box>
         
         <Text 
-          fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
+          fontSize="xs"
           color={colors.terminal.textSecondary}
           textAlign="center" 
-          mt={spacing[2]}
+          mt={1}
         >
           {Math.round(engine.getProgress())}% Complete
         </Text>
-      </TerminalPanel>
+      </Box>
       
       {/* Typing Display */}
-      <Box flex={fullScreen ? 1 : "none"} overflow="hidden">
+      <Box flex={1} overflow="hidden">
         <TypingDisplay
           text={challenge.code}
           engine={engine}
@@ -275,70 +284,70 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           transition={{ 
             boxShadow: { repeat: Infinity, duration: 1.5 }
           }}
+          position="absolute"
+          top="50%"
+          left="50%"
+          transform="translate(-50%, -50%)"
+          zIndex={1000}
+          bg={colors.terminal.surface}
+          border={`2px solid ${colors.primary[500]}`}
+          borderRadius="8px"
+          p={4}
+          maxW="400px"
+          w="90%"
         >
-          <TerminalPanel title="CHALLENGE COMPLETED!" variant="primary">
-            <VStack spacing={spacing[3]}>
+          <VStack spacing={3}>
+            <Box
+              {...createPulseAnimation(1.5)}
+              color={colors.primary[500]}
+              fontWeight={typography.weights.bold}
+              fontSize="xl"
+              textAlign="center"
+            >
+              🎉 COMPLETED! 🎉
+            </Box>
+            
+            <Box textAlign="center">
+              <Text color={colors.combo.perfect} fontSize="md">
+                Score: {engineState.totalScore}
+              </Text>
+              <Text color={colors.terminal.textSecondary} fontSize="xs" mt={1}>
+                WPM: {engineState.wpm} | Accuracy: {engineState.accuracy}%
+              </Text>
+            </Box>
+            
+            {engineState.perfectStreak > 5 && (
               <Box
-                {...createPulseAnimation(1.5)}
-                color={colors.primary[500]}
+                bg={colors.performance.perfect.primary}
+                color="#fff"
+                p={2}
+                textAlign="center"
                 fontWeight={typography.weights.bold}
-                fontSize={fullScreen ? typography.sizes['4xl'] : typography.sizes['2xl']}
-                textAlign="center"
+                fontSize="xs"
+                borderRadius="4px"
               >
-                🎉 CHALLENGE MASTERED! 🎉
+                ⚡ PERFECT STREAK: {engineState.perfectStreak} ⚡
               </Box>
-              
-              <Box 
-                fontSize={fullScreen ? typography.sizes.lg : typography.sizes.base} 
-                textAlign="center"
-              >
-                <Text color={colors.combo.perfect}>
-                  Final Score: {engineState.totalScore}
-                </Text>
-                <Text color={colors.terminal.textSecondary} mt={spacing[1]}>
-                  WPM: {engineState.wpm} | Accuracy: {engineState.accuracy}% | Max Combo: x{engineState.maxCombo}
-                </Text>
-              </Box>
-              
-              {engineState.perfectStreak > 5 && (
-                <Box
-                  bg={colors.performance.perfect.primary}
-                  color="#fff"
-                  p={spacing[2]}
-                  textAlign="center"
-                  fontWeight={typography.weights.bold}
-                >
-                  ⚡ PERFECT STREAK: {engineState.perfectStreak} ⚡
-                </Box>
-              )}
-              
-              {engineState.streakMultiplier > 1 && (
-                <Box
-                  bg={colors.combo.god}
-                  color="#000"
-                  p={spacing[2]}
-                  textAlign="center"
-                  fontWeight={typography.weights.bold}
-                >
-                  🔥 STREAK MULTIPLIER: x{engineState.streakMultiplier} 🔥
-                </Box>
-              )}
-            </VStack>
-          </TerminalPanel>
+            )}
+          </VStack>
         </MotionBox>
       )}
       
       {!engineState.isComplete && (
         <Text 
-          fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
+          fontSize="xs"
           color={colors.terminal.textSecondary} 
           textAlign="center"
           style={{ opacity: 0.7 }}
+          position="absolute"
+          bottom="10px"
+          left="50%"
+          transform="translateX(-50%)"
         >
           Type the code above exactly as shown. Build combos for higher scores!
         </Text>
       )}
-    </VStack>
+    </Box>
   );
 };
 

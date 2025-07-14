@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Text as ChakraText } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TypingBlock } from './TypingBlock';
 import { TerminalPanel } from '../../design/components/TerminalPanel';
@@ -245,9 +245,9 @@ export const TypingDisplay = memo(({
       flexDirection="column"
       overflow="hidden"
     >
-      <Text fontSize="xs" color={colors.terminal.textSecondary} p={2} borderBottom="1px solid #333">
+      <ChakraText fontSize="xs" color={colors.terminal.textSecondary} p={2} borderBottom="1px solid #333">
         │ TYPING INTERFACE
-      </Text>
+      </ChakraText>
       
       <Box
         ref={containerRef}

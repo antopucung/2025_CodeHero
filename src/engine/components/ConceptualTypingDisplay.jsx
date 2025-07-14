@@ -70,34 +70,52 @@ export const ConceptualTypingDisplay = memo(({
   
   // Fixed cursor position calculation
   const updateCursorPosition = useCallback(() => {
-    if (!containerRef.current || !engine.state || !structuredCode.length) return;
+    if (!containerRef.current || !engine.state) return;
     
     const currentIndex = engine.state.currentIndex;
+    const text = engine.typingProcessor?.targetText || '';
     
-    // Calculate accurate cursor position
+    if (!text) return;
+    
+    // Calculate cursor position based on actual character positions
     let x = 0;
     let y = 0;
-    let currentLine = 0;
-    let currentCol = 0;
+    let line = 0;
+    let col = 0;
     
-    for (let i = 0; i < Math.min(currentIndex, structuredCode.length); i++) {
-      const item = structuredCode[i];
+    const charWidth = fullScreen ? 22 : 18; // Character width including spacing
+    const lineHeight = fullScreen ? 32 : 28; // Line height
+    const containerWidth = containerRef.current.offsetWidth - 48; // Account for padding
+    const maxCharsPerLine = Math.floor(containerWidth / charWidth);
+    
+    // Calculate position character by character
+    for (let i = 0; i < currentIndex && i < text.length; i++) {
+      const char = text[i];
       
-      if (item.isNewline) {
-        currentLine++;
-        currentCol = 0;
-        x = (item.indentLevel || 0) * (fullScreen ? 16 : 12);
-        y = currentLine * (fullScreen ? 32 : 28);
+      if (char === '\n') {
+        // New line - reset column, increment line
+        line++;
+        col = 0;
+        x = 0;
+        y = line * lineHeight;
       } else {
-        // Standard character width with spacing
-        const charWidth = fullScreen ? 24 : 20; // width + spacing
+        // Regular character - advance column
+        col++;
         x += charWidth;
-        currentCol++;
+        
+        // Handle line wrapping for very long lines
+        if (col >= maxCharsPerLine) {
+          line++;
+          col = 0;
+          x = 0;
+          y = line * lineHeight;
+        }
       }
     }
     
+    // Position cursor at the end of the last typed character
     setCursorPosition({ x, y });
-  }, [engine.state?.currentIndex, structuredCode, fullScreen]);
+  }, [engine.state?.currentIndex, engine.typingProcessor?.targetText, fullScreen]);
   
   // Update cursor position when index changes
   useEffect(() => {
@@ -436,10 +454,10 @@ export const ConceptualTypingDisplay = memo(({
         <motion.div
           animate={{
             opacity: [1, 0.3, 1],
-            scaleY: [1, 1.1, 1]
+            scaleY: [1, 1.05, 1]
           }}
           transition={{
-            duration: 0.8,
+            duration: 1.0, // Slower, more natural blinking
             repeat: Infinity,
             ease: "easeInOut"
           }}
@@ -447,31 +465,16 @@ export const ConceptualTypingDisplay = memo(({
             position: 'absolute',
             left: `${cursorPosition.x}px`,
             top: `${cursorPosition.y}px`,
-            width: '2px',
+            width: '2px', // Thin cursor line
             height: fullScreen ? '26px' : '22px',
-            background: '#3182CE',
+            background: 'linear-gradient(180deg, #3182CE, #4299E1)', // Subtle gradient
             borderRadius: '1px',
             zIndex: 1000,
             pointerEvents: 'none',
-            boxShadow: '0 0 8px #3182CE'
+            boxShadow: '0 0 6px #3182CE', // Subtle glow
+            transform: 'translateX(-1px)' // Center the cursor on the character
           }}
         />
-        
-        {/* Backup cursor for debugging */}
-        {process.env.NODE_ENV === 'development' && (
-          <div
-            style={{
-              position: 'absolute',
-              left: `${cursorPosition.x - 1}px`,
-              top: `${cursorPosition.y - 1}px`,
-              width: '4px',
-              height: fullScreen ? '28px' : '24px',
-              border: '1px solid red',
-              pointerEvents: 'none',
-              zIndex: 999
-            }}
-          />
-        )}
         
         {/* Code Lines with Enhanced Layout */}
         <Box

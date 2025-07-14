@@ -26,6 +26,9 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showAchievement, setShowAchievement] = useState(null);
 
+  // DISABLE ALL REWARD POPUPS FOR NOW
+  const DISABLE_POPUPS = true;
+
   // Performance optimization - limit concurrent effects
   const [effectLimiter, setEffectLimiter] = useState({
     maxFloatingScores: 5,
@@ -61,33 +64,41 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       
       // Show new pattern bonuses
       if (newState.patternMatches && newState.patternMatches.length > 0) {
-        const newPatterns = newState.patternMatches.filter(
-          pattern => !activePatterns.some(active => active.id === pattern.id)
-        ).slice(0, effectLimiter.maxPatterns); // Limit concurrent patterns
-        
-        if (newPatterns.length > 0) {
-          setActivePatterns(prev => [...prev, ...newPatterns]);
+        if (!DISABLE_POPUPS) {
+          const newPatterns = newState.patternMatches.filter(
+            pattern => !activePatterns.some(active => active.id === pattern.id)
+          ).slice(0, effectLimiter.maxPatterns); // Limit concurrent patterns
+          
+          if (newPatterns.length > 0) {
+            setActivePatterns(prev => [...prev, ...newPatterns]);
+          }
         }
       }
       
       // Clear new achievements after showing
       if (newState.newAchievements && newState.newAchievements.length > 0) {
-        setTimeout(() => {
-          engine.state.newAchievements = [];
-        }, 100);
+        if (!DISABLE_POPUPS) {
+          setTimeout(() => {
+            engine.state.newAchievements = [];
+          }, 100);
+        }
       }
       
       // Clear new level after showing
       if (newState.newLevel) {
-        setShowLevelUp(newState.newLevel);
-        setTimeout(() => {
-          engine.state.newLevel = null;
-        }, 100);
+        if (!DISABLE_POPUPS) {
+          setShowLevelUp(newState.newLevel);
+          setTimeout(() => {
+            engine.state.newLevel = null;
+          }, 100);
+        }
       }
       
       // Show new achievements
       if (newState.newAchievements && newState.newAchievements.length > 0) {
-        setShowAchievement(newState.newAchievements[0]);
+        if (!DISABLE_POPUPS) {
+          setShowAchievement(newState.newAchievements[0]);
+        }
       }
     };
 
@@ -232,32 +243,37 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       flexDirection="column"
       overflow="hidden"
     >
-      {/* Pattern Bonus Display */}
-      <PatternBonusDisplay
-        patterns={activePatterns}
-        onPatternComplete={(patternId) => {
-          setActivePatterns(prev => prev.filter(p => p.id !== patternId));
-        }}
-      />
-      
-      {/* Level Up Celebration */}
-      {showLevelUp && (
-        <MegaLevelUpCelebration
-          newLevel={showLevelUp}
-          onComplete={() => {
-            setShowLevelUp(false);
-          }}
-        />
-      )}
-      
-      {/* Achievement Unlock */}
-      {showAchievement && (
-        <MegaAchievementUnlock
-          achievement={showAchievement}
-          onComplete={() => {
-            setShowAchievement(null);
-          }}
-        />
+      {/* REWARD POPUPS DISABLED FOR NOW */}
+      {!DISABLE_POPUPS && (
+        <>
+          {/* Pattern Bonus Display */}
+          <PatternBonusDisplay
+            patterns={activePatterns}
+            onPatternComplete={(patternId) => {
+              setActivePatterns(prev => prev.filter(p => p.id !== patternId));
+            }}
+          />
+          
+          {/* Level Up Celebration */}
+          {showLevelUp && (
+            <MegaLevelUpCelebration
+              newLevel={showLevelUp}
+              onComplete={() => {
+                setShowLevelUp(false);
+              }}
+            />
+          )}
+          
+          {/* Achievement Unlock */}
+          {showAchievement && (
+            <MegaAchievementUnlock
+              achievement={showAchievement}
+              onComplete={() => {
+                setShowAchievement(null);
+              }}
+            />
+          )}
+        </>
       )}
       
       {/* Progress Bar */}
@@ -314,72 +330,74 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       
       {/* Completion Message */}
       {engineState.isComplete && (
-        <MotionBox
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ 
-            opacity: 1, 
-            scale: 1,
-            boxShadow: [
-              `0 0 15px ${colors.primary[500]}`,
-              `0 0 25px ${colors.primary[500]}`,
-              `0 0 15px ${colors.primary[500]}`
-            ]
-          }}
-          transition={{ 
-            boxShadow: { repeat: Infinity, duration: 1.5 }
-          }}
-          position="fixed"
-          top="10px"
-          left="50%"
-          transform="translateX(-50%)"
-          zIndex={999} // Lower z-index
-          textAlign="center"
-          pointerEvents="none"
-          onClick={() => {
-            // Allow clicking to dismiss or continue
-            if (onComplete) {
-              onComplete({
-                ...engineState,
-                challenge: challenge.id,
-                language: challenge.language
-              });
-            }
-          }}
-        >
-          <VStack spacing={2}>
-            <Box
-              {...createPulseAnimation(1.5)}
-              color={colors.primary[500]}
-              fontWeight={typography.weights.bold}
-              fontSize="md"
-              textAlign="center"
-              style={{ textShadow: `0 0 20px ${colors.primary[500]}` }}
-            >
-              🎉 COMPLETED! 🎉
-            </Box>
-            
-            <Box textAlign="center">
-              <Text color={colors.combo.perfect} fontSize="sm" style={{ textShadow: `0 0 15px ${colors.combo.perfect}` }}>
-                Score: {engineState.totalScore}
-              </Text>
-              <Text color={colors.terminal.textSecondary} fontSize="xs" mt={1} style={{ textShadow: '0 0 10px #666' }}>
-                WPM: {engineState.wpm} | Accuracy: {engineState.accuracy}%
-              </Text>
-            </Box>
-            
-            {engineState.perfectStreak > 5 && (
+        !DISABLE_POPUPS && (
+          <MotionBox
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1,
+              boxShadow: [
+                `0 0 15px ${colors.primary[500]}`,
+                `0 0 25px ${colors.primary[500]}`,
+                `0 0 15px ${colors.primary[500]}`
+              ]
+            }}
+            transition={{ 
+              boxShadow: { repeat: Infinity, duration: 1.5 }
+            }}
+            position="fixed"
+            top="10px"
+            left="50%"
+            transform="translateX(-50%)"
+            zIndex={999} // Lower z-index
+            textAlign="center"
+            pointerEvents="none"
+            onClick={() => {
+              // Allow clicking to dismiss or continue
+              if (onComplete) {
+                onComplete({
+                  ...engineState,
+                  challenge: challenge.id,
+                  language: challenge.language
+                });
+              }
+            }}
+          >
+            <VStack spacing={2}>
               <Box
-                color="#fff"
-                textAlign="center"
+                {...createPulseAnimation(1.5)}
+                color={colors.primary[500]}
                 fontWeight={typography.weights.bold}
-                fontSize="xs"
-                style={{ textShadow: `0 0 20px ${colors.performance.perfect.primary}` }}
+                fontSize="md"
+                textAlign="center"
+                style={{ textShadow: `0 0 20px ${colors.primary[500]}` }}
               >
-                ⚡ PERFECT STREAK: {engineState.perfectStreak} ⚡
+                🎉 COMPLETED! 🎉
               </Box>
-            )}
-          </VStack>
-        </MotionBox>
+              
+              <Box textAlign="center">
+                <Text color={colors.combo.perfect} fontSize="sm" style={{ textShadow: `0 0 15px ${colors.combo.perfect}` }}>
+                  Score: {engineState.totalScore}
+                </Text>
+                <Text color={colors.terminal.textSecondary} fontSize="xs" mt={1} style={{ textShadow: '0 0 10px #666' }}>
+                  WPM: {engineState.wpm} | Accuracy: {engineState.accuracy}%
+                </Text>
+              </Box>
+              
+              {engineState.perfectStreak > 5 && (
+                <Box
+                  color="#fff"
+                  textAlign="center"
+                  fontWeight={typography.weights.bold}
+                  fontSize="xs"
+                  style={{ textShadow: `0 0 20px ${colors.performance.perfect.primary}` }}
+                >
+                  ⚡ PERFECT STREAK: {engineState.perfectStreak} ⚡
+                </Box>
+              )}
+            </VStack>
+          </MotionBox>
+        )
       )}
       
       {!engineState.isComplete && (

@@ -231,12 +231,6 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           newLevel={showLevelUp}
           onComplete={() => {
             setShowLevelUp(false);
-            // Ensure typing can continue immediately
-            setTimeout(() => {
-              if (containerRef.current) {
-                containerRef.current.focus();
-              }
-            }, 100);
           }}
         />
       )}
@@ -247,12 +241,6 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           achievement={showAchievement}
           onComplete={() => {
             setShowAchievement(null);
-            // Ensure typing can continue immediately
-            setTimeout(() => {
-              if (containerRef.current) {
-                containerRef.current.focus();
-              }
-            }, 100);
           }}
         />
       )}

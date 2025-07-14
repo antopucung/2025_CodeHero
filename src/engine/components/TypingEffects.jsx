@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text as ChakraText } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
@@ -909,13 +909,13 @@ export const AchievementUnlock = ({ achievement, onComplete }) => {
       </motion.div>
       
       {/* Achievement description */}
-      <Text
+      <ChakraText
         color="#ccc"
         fontSize="14px"
         fontFamily="'Courier New', monospace"
       >
         {data.desc}
-      </Text>
+      </ChakraText>
       
       {/* Orbiting achievement particles */}
       {Array.from({ length: 8 }).map((_, i) => (
@@ -1229,9 +1229,9 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
             🚀 INCREDIBLE PROGRESS! 🚀
           </motion.div>
           
-          <Text fontSize="18px" color="#ffd93d">
+          <ChakraText fontSize="18px" color="#ffd93d">
             Your typing skills have evolved to Level {newLevel}!
-          </Text>
+          </ChakraText>
           
           <motion.div
             animate={{ rotate: [0, 360] }}

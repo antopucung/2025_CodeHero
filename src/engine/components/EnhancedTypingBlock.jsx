@@ -310,7 +310,7 @@ export const EnhancedTypingBlock = memo(({
   };
   
   const dimensions = getCharacterDimensions();
-  const spacing = getSpacing();
+  const calculatedSpacing = getSpacing();
   
   return (
     <motion.div
@@ -318,7 +318,7 @@ export const EnhancedTypingBlock = memo(({
       onClick={onClick}
       style={{
         ...dimensions,
-        margin: `1px ${spacing}`,
+        margin: `1px ${calculatedSpacing}`,
         border: `1px solid ${blockStyle.borderColor}`,
         borderRadius: fullScreen ? '4px' : '3px',
         textAlign: 'center',

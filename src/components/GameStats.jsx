@@ -14,8 +14,9 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
   
   // Get optimization data if available
   const optimizations = progress.optimizations || {};
-  const performanceMode = optimizations.performance?.mode || 'auto';
+  const performanceMode = optimizations.performance?.mode || 'high';
   const fps = optimizations.performance?.fps || 60;
+  const effectScale = optimizations.performance?.effectScale || 1;
 
   return (
     <MotionBox 
@@ -49,11 +50,21 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
         <JuicyProgressBar progress={xpProgress} color={colors.primary[500]} />
         
         {/* Performance indicator */}
-        {performanceMode !== 'auto' && (
+        {performanceMode !== 'high' && (
           <HStack justify="space-between" fontSize={typography.sizes.xs}>
             <Text color={colors.terminal.textSecondary}>PERFORMANCE</Text>
             <Text color={fps >= 55 ? colors.performance.good.primary : fps >= 45 ? colors.performance.best.primary : colors.performance.error.primary}>
-              {performanceMode.toUpperCase()} ({fps} FPS)
+              {performanceMode.toUpperCase()} ({fps} FPS) [{Math.round(effectScale * 100)}%]
+            </Text>
+          </HStack>
+        )}
+        
+        {/* Effect scale indicator for low performance */}
+        {effectScale < 0.8 && (
+          <HStack justify="space-between" fontSize={typography.sizes.xs}>
+            <Text color={colors.terminal.textSecondary}>EFFECTS</Text>
+            <Text color={effectScale < 0.5 ? colors.performance.error.primary : colors.performance.best.primary}>
+              {Math.round(effectScale * 100)}% INTENSITY
             </Text>
           </HStack>
         )}

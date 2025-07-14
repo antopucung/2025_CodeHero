@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
 // Enhanced floating score with speed and pattern indicators
-export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed = 'lame', patterns = 0, onComplete }) => {
+export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed = 'lame', patterns = 0, onComplete, reduced = false }) => {
   const getScoreSize = (combo, patterns) => {
     const baseSize = 16;
     const comboBonus = Math.min(combo / 10, 8);
@@ -15,6 +15,11 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
   const getScoreEffect = (combo, speed, patterns) => {
     const speedMultiplier = { perfect: 2, best: 1.5, good: 1.2, lame: 1 }[speed];
     const patternMultiplier = 1 + (patterns * 0.3);
+    
+    // Reduce effects for performance
+    if (reduced) {
+      return { scale: [0.5, 1.2, 1], rotate: [0, 45, 0], textShadow: [`0 0 5px ${color}`, `0 0 15px ${color}`, `0 0 5px ${color}`] };
+    }
     
     if (combo >= 50) return {
       scale: [0.5, 2.5 * speedMultiplier * patternMultiplier, 1.8],
@@ -59,7 +64,7 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
       }}
       exit={{ opacity: 0 }}
       transition={{ 
-        duration: 2.5 + (patterns * 0.5), 
+        duration: reduced ? 1.5 : 2.5 + (patterns * 0.5), 
         ease: "easeOut"
       }}
       onAnimationComplete={onComplete}
@@ -74,7 +79,7 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
       }}
     >
       +{score}
-      {combo > 10 && (
+      {combo > 10 && !reduced && (
         <motion.span
           animate={{
             opacity: [0, 1, 0],
@@ -90,7 +95,7 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
           x{combo} COMBO!
         </motion.span>
       )}
-      {speed !== 'lame' && (
+      {speed !== 'lame' && !reduced && (
         <motion.span
           animate={{
             opacity: [0, 1, 0],
@@ -107,7 +112,7 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
           {speed.toUpperCase()}!
         </motion.span>
       )}
-      {patterns > 0 && (
+      {patterns > 0 && !reduced && (
         <motion.span
           animate={{
             opacity: [0, 1, 0],
@@ -130,7 +135,7 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
 };
 
 // Enhanced character explosion with speed and pattern effects
-export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = 'lame', patterns = 0, onComplete }) => {
+export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = 'lame', patterns = 0, onComplete, reduced = false }) => {
   const getExplosionColor = (isCorrect, speed, combo) => {
     if (!isCorrect) return '#ff1744';
     
@@ -145,7 +150,9 @@ export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = '
   };
 
   const explosionColor = getExplosionColor(isCorrect, speed, combo);
-  const particleCount = isCorrect ? Math.min(8 + combo / 2 + patterns * 3, 20) : 10;
+  const particleCount = reduced ? 
+    (isCorrect ? Math.min(4 + combo / 4, 8) : 4) :
+    (isCorrect ? Math.min(8 + combo / 2 + patterns * 3, 20) : 10);
   const explosionSize = isCorrect ? Math.min(35 + combo * 2 + patterns * 8, 100) : 30;
   const speedMultiplier = { perfect: 1.5, best: 1.3, good: 1.1, lame: 1 }[speed] || 1;
   
@@ -187,7 +194,7 @@ export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = '
             opacity: [1, 0.9, 0]
           }}
           transition={{ 
-            duration: 1.5 + (patterns * 0.2), 
+            duration: reduced ? 1 : 1.5 + (patterns * 0.2), 
             ease: "easeOut",
             delay: particle.delay
           }}
@@ -225,7 +232,7 @@ export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = '
       </motion.div>
 
       {/* Speed indicator */}
-      {isCorrect && speed !== 'lame' && (
+      {isCorrect && speed !== 'lame' && !reduced && (
         <motion.div
           initial={{ scale: 0, y: -10, opacity: 0 }}
           animate={{ 
@@ -253,7 +260,7 @@ export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = '
       )}
 
       {/* Pattern bonus indicator */}
-      {patterns > 0 && (
+      {patterns > 0 && !reduced && (
         <motion.div
           initial={{ scale: 0, rotate: -180 }}
           animate={{ 
@@ -281,7 +288,7 @@ export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = '
       )}
 
       {/* Enhanced error indicator */}
-      {!isCorrect && (
+      {!isCorrect && !reduced && (
         <motion.div
           initial={{ scale: 0, y: 0, rotate: -90 }}
           animate={{ 
@@ -310,7 +317,7 @@ export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = '
       )}
 
       {/* Enhanced celebration rings for high performance */}
-      {isCorrect && (combo > 5 || patterns > 0) && (
+      {isCorrect && (combo > 5 || patterns > 0) && !reduced && (
         <>
           <motion.div
             initial={{ scale: 0, opacity: 1 }}
@@ -360,7 +367,7 @@ export const CharacterExplosion = ({ char, x, y, isCorrect, combo = 1, speed = '
 };
 
 // Enhanced combo burst effect with pattern matching
-export const ComboBurstEffect = ({ isActive, combo, x, y, patterns = [] }) => {
+export const ComboBurstEffect = ({ isActive, combo, x, y, patterns = [], reduced = false }) => {
   if (!isActive || combo <= 5) return null;
 
   const getComboColor = (combo) => {
@@ -372,7 +379,9 @@ export const ComboBurstEffect = ({ isActive, combo, x, y, patterns = [] }) => {
   };
 
   const burstColor = getComboColor(combo);
-  const particleCount = Math.min(Math.floor(combo / 3) + patterns.length * 2, 16);
+  const particleCount = reduced ? 
+    Math.min(Math.floor(combo / 6) + patterns.length, 6) :
+    Math.min(Math.floor(combo / 3) + patterns.length * 2, 16);
   const burstSize = Math.min(combo * 2 + patterns.length * 10, 60);
 
   return (
@@ -396,7 +405,7 @@ export const ComboBurstEffect = ({ isActive, combo, x, y, patterns = [] }) => {
             opacity: [1, 0.8, 0]
           }}
           transition={{
-            duration: 1.2 + (patterns.length * 0.2),
+            duration: reduced ? 0.8 : 1.2 + (patterns.length * 0.2),
             delay: i * 0.03,
             repeat: Infinity,
             repeatDelay: 0.8
@@ -413,7 +422,7 @@ export const ComboBurstEffect = ({ isActive, combo, x, y, patterns = [] }) => {
       ))}
       
       {/* Enhanced central burst for pattern matches */}
-      <motion.div
+      {!reduced && <motion.div
         animate={{
           scale: [1, 1.5 + (patterns.length * 0.2), 1],
           opacity: [0.8, 0.4, 0.8],
@@ -433,13 +442,13 @@ export const ComboBurstEffect = ({ isActive, combo, x, y, patterns = [] }) => {
           transform: 'translate(-50%, -50%)',
           boxShadow: `0 0 ${20 + patterns.length * 5}px ${burstColor}`
         }}
-      />
+      />}
     </motion.div>
   );
 };
 
 // Dynamic anticipation cursor
-export const AnticipationCursor = ({ isVisible, position, typingSpeed = 'lame', anticipationLevel = 1, combo = 1 }) => {
+export const AnticipationCursor = ({ isVisible, position, typingSpeed = 'lame', anticipationLevel = 1, combo = 1, reduced = false }) => {
   if (!isVisible) return null;
   
   const getSpeedColor = (speed) => {
@@ -453,7 +462,7 @@ export const AnticipationCursor = ({ isVisible, position, typingSpeed = 'lame', 
   };
 
   const cursorColor = getSpeedColor(typingSpeed);
-  const intensity = Math.min(1 + (combo / 15) + anticipationLevel, 3);
+  const intensity = reduced ? 1 : Math.min(1 + (combo / 15) + anticipationLevel, 3);
 
   return (
     <motion.div
@@ -484,7 +493,7 @@ export const AnticipationCursor = ({ isVisible, position, typingSpeed = 'lame', 
       }}
     >
       {/* Speed indicator for current character */}
-      {typingSpeed !== 'lame' && (
+      {typingSpeed !== 'lame' && !reduced && (
         <motion.div
           animate={{
             opacity: [0.3, 0.8, 0.3],
@@ -520,17 +529,20 @@ export const BackgroundWaveEffect = ({ isActive, intensity = 1, combo = 1, antic
   useEffect(() => {
     if (!isActive) return;
     
+    // Reduce animation frequency for performance
+    const updateInterval = intensity < 0.5 ? 100 : 50;
+    
     const interval = setInterval(() => {
       setTime(prev => prev + (0.08 * anticipationLevel));
-    }, 50);
+    }, updateInterval);
     
     return () => clearInterval(interval);
-  }, [isActive, anticipationLevel]);
+  }, [isActive, anticipationLevel, intensity]);
 
   if (!isActive) return null;
 
   const getGradient = (combo, time, anticipationLevel, typingSpeed) => {
-    const baseOpacity = 0.15 * intensity * anticipationLevel;
+    const baseOpacity = Math.min(0.15 * intensity * anticipationLevel, 0.3);
     const pulseOpacity = baseOpacity + Math.sin(time * 3) * 0.05;
     
     // Anticipation-based background colors
@@ -543,40 +555,25 @@ export const BackgroundWaveEffect = ({ isActive, intensity = 1, combo = 1, antic
     
     const [color1, color2] = anticipationColors[typingSpeed] || anticipationColors.lame;
     
+    // Simplified gradients for better performance
     if (combo >= 50) {
       return `
-        radial-gradient(circle at ${50 + Math.sin(time) * 20}% ${50 + Math.cos(time * 1.3) * 20}%, 
+        radial-gradient(circle at ${50 + Math.sin(time) * 10}% ${50 + Math.cos(time) * 10}%, 
           rgba(${color1}, ${pulseOpacity * 1.5}) 0%, 
-          rgba(${color2}, ${pulseOpacity * 1.2}) 30%, 
-          rgba(${color1}, ${pulseOpacity * 0.8}) 60%,
-          transparent 100%),
-        linear-gradient(${time * 45}deg, 
-          rgba(${color1}, ${pulseOpacity * 0.4}) 0%, 
-          rgba(${color2}, ${pulseOpacity * 0.3}) 50%, 
-          rgba(${color1}, ${pulseOpacity * 0.4}) 100%)
+          transparent 70%)
       `;
     } else if (combo >= 30) {
       return `
-        radial-gradient(circle at ${50 + Math.sin(time * 1.2) * 15}% ${50 + Math.cos(time) * 15}%, 
+        radial-gradient(circle at ${50 + Math.sin(time) * 8}% ${50 + Math.cos(time) * 8}%, 
           rgba(${color1}, ${pulseOpacity * 1.2}) 0%, 
-          rgba(${color2}, ${pulseOpacity * 0.9}) 40%, 
           transparent 80%),
-        linear-gradient(${time * 35}deg, 
-          rgba(${color1}, ${pulseOpacity * 0.3}) 0%, 
-          rgba(${color2}, ${pulseOpacity * 0.2}) 50%, 
-          rgba(${color1}, ${pulseOpacity * 0.3}) 100%)
       `;
     }
     
     return `
-      radial-gradient(circle at ${50 + Math.sin(time * 0.5) * 8}% ${50 + Math.cos(time * 0.7) * 8}%, 
+      radial-gradient(circle at ${50 + Math.sin(time * 0.5) * 5}% ${50 + Math.cos(time * 0.5) * 5}%, 
         rgba(${color1}, ${pulseOpacity}) 0%, 
-        rgba(${color2}, ${pulseOpacity * 0.7}) 70%, 
-        transparent 100%),
-      linear-gradient(${time * 15}deg, 
-        rgba(${color1}, ${pulseOpacity * 0.2}) 0%, 
-        rgba(${color2}, ${pulseOpacity * 0.15}) 50%, 
-        rgba(${color1}, ${pulseOpacity * 0.2}) 100%)
+        transparent 90%)
     `;
   };
 

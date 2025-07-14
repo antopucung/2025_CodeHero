@@ -28,7 +28,11 @@ export const TypingDisplay = memo(({
   const [activeEffects, setActiveEffects] = useState({
     floatingScores: [],
     explosions: [],
-    comboBursts: []
+    comboBursts: [],
+    characterUpgrades: [],
+    achievements: [],
+    streakEffects: [],
+    levelUps: []
   });
   
   // Optimized cursor position calculation

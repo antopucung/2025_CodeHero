@@ -164,7 +164,11 @@ export const TypingDisplay = memo(({
       setActiveEffects(prev => ({
         floatingScores: prev.floatingScores.filter(effect => now - effect.id < 3000),
         explosions: prev.explosions.filter(effect => now - effect.id < 2000),
-        comboBursts: prev.comboBursts.filter(effect => now - effect.id < 2000)
+        comboBursts: prev.comboBursts.filter(effect => now - effect.id < 2000),
+        characterUpgrades: prev.characterUpgrades.filter(effect => now - effect.createdAt < 3000),
+        achievements: prev.achievements.filter(effect => now - effect.createdAt < 6000),
+        streakEffects: prev.streakEffects.filter(effect => now - effect.createdAt < 8000),
+        levelUps: prev.levelUps.filter(effect => now - effect.createdAt < 6000)
       }));
     }, 1000);
     
@@ -301,6 +305,53 @@ export const TypingDisplay = memo(({
               x={burst.x}
               y={burst.y}
               patterns={burst.patterns}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Character Upgrade Effects */}
+        <AnimatePresence>
+          {activeEffects.characterUpgrades.map((upgrade) => (
+            <CharacterUpgradeEffect
+              key={upgrade.id}
+              char={upgrade.char}
+              index={upgrade.index}
+              upgrade={upgrade.upgrade}
+              onComplete={() => removeEffect('characterUpgrades', upgrade.id)}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Achievement Unlocks */}
+        <AnimatePresence>
+          {activeEffects.achievements.map((achievement) => (
+            <AchievementUnlock
+              key={achievement.id}
+              achievement={achievement.type}
+              onComplete={() => removeEffect('achievements', achievement.id)}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Streak Multiplier Effects */}
+        <AnimatePresence>
+          {activeEffects.streakEffects.map((streak) => (
+            <StreakMultiplierEffect
+              key={streak.id}
+              streak={streak.streak}
+              multiplier={streak.multiplier}
+              isActive={true}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Level Up Transformations */}
+        <AnimatePresence>
+          {activeEffects.levelUps.map((levelUp) => (
+            <LevelUpTransformation
+              key={levelUp.id}
+              newLevel={levelUp.newLevel}
+              onComplete={() => removeEffect('levelUps', levelUp.id)}
             />
           ))}
         </AnimatePresence>

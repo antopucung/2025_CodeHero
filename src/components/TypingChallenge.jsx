@@ -58,6 +58,20 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           setActivePatterns(prev => [...prev, ...newPatterns]);
         }
       }
+      
+      // Clear new achievements after showing
+      if (newState.newAchievements && newState.newAchievements.length > 0) {
+        setTimeout(() => {
+          engine.state.newAchievements = [];
+        }, 100);
+      }
+      
+      // Clear new level after showing
+      if (newState.newLevel) {
+        setTimeout(() => {
+          engine.state.newLevel = null;
+        }, 100);
+      }
     };
 
     engine.on('stateChange', handleStateChange);
@@ -272,6 +286,18 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
                   fontWeight={typography.weights.bold}
                 >
                   ⚡ PERFECT STREAK: {engineState.perfectStreak} ⚡
+                </Box>
+              )}
+              
+              {engineState.streakMultiplier > 1 && (
+                <Box
+                  bg={colors.combo.god}
+                  color="#000"
+                  p={spacing[2]}
+                  textAlign="center"
+                  fontWeight={typography.weights.bold}
+                >
+                  🔥 STREAK MULTIPLIER: x{engineState.streakMultiplier} 🔥
                 </Box>
               )}
             </VStack>

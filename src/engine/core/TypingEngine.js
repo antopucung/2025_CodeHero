@@ -309,11 +309,12 @@ export class TypingEngine extends CustomEventEmitter {
     const baseScore = 15;
     const speedBonus = { perfect: 50, best: 30, good: 20, lame: 10 }[speed];
     const comboBonus = combo * 3;
-    const streakBonus = streak > 10 ? Math.floor(streak / 5) * 5 : 0;
+    const streakBonus = streak > 10 ? Math.floor(streak / 5) * 10 : 0;
     const patternBonus = patterns.reduce((sum, p) => sum + p.bonus, 0);
     const speedMultiplier = { perfect: 2, best: 1.5, good: 1.2, lame: 1 }[speed];
+    const streakMultiplier = this.state.streakMultiplier;
     
-    return Math.round((baseScore + speedBonus + comboBonus + streakBonus + patternBonus) * speedMultiplier);
+    return Math.round((baseScore + speedBonus + comboBonus + streakBonus + patternBonus) * speedMultiplier * streakMultiplier);
   }
   
   checkPatterns(newTypedText, currentCombo) {

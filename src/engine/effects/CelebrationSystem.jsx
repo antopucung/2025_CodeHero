@@ -8,80 +8,35 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
   const [phase, setPhase] = React.useState('buildup');
 
   useEffect(() => {
-    // Auto-complete after shorter duration to prevent blocking
+    // Much faster auto-complete
     const autoComplete = setTimeout(() => {
       if (onComplete) onComplete();
-    }, 4000); // Reduced from 6000ms
+    }, 2000); // Much faster
     
-    // Massive confetti celebration
+    // ONLY confetti for major level milestones (every 5 levels)
     const celebrate = () => {
-      const colors = ['#ff6b6b', '#ffd93d', '#4ecdc4', '#9c27b0', '#00e5ff'];
-      
-      // Central massive explosion
-      confetti({
-        particleCount: 300,
-        spread: 120,
-        origin: { y: 0.5 },
-        colors,
-        scalar: 1.5
-      });
-      
-      // Side explosions
-      setTimeout(() => {
+      // Only show confetti for milestone levels (5, 10, 15, 20, etc.)
+      if (newLevel % 5 === 0) {
+        const colors = ['#ff6b6b', '#ffd93d', '#4ecdc4'];
+        
+        // Single modest confetti burst
         confetti({
-          particleCount: 200,
-          spread: 100,
-          origin: { y: 0.6, x: 0.1 },
-          colors
-        });
-        confetti({
-          particleCount: 200,
-          spread: 100,
-          origin: { y: 0.6, x: 0.9 },
-          colors
-        });
-      }, 200);
-      
-      // Top explosions
-      setTimeout(() => {
-        confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.3, x: 0.3 },
-          colors
-        });
-        confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.3, x: 0.7 },
-          colors
-        });
-      }, 400);
-      
-      // Final burst
-      setTimeout(() => {
-        confetti({
-          particleCount: 400,
-          spread: 140,
+          particleCount: 80,
+          spread: 60,
           origin: { y: 0.7 },
-          colors,
-          scalar: 2
+          colors
         });
-      }, 600);
+      }
     };
     
     celebrate();
     
     // Phase progression
-    const timer1 = setTimeout(() => setPhase('explosion'), 800);
-    const timer2 = setTimeout(() => setPhase('celebration'), 2000);
-    const timer3 = setTimeout(() => setPhase('complete'), 3500);
+    const timer1 = setTimeout(() => setPhase('complete'), 1800);
     
     return () => {
       clearTimeout(autoComplete);
       clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
     };
   }, []);
 
@@ -92,160 +47,72 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
 
   return (
     <motion.div
+      initial={{ scale: 0, opacity: 0, y: 20 }}
+      animate={{ 
+        scale: 1,
+        opacity: 1,
+        y: 0
+      }}
+      exit={{ 
+        scale: 0.8,
+        opacity: 0,
+        y: -20
+      }}
+      transition={{ duration: 0.3 }}
       style={{
         position: 'fixed',
-        top: '10px',
+        top: '5px',
         right: '10px',
-        zIndex: 200,
-        maxWidth: '300px',
+        zIndex: 150,
+        maxWidth: '200px', // Much smaller
         background: 'linear-gradient(135deg, #000, #111)',
         border: '2px solid #00ff00',
-        borderRadius: '8px',
-        padding: '15px',
+        borderRadius: '6px',
+        padding: '8px 12px', // Much smaller padding
         cursor: 'pointer'
       }}
       onClick={() => onComplete && onComplete()} // Click to dismiss
     >
-      {phase === 'buildup' && (
+      {/* Simple, clean level up notification */}
+      <div style={{ textAlign: 'center' }}>
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ 
-            scale: [0, 1],
-            opacity: [0, 0.7, 1, 1]
+          animate={{
+            textShadow: [
+              '0 0 10px #ffd93d',
+              '0 0 20px #ffd93d',
+              '0 0 10px #ffd93d'
+            ]
           }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 2, repeat: Infinity }}
           style={{
-            textAlign: 'center',
-            color: '#ffd93d'
+            fontSize: '12px',
+            fontWeight: 'bold',
+            color: '#ffd93d',
+            marginBottom: '4px'
           }}
         >
-          <motion.div
-            animate={{
-              textShadow: [
-                '0 0 30px #ffd93d',
-                '0 0 60px #ffd93d',
-                '0 0 30px #ffd93d'
-              ],
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              marginBottom: '10px'
-            }}
-          >
-            LEVEL UP!
-          </motion.div>
-          
-          <motion.div
-            style={{
-              fontSize: '24px',
-              color: '#4ecdc4'
-            }}
-          >
-            ⚡
-          </motion.div>
+          LEVEL UP!
         </motion.div>
-      )}
-      
-      {phase === 'explosion' && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ 
-            scale: [0, 1.2, 1]
-          }}
-          transition={{ duration: 0.8 }}
-          style={{
-            textAlign: 'center'
-          }}
-        >
-          <motion.div
-            animate={{
-              textShadow: [
-                '0 0 40px #ff6b6b',
-                '0 0 80px #ff6b6b',
-                '0 0 40px #ff6b6b'
-              ]
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: '#ff6b6b',
-              marginBottom: '8px'
-            }}
-          >
-            LEVEL UP!
-          </motion.div>
-          
-          <motion.div
-            animate={{
-              color: ['#ffd93d', '#ff6b6b', '#4ecdc4', '#ffd93d'],
-              textShadow: [
-                '0 0 30px #ffd93d',
-                '0 0 60px #ff6b6b',
-                '0 0 30px #4ecdc4',
-                '0 0 30px #ffd93d'
-              ]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              fontSize: '32px',
-              fontWeight: 'bold'
-            }}
-          >
-            {newLevel}
-          </motion.div>
-        </motion.div>
-      )}
-      
-      {phase === 'celebration' && (
-        <motion.div
-          initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          style={{
-            textAlign: 'center',
-            color: '#4ecdc4'
-          }}
-        >
-          <motion.div
-            animate={{
-              textShadow: [
-                '0 0 35px #4ecdc4',
-                '0 0 70px #4ecdc4',
-                '0 0 35px #4ecdc4'
-              ]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              marginBottom: '8px'
-            }}
-          >
-            🚀 PROGRESS! 🚀
-          </motion.div>
-          
-          <motion.div
-            style={{
-              fontSize: '12px',
-              color: '#ffd93d',
-              marginBottom: '8px'
-            }}
-          >
-            Level {newLevel}!
-          </motion.div>
-          
-          <motion.div
-            style={{
-              fontSize: '20px',
-              marginTop: '8px'
-            }}
-          >
-            🎉
-          </motion.div>
-        </motion.div>
-      )}
+        
+        <div style={{
+          fontSize: '16px',
+          fontWeight: 'bold',
+          color: '#4ecdc4'
+        }}>
+          {newLevel}
+        </div>
+        
+        {/* Show special indicator for milestone levels */}
+        {newLevel % 5 === 0 && (
+          <div style={{
+            fontSize: '10px',
+            color: '#ff6b6b',
+            marginTop: '2px'
+          }}>
+            🎉 MILESTONE!
+          </div>
+        )}
+      </div>
     </motion.div>
   );
 };
@@ -259,28 +126,32 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
         title: 'SPEED DEMON', 
         desc: 'Achieved 15+ perfect streak!',
         color: '#ff6b6b',
-        rarity: 'LEGENDARY'
+        rarity: 'LEGENDARY',
+        important: true
       },
       combo_master: { 
         icon: '🔥', 
         title: 'COMBO MASTER', 
         desc: 'Reached 50x combo multiplier!',
         color: '#ffd93d',
-        rarity: 'EPIC'
+        rarity: 'EPIC',
+        important: true
       },
       perfectionist: { 
         icon: '💎', 
         title: 'PERFECTIONIST', 
         desc: 'Completed with 100% accuracy!',
         color: '#9c27b0',
-        rarity: 'LEGENDARY'
+        rarity: 'LEGENDARY',
+        important: true
       },
       code_wizard: { 
         icon: '🧙‍♂️', 
         title: 'CODE WIZARD', 
         desc: 'Mastered advanced syntax patterns!',
         color: '#00e5ff',
-        rarity: 'MYTHIC'
+        rarity: 'MYTHIC',
+        important: true
       }
     };
     return achievements[type] || achievements.speed_demon;
@@ -289,37 +160,24 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
   const data = getAchievementData(achievement);
 
   useEffect(() => {
-    // Auto-dismiss after shorter duration
+    // Much faster auto-dismiss
     const autoDismiss = setTimeout(() => {
       if (onComplete) onComplete();
-    }, 3000); // Reduced from longer duration
+    }, 2000);
     
-    // Massive achievement celebration
+    // ONLY confetti for important achievements
     const celebrate = () => {
-      const colors = [data.color, '#ffd93d', '#ff6b6b', '#4ecdc4'];
-      
-      // Central explosion
-      confetti({
-        particleCount: 250,
-        spread: 100,
-        origin: { y: 0.6 },
-        colors,
-        scalar: 1.8
-      });
-      
-      // Multiple bursts
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => {
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { 
-              y: 0.7, 
-              x: 0.2 + (i * 0.15) 
-            },
-            colors
-          });
-        }, i * 150);
+      // Only show confetti for important achievements
+      if (data.important) {
+        const colors = [data.color, '#ffd93d'];
+        
+        // Single modest confetti burst
+        confetti({
+          particleCount: 60,
+          spread: 50,
+          origin: { y: 0.8 },
+          colors
+        });
       }
     };
     
@@ -332,111 +190,64 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
 
   return (
     <motion.div
-      initial={{ scale: 0, opacity: 0, rotate: -360 }}
+      initial={{ scale: 0, opacity: 0, y: 20 }}
       animate={{ 
-        scale: [0, 1],
-        opacity: [0, 1, 1, 1, 0], // Keep visible longer before fade
-        y: [0, -20, 0, 0, -100] // Less dramatic movement
+        scale: 1,
+        opacity: 1,
+        y: 0
       }}
-      transition={{ 
-        duration: 3, // Reduced duration
-        times: [0, 0.3, 0.7, 0.9, 1]
+      exit={{ 
+        scale: 0.8,
+        opacity: 0,
+        y: -20
       }}
+      transition={{ duration: 0.3 }}
       onAnimationComplete={onComplete}
       onClick={() => onComplete && onComplete()} // Click to dismiss
       style={{
         position: 'fixed',
-        top: '10px',
+        top: '5px',
         left: '10px',
-        zIndex: 200,
+        zIndex: 150,
         background: `linear-gradient(135deg, ${data.color}, ${data.color}cc, #000)`,
         border: `2px solid ${data.color}`,
-        borderRadius: '8px',
-        padding: '15px',
+        borderRadius: '6px',
+        padding: '8px 12px', // Much smaller
         textAlign: 'center',
-        maxWidth: '280px',
-        boxShadow: `0 0 80px ${data.color}, inset 0 0 40px rgba(0,0,0,0.3)`,
+        maxWidth: '180px', // Much smaller
+        boxShadow: `0 0 20px ${data.color}44`,
         cursor: 'pointer' // Indicate it's clickable
       }}
     >
-      {/* Achievement burst background */}
-      <motion.div
-        animate={{
-          opacity: [0.4, 0.8, 0.4]
-        }}
-        transition={{ duration: 2, repeat: Infinity }}
+      {/* Simple achievement notification */}
+      <div
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `radial-gradient(circle, ${data.color}44, transparent)`,
-          borderRadius: '6px'
-        }}
-      />
-      
-      {/* Rarity indicator */}
-      <motion.div
-        animate={{
-          textShadow: [
-            `0 0 15px ${data.color}`,
-            `0 0 35px ${data.color}`,
-            `0 0 15px ${data.color}`
-          ]
-        }}
-        transition={{ duration: 2.5, repeat: Infinity }}
-        style={{
-          color: data.color,
-          fontSize: '10px',
-          fontWeight: 'bold',
-          marginBottom: '8px',
-          letterSpacing: '1px'
-        }}
-      >
-        {data.rarity} ACHIEVEMENT
-      </motion.div>
-      
-      {/* Achievement icon */}
-      <motion.div
-        style={{
-          fontSize: '24px',
-          marginBottom: '8px'
+          fontSize: '16px',
+          marginBottom: '4px'
         }}
       >
         {data.icon}
-      </motion.div>
+      </div>
       
-      {/* Achievement title */}
-      <motion.div
-        animate={{
-          textShadow: [
-            `0 0 20px ${data.color}`,
-            `0 0 40px ${data.color}`,
-            `0 0 20px ${data.color}`
-          ]
-        }}
-        transition={{ duration: 2.5, repeat: Infinity }}
+      <div
         style={{
-          color: '#fff',
-          fontSize: '14px',
+          color: data.color,
+          fontSize: '11px',
           fontWeight: 'bold',
-          marginBottom: '6px',
-          fontFamily: "'Courier New', monospace"
+          marginBottom: '2px'
         }}
       >
         {data.title}
-      </motion.div>
+      </div>
       
-      {/* Achievement description */}
       <div
         style={{
-          color: '#ccc',
+          color: '#aaa',
           fontSize: '10px',
-          fontFamily: "'Courier New', monospace"
+          opacity: 0.8
         }}
       >
-        {data.desc}
+        {data.rarity}
       </div>
     </motion.div>
   );

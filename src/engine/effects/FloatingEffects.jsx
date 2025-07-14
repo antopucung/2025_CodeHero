@@ -4,36 +4,17 @@ import { motion } from 'framer-motion';
 // Enhanced floating score with speed and pattern indicators
 export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed = 'lame', patterns = 0, onComplete, reduced = false }) => {
   const getScoreSize = (combo, patterns) => {
-    const baseSize = 16;
-    const comboBonus = Math.min(combo / 10, 8);
-    const patternBonus = patterns * 2;
+    const baseSize = 12; // Smaller base size
+    const comboBonus = Math.min(combo / 15, 4); // Less size increase
+    const patternBonus = patterns * 1; // Less pattern bonus
     return `${baseSize + comboBonus + patternBonus}px`;
   };
 
+  // Simple clicker-game style floating - no rotation, just gentle float up
   const getScoreEffect = (combo, speed, patterns) => {
-    const speedMultiplier = { perfect: 2, best: 1.5, good: 1.2, lame: 1 }[speed];
-    const patternMultiplier = 1 + (patterns * 0.3);
-    
-    // Reduce effects for performance
-    if (reduced) {
-      return { scale: [0.5, 1.2, 1], rotate: [0, 45, 0], textShadow: [`0 0 5px ${color}`, `0 0 15px ${color}`, `0 0 5px ${color}`] };
-    }
-    
-    // Simplified effects for better performance
-    if (combo >= 30) return {
-      scale: [0.5, 1.8, 1.3],
-      rotate: [0, 180, 90],
-      textShadow: [`0 0 8px ${color}`, `0 0 25px ${color}`, `0 0 15px ${color}`]
-    };
-    if (combo >= 10) return {
-      scale: [0.5, 1.5, 1.2],
-      rotate: [0, 90, 45],
-      textShadow: [`0 0 6px ${color}`, `0 0 20px ${color}`, `0 0 10px ${color}`]
-    };
     return {
-      scale: [0.5, 1.3, 1.1],
-      rotate: [0, 45, 0],
-      textShadow: [`0 0 5px ${color}`, `0 0 15px ${color}`, `0 0 8px ${color}`]
+      scale: [0.8, 1.1, 1], // Gentle scale, no big pops
+      textShadow: [`0 0 5px ${color}`, `0 0 10px ${color}`, `0 0 5px ${color}`] // Subtle glow
     };
   };
 
@@ -51,14 +32,13 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
       animate={{ 
         opacity: [1, 1, 0], 
         scale: effects.scale,
-        rotate: effects.rotate,
         textShadow: effects.textShadow,
-        y: y - 120 - (patterns * 20),
-        x: x + (-20 + Math.random() * 40)
+        y: y - 60, // Gentle float up, like clicker games
+        x: x + (-10 + Math.random() * 20) // Small horizontal drift
       }}
       exit={{ opacity: 0 }}
       transition={{ 
-        duration: reduced ? 1.5 : 2.5 + (patterns * 0.5), 
+        duration: 1.5, // Faster, consistent duration
         ease: "easeOut"
       }}
       onAnimationComplete={onComplete}
@@ -73,55 +53,42 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
       }}
     >
       +{score}
-      {combo > 10 && !reduced && (
+      {/* Only show combo text for high combos to reduce clutter */}
+      {combo > 20 && !reduced && (
         <motion.span
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0.8, 1.3, 1]
-          }}
-          transition={{ duration: 1.2, delay: 0.3 }}
           style={{
             display: 'block',
-            fontSize: '10px',
+            fontSize: '8px',
             marginTop: '2px'
           }}
         >
           x{combo} COMBO!
         </motion.span>
       )}
-      {speed !== 'lame' && !reduced && (
+      {/* Only show speed for perfect speed to reduce clutter */}
+      {speed === 'perfect' && !reduced && (
         <motion.span
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0.6, 1.1, 0.9]
-          }}
-          transition={{ duration: 1, delay: 0.5 }}
           style={{
             display: 'block',
-            fontSize: '8px',
+            fontSize: '7px',
             marginTop: '1px',
-            color: speed === 'perfect' ? '#ff6b6b' : speed === 'best' ? '#ffd93d' : '#4ecdc4'
+            color: '#ff6b6b'
           }}
         >
-          {speed.toUpperCase()}!
+          PERFECT!
         </motion.span>
       )}
-      {patterns > 0 && !reduced && (
+      {/* Only show pattern bonus for multiple patterns */}
+      {patterns > 1 && !reduced && (
         <motion.span
-          animate={{
-            opacity: [0, 1, 0],
-            scale: [0.4, 1.2, 1],
-            rotate: [0, 360, 180]
-          }}
-          transition={{ duration: 1.5, delay: 0.2 }}
           style={{
             display: 'block',
-            fontSize: '12px',
+            fontSize: '7px',
             marginTop: '2px',
             color: '#ff6b6b'
           }}
         >
-          ⭐ BONUS!
+          BONUS!
         </motion.span>
       )}
     </motion.div>
@@ -137,49 +104,45 @@ export const PatternCelebration = ({ patterns, onComplete }) => {
       {patterns.map((pattern, index) => (
         <motion.div
           key={pattern.id}
-          initial={{ scale: 0, opacity: 0, y: 50 }}
+          initial={{ scale: 0.8, opacity: 0, y: 20 }}
           animate={{ 
-            scale: [1, 1.5, 1.2],
+            scale: 1,
             opacity: [1, 1, 0],
-            y: [0, -100, -150]
+            y: [0, -40] // Gentle float up
           }}
           exit={{ opacity: 0 }}
           transition={{ 
-            duration: 2, // Faster to avoid blocking
+            duration: 1.5, // Faster
             delay: index * 0.2
           }}
           onAnimationComplete={() => index === patterns.length - 1 && onComplete && onComplete()}
           style={{
             position: 'fixed',
-            top: '120px',
+            top: '80px',
             right: '10px',
-            zIndex: 200, // Lower z-index
+            zIndex: 120, // Lower z-index
             background: `linear-gradient(45deg, ${pattern.color}, ${pattern.color}cc)`,
-            padding: '10px 15px',
-            borderRadius: '8px',
+            padding: '6px 10px', // Smaller padding
+            borderRadius: '4px',
             color: '#fff',
             fontFamily: "'Courier New', monospace",
             fontWeight: 'bold',
-            fontSize: '12px',
+            fontSize: '10px', // Smaller text
             textAlign: 'center',
-            border: `2px solid ${pattern.color}`,
-            boxShadow: `0 0 30px ${pattern.color}`,
+            border: `1px solid ${pattern.color}`,
+            boxShadow: `0 0 15px ${pattern.color}44`,
             cursor: 'pointer',
             pointerEvents: 'auto',
-            maxWidth: '200px'
+            maxWidth: '150px' // Smaller width
           }}
           onClick={() => onComplete && onComplete()} // Click to dismiss
         >
-          <motion.div
-            style={{
-              fontSize: '10px'
-            }}
-          >
+          <div>
             🎯 {pattern.type.replace('_', ' ').toUpperCase()}!
-            <div style={{ fontSize: '10px', marginTop: '3px' }}>
+            <div style={{ fontSize: '8px', marginTop: '2px' }}>
               +{pattern.bonus} BONUS POINTS!
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       ))}
     </>

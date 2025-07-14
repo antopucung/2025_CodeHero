@@ -207,36 +207,36 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
   };
 
   const explosionColor = getExplosionColor(isCorrect, speed, combo);
-  const particleCount = isCorrect ? Math.min(12 + combo / 2 + patterns * 4, 25) : 15;
-  const explosionSize = isCorrect ? Math.min(50 + combo * 3 + patterns * 12, 120) : 40;
+  const particleCount = isCorrect ? Math.min(6 + combo / 4, 12) : 8; // Much fewer particles
+  const explosionSize = isCorrect ? Math.min(30 + combo * 1, 60) : 25; // Smaller explosions
   const speedMultiplier = { perfect: 2, best: 1.7, good: 1.4, lame: 1 }[speed] || 1;
   
   const particles = Array.from({ length: particleCount }, (_, i) => ({
     id: i,
     angle: (i * (360 / particleCount)) * (Math.PI / 180),
     velocity: (25 + Math.random() * explosionSize) * speedMultiplier,
-    size: isCorrect ? 3 + Math.random() * (6 + patterns) : 3 + Math.random() * 3,
+    size: isCorrect ? 2 + Math.random() * 3 : 2 + Math.random() * 2, // Smaller particles
     delay: Math.random() * 0.4
   }));
 
-  // Trigger confetti for high performance
+  // MUCH more selective confetti - only for exceptional performance
   React.useEffect(() => {
-    if (isCorrect && (combo >= 10 || speed === 'perfect' || patterns > 0)) {
+    if (isCorrect && (combo >= 30 || (speed === 'perfect' && combo >= 10) || patterns > 1)) {
       const colors = [explosionColor, '#ffff00', '#ff6b6b', '#4ecdc4'];
       
-      if (combo >= 30 || patterns > 1) {
-        // Major celebration
+      if (combo >= 50 || patterns > 2) {
+        // Only major celebrations for very high performance
         confetti({
-          particleCount: 100 + (combo * 2),
-          spread: 90,
+          particleCount: 40,
+          spread: 50,
           origin: { x: x / window.innerWidth, y: y / window.innerHeight },
           colors
         });
-      } else if (combo >= 10 || speed === 'perfect') {
-        // Medium celebration
+      } else if (combo >= 30 || (speed === 'perfect' && combo >= 15)) {
+        // Medium celebration for good performance
         confetti({
-          particleCount: 50 + combo,
-          spread: 60,
+          particleCount: 20,
+          spread: 40,
           origin: { x: x / window.innerWidth, y: y / window.innerHeight },
           colors
         });
@@ -258,7 +258,7 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
         zIndex: 999
       }}
     >
-      {/* Enhanced particle explosion */}
+      {/* Simpler particle explosion */}
       {particles.map((particle) => (
         <motion.div
           key={particle.id}
@@ -271,11 +271,11 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
           animate={{ 
             x: Math.cos(particle.angle) * particle.velocity,
             y: Math.sin(particle.angle) * particle.velocity,
-            scale: [1, 2.5 + (patterns * 0.4), 0],
+            scale: [1, 1.8, 0], // Simpler scaling
             opacity: [1, 0.9, 0]
           }}
           transition={{ 
-            duration: 2 + (patterns * 0.3), 
+            duration: 1.2, // Faster
             ease: "easeOut",
             delay: particle.delay
           }}
@@ -285,35 +285,26 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
             height: `${particle.size}px`,
             background: `radial-gradient(circle, ${explosionColor}, ${explosionColor}88)`,
             borderRadius: '50%',
-            boxShadow: `0 0 ${particle.size * 4}px ${explosionColor}`
+            boxShadow: `0 0 ${particle.size * 2}px ${explosionColor}44`
           }}
         />
       ))}
       
-      {/* Enhanced main character explosion */}
+      {/* Simpler main character explosion - NO ROTATION */}
       <motion.div
-        initial={{ scale: 1, rotate: 0 }}
+        initial={{ scale: 1 }}
         animate={{ 
-          scale: isCorrect ? [1, 4.5 + (patterns * 0.8), 0] : [1, 3.5, 0], 
+          scale: isCorrect ? [1, 2.2, 0] : [1, 2, 0], // Much simpler scaling
           opacity: [1, 0.9, 0],
-          rotate: isCorrect ? [0, 360 + (patterns * 180), 720 + (patterns * 360)] : [0, -180, -360],
-          filter: isCorrect ? [
-            'brightness(1)',
-            'brightness(2.5) saturate(2)',
-            'brightness(1)'
-          ] : [
-            'brightness(1)',
-            'brightness(1.5)',
-            'brightness(1)'
-          ]
+          // NO ROTATION - just simple scale and fade
         }}
-        transition={{ duration: 1.5 + (patterns * 0.3) }}
+        transition={{ duration: 1 }}
         style={{
           color: explosionColor,
           fontFamily: "'Courier New', monospace",
           fontWeight: 'bold',
-          fontSize: isCorrect && (combo > 10 || patterns > 0) ? '28px' : '20px',
-          textShadow: `0 0 ${30 + patterns * 8}px ${explosionColor}`,
+          fontSize: isCorrect && combo > 20 ? '20px' : '16px',
+          textShadow: `0 0 15px ${explosionColor}`,
           position: 'absolute',
           transform: 'translate(-50%, -50%)'
         }}
@@ -321,107 +312,84 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
         {char}
       </motion.div>
 
-      {/* Enhanced speed indicator */}
-      {isCorrect && speed !== 'lame' && (
+      {/* Only show speed indicator for perfect speed */}
+      {isCorrect && speed === 'perfect' && (
         <motion.div
-          initial={{ scale: 0, y: -15, opacity: 0 }}
+          initial={{ scale: 0.8, y: -10, opacity: 0 }}
           animate={{ 
-            scale: [1, 2, 1.5],
-            y: [-40, -55, -50],
+            scale: 1,
+            y: -25,
             opacity: [1, 1, 0],
             rotate: [0, 360, 180]
           }}
           transition={{ 
-            duration: 1.8,
-            opacity: { delay: 1, duration: 0.8 }
+            duration: 1,
+            opacity: { delay: 0.5, duration: 0.5 }
           }}
           style={{
             position: 'absolute',
-            top: '-50px',
+            top: '-25px',
             left: '50%',
             transform: 'translateX(-50%)',
             color: explosionColor,
-            fontSize: '16px',
+            fontSize: '10px',
             fontWeight: 'bold',
-            textShadow: `0 0 15px ${explosionColor}`
+            textShadow: `0 0 8px ${explosionColor}`
           }}
         >
-          {speed.toUpperCase()}!
+          PERFECT!
         </motion.div>
       )}
 
-      {/* Enhanced pattern bonus indicator */}
-      {patterns > 0 && (
+      {/* Only show pattern bonus for multiple patterns */}
+      {patterns > 1 && (
         <motion.div
-          initial={{ scale: 0, rotate: -360 }}
+          initial={{ scale: 0.8, opacity: 0 }}
           animate={{ 
-            scale: [1, 3, 2],
-            rotate: [0, 720, 360],
+            scale: 1,
             opacity: [1, 1, 0]
           }}
           transition={{ 
-            duration: 2.5,
-            opacity: { delay: 1.5, duration: 1 }
+            duration: 1,
+            opacity: { delay: 0.5, duration: 0.5 }
           }}
           style={{
             position: 'absolute',
-            top: '-70px',
+            top: '-40px',
             left: '50%',
             transform: 'translateX(-50%)',
             color: '#ff6b6b',
-            fontSize: '20px',
+            fontSize: '10px',
             fontWeight: 'bold',
-            textShadow: '0 0 25px #ff6b6b'
+            textShadow: '0 0 8px #ff6b6b'
           }}
         >
-          ⭐ PATTERN! ⭐
+          BONUS!
         </motion.div>
       )}
 
-      {/* Enhanced celebration rings */}
-      {isCorrect && (combo > 5 || patterns > 0) && (
+      {/* Only show celebration rings for high combos */}
+      {isCorrect && combo > 15 && (
         <>
           <motion.div
             initial={{ scale: 0, opacity: 1 }}
             animate={{
-              scale: [0, 4 + patterns, 6 + patterns],
+              scale: [0, 2.5, 3.5],
               opacity: [1, 0.8, 0]
             }}
-            transition={{ duration: 2.5 }}
+            transition={{ duration: 1.5 }}
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '100px',
-              height: '100px',
-              border: `6px solid ${explosionColor}`,
+              width: '60px',
+              height: '60px',
+              border: `3px solid ${explosionColor}`,
               borderRadius: '50%',
-              boxShadow: `0 0 40px ${explosionColor}`
+              boxShadow: `0 0 20px ${explosionColor}44`
             }}
           />
-          
-          {patterns > 0 && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0.8 }}
-              animate={{
-                scale: [0, 5 + patterns, 8 + patterns],
-                opacity: [0.8, 0.6, 0]
-              }}
-              transition={{ duration: 3, delay: 0.5 }}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '120px',
-                height: '120px',
-                border: `8px solid ${explosionColor}`,
-                borderRadius: '50%',
-                boxShadow: `0 0 60px ${explosionColor}`
-              }}
-            />
-          )}
         </>
       )}
     </motion.div>
@@ -430,19 +398,19 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
 
 // Enhanced combo burst effect
 export const JuicyComboBurst = ({ isActive, combo, x, y, patterns = [] }) => {
-  if (!isActive || combo <= 5) return null;
+  if (!isActive || combo <= 15) return null; // Higher threshold
 
   const getComboColor = (combo) => {
     if (combo >= 50) return '#ff6b6b';
     if (combo >= 30) return '#ffd93d';
     if (combo >= 20) return '#6bcf7f';
-    if (combo >= 10) return '#4ecdc4';
+    if (combo >= 15) return '#4ecdc4';
     return '#45b7d1';
   };
 
   const burstColor = getComboColor(combo);
-  const particleCount = Math.min(Math.floor(combo / 2) + patterns.length * 3, 20);
-  const burstSize = Math.min(combo * 3 + patterns.length * 15, 80);
+  const particleCount = Math.min(Math.floor(combo / 4), 8); // Much fewer particles
+  const burstSize = Math.min(combo * 1.5, 40); // Smaller burst
 
   return (
     <motion.div
@@ -459,48 +427,47 @@ export const JuicyComboBurst = ({ isActive, combo, x, y, patterns = [] }) => {
           key={i}
           initial={{ scale: 0, opacity: 1 }}
           animate={{
-            scale: [0, 2.5 + (patterns.length * 0.5), 0],
+            scale: [0, 1.8, 0], // Simpler scaling
             x: Math.cos((i * (360 / particleCount)) * Math.PI / 180) * burstSize,
             y: Math.sin((i * (360 / particleCount)) * Math.PI / 180) * burstSize,
             opacity: [1, 0.8, 0]
           }}
           transition={{
-            duration: 2 + (patterns.length * 0.4),
+            duration: 1.5, // Faster
             delay: i * 0.05,
-            repeat: Infinity,
-            repeatDelay: 1.5
+            // No repeat to reduce clutter
           }}
           style={{
             position: 'absolute',
-            width: `${8 + patterns.length * 2}px`,
-            height: `${8 + patterns.length * 2}px`,
+            width: '6px',
+            height: '6px',
             background: `radial-gradient(circle, ${burstColor}, ${burstColor}88)`,
             borderRadius: '50%',
-            boxShadow: `0 0 ${15 + patterns.length * 3}px ${burstColor}`
+            boxShadow: `0 0 10px ${burstColor}44`
           }}
         />
       ))}
       
-      {/* Enhanced central burst */}
+      {/* Simpler central burst - NO ROTATION */}
       <motion.div
         animate={{
-          scale: [1, 2.5 + (patterns.length * 0.4), 1],
+          scale: [1, 1.8, 1],
           opacity: [0.8, 0.4, 0.8],
-          rotate: [0, 360 + (patterns.length * 60), 720 + (patterns.length * 120)]
+          // NO ROTATION
         }}
         transition={{
-          duration: 2 + (patterns.length * 0.4),
-          repeat: Infinity,
+          duration: 1.5,
+          // No repeat
           ease: "easeInOut"
         }}
         style={{
           position: 'absolute',
-          width: `${20 + patterns.length * 4}px`,
-          height: `${20 + patterns.length * 4}px`,
+          width: '15px',
+          height: '15px',
           background: `radial-gradient(circle, ${burstColor}, transparent)`,
           borderRadius: '50%',
           transform: 'translate(-50%, -50%)',
-          boxShadow: `0 0 ${30 + patterns.length * 8}px ${burstColor}`
+          boxShadow: `0 0 20px ${burstColor}44`
         }}
       />
     </motion.div>

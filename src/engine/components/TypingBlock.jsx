@@ -13,7 +13,8 @@ export const TypingBlock = memo(({
   anticipationLevel = 1,
   onClick,
   style = {},
-  showError = false
+  showError = false,
+  fullScreen = false
 }) => {
   const getBlockStyle = () => {
     switch (status) {
@@ -115,8 +116,10 @@ export const TypingBlock = memo(({
   
   // Fixed dimensions for consistent spacing
   const isSpace = char === ' ';
-  const width = isSpace ? '8px' : '16px';
-  const height = '20px';
+  const width = isSpace ? (fullScreen ? '12px' : '8px') : (fullScreen ? '24px' : '16px');
+  const height = fullScreen ? '30px' : '20px';
+  const fontSize = fullScreen ? '16px' : '12px';
+  const lineHeight = fullScreen ? '28px' : '18px';
   
   return (
     <motion.div
@@ -126,13 +129,13 @@ export const TypingBlock = memo(({
         display: 'inline-block',
         width,
         height,
-        margin: '1px',
+        margin: fullScreen ? '2px' : '1px',
         border: `1px solid ${blockStyle.borderColor}`,
-        borderRadius: '2px',
+        borderRadius: fullScreen ? '4px' : '2px',
         textAlign: 'center',
-        lineHeight: '18px',
+        lineHeight,
         fontFamily: typography.fonts.mono,
-        fontSize: '12px',
+        fontSize,
         fontWeight: typography.weights.bold,
         cursor: 'pointer',
         position: 'relative',
@@ -158,8 +161,8 @@ export const TypingBlock = memo(({
             position: 'absolute',
             top: '-8px',
             right: '-8px',
-            width: `${8 + (upgrade.level * 2)}px`,
-            height: `${8 + (upgrade.level * 2)}px`,
+            width: `${(fullScreen ? 12 : 8) + (upgrade.level * 2)}px`,
+            height: `${(fullScreen ? 12 : 8) + (upgrade.level * 2)}px`,
             background: blockStyle.borderColor,
             borderRadius: '50%',
             boxShadow: `0 0 ${10 + (upgrade.level * 5)}px ${blockStyle.borderColor}`,
@@ -181,10 +184,10 @@ export const TypingBlock = memo(({
           }}
           style={{
             position: 'absolute',
-            top: '-12px',
+            top: fullScreen ? '-16px' : '-12px',
             left: '50%',
             transform: 'translateX(-50%)',
-            fontSize: '8px',
+            fontSize: fullScreen ? '10px' : '8px',
             color: blockStyle.borderColor,
             fontWeight: 'bold',
             textShadow: `0 0 5px ${blockStyle.borderColor}`,
@@ -210,10 +213,10 @@ export const TypingBlock = memo(({
           }}
           style={{
             position: 'absolute',
-            top: '-12px',
-            right: '-12px',
+            top: fullScreen ? '-16px' : '-12px',
+            right: fullScreen ? '-16px' : '-12px',
             color: '#ff1744',
-            fontSize: '18px',
+            fontSize: fullScreen ? '24px' : '18px',
             fontWeight: 'bold',
             textShadow: '0 0 10px #ff1744',
             zIndex: 10
@@ -238,8 +241,8 @@ export const TypingBlock = memo(({
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: `${40 + (upgrade.level * 10)}px`,
-              height: `${40 + (upgrade.level * 10)}px`,
+              width: `${(fullScreen ? 60 : 40) + (upgrade.level * 10)}px`,
+              height: `${(fullScreen ? 60 : 40) + (upgrade.level * 10)}px`,
               border: `2px solid ${blockStyle.borderColor}`,
               borderRadius: '50%',
               pointerEvents: 'none'
@@ -260,8 +263,8 @@ export const TypingBlock = memo(({
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: `${60 + (upgrade.level * 15)}px`,
-                height: `${60 + (upgrade.level * 15)}px`,
+                width: `${(fullScreen ? 90 : 60) + (upgrade.level * 15)}px`,
+                height: `${(fullScreen ? 90 : 60) + (upgrade.level * 15)}px`,
                 border: `3px solid ${blockStyle.borderColor}`,
                 borderRadius: '50%',
                 pointerEvents: 'none'

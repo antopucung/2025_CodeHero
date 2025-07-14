@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Button, Text, useToast } from "@chakra-ui/react";
 import { executeCode } from "../api";
 
-const Output = ({ editorRef, language, onExecutionComplete }) => {
+const Output = ({ editorRef, language, onExecutionComplete, fullHeight = false }) => {
   const toast = useToast();
   const [output, setOutput] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,15 @@ const Output = ({ editorRef, language, onExecutionComplete }) => {
   };
 
   return (
-    <Box w="50%" bg="#111" border="1px solid #333" p={3}>
+    <Box 
+      w="100%" 
+      h={fullHeight ? "100%" : "auto"}
+      bg="#111" 
+      border="1px solid #333" 
+      p={3}
+      display="flex"
+      flexDirection="column"
+    >
       <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
         │ TERMINAL OUTPUT
       </Text>
@@ -53,14 +61,15 @@ const Output = ({ editorRef, language, onExecutionComplete }) => {
         _hover={{ bg: "#003300", color: "#00ff41" }}
         _active={{ bg: "#001100" }}
         mb={4}
+        flexShrink={0}
         isLoading={isLoading}
         onClick={runCode}
       >
         {isLoading ? "EXECUTING..." : "$ ./run"}
       </Button>
       <Box
-        height="75vh"
-        height="60vh"
+        flex={fullHeight ? 1 : "none"}
+        height={fullHeight ? "auto" : "60vh"}
         p={3}
         bg="#000"
         color={isError ? "#ff4444" : "#00ff00"}

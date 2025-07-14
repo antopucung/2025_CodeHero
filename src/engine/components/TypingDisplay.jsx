@@ -18,7 +18,8 @@ import { spacing } from '../../design/tokens/spacing';
 export const TypingDisplay = memo(({
   text,
   engine,
-  onCharacterClick
+  onCharacterClick,
+  fullScreen = false
 }) => {
   const containerRef = useRef(null);
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
@@ -42,8 +43,8 @@ export const TypingDisplay = memo(({
     if (!containerRef.current || !engine.state) return;
     
     const currentIndex = engine.state.currentIndex;
-    const charWidth = 17; // width + margin
-    const lineHeight = 22; // height + margin
+    const charWidth = fullScreen ? 24 : 17; // width + margin
+    const lineHeight = fullScreen ? 32 : 22; // height + margin
     const containerWidth = containerRef.current.offsetWidth;
     const charsPerLine = Math.floor(containerWidth / charWidth);
     
@@ -54,7 +55,7 @@ export const TypingDisplay = memo(({
       x: col * charWidth + 1,
       y: line * lineHeight + 1
     });
-  }, [engine.state?.currentIndex]);
+  }, [engine.state?.currentIndex, fullScreen]);
   
   // Update cursor position when index changes
   useEffect(() => {
@@ -229,24 +230,29 @@ export const TypingDisplay = memo(({
         anticipationLevel={engine.state?.anticipationLevel || 1}
         showError={showError}
         onClick={() => onCharacterClick && onCharacterClick(index)}
+        fullScreen={fullScreen}
       />
     );
   }, [engine, errorPositions, onCharacterClick]);
   
   return (
-    <TerminalPanel title="ADDICTIVE TYPING INTERFACE" variant="primary">
+    <TerminalPanel 
+      title={fullScreen ? "FULL SCREEN TYPING CHALLENGE" : "ADDICTIVE TYPING INTERFACE"} 
+      variant="primary"
+    >
       <Box
         ref={containerRef}
         bg={colors.terminal.bg}
         border={`1px solid ${colors.terminal.border}`}
         p={spacing[3]}
-        minH="200px"
-        maxH="400px"
+        minH={fullScreen ? "400px" : "200px"}
+        maxH={fullScreen ? "none" : "400px"}
+        h={fullScreen ? "100%" : "auto"}
         overflowY="auto"
         position="relative"
         fontFamily="monospace"
-        fontSize="12px"
-        lineHeight="22px"
+        fontSize={fullScreen ? "16px" : "12px"}
+        lineHeight={fullScreen ? "32px" : "22px"}
       >
         {/* Progressive Background Effect with Intensity Scaling */}
         <BackgroundWaveEffect
@@ -271,6 +277,7 @@ export const TypingDisplay = memo(({
           typingSpeed={engine.state?.typingSpeed || 'lame'}
           anticipationLevel={(engine.state?.anticipationLevel || 1) * effectScale}
           combo={engine.state?.combo || 1}
+          fullScreen={fullScreen}
         />
         
         {/* Character Blocks */}
@@ -278,7 +285,7 @@ export const TypingDisplay = memo(({
           style={{
             wordWrap: 'break-word',
             whiteSpace: 'pre-wrap',
-            lineHeight: '22px'
+            lineHeight: fullScreen ? '32px' : '22px'
           }}
         >
           {text.split('').map(renderCharacter)}
@@ -297,6 +304,7 @@ export const TypingDisplay = memo(({
               speed={score.speed}
               patterns={score.patterns}
               onComplete={() => removeEffect('floatingScores', score.id)}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>
@@ -314,6 +322,7 @@ export const TypingDisplay = memo(({
               speed={explosion.speed}
               patterns={explosion.patterns}
               onComplete={() => removeEffect('explosions', explosion.id)}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>
@@ -328,6 +337,7 @@ export const TypingDisplay = memo(({
               x={burst.x}
               y={burst.y}
               patterns={burst.patterns}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>
@@ -342,6 +352,7 @@ export const TypingDisplay = memo(({
               index={upgrade.index}
               upgrade={upgrade.upgrade}
               onComplete={() => removeEffect('characterUpgrades', upgrade.id)}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>
@@ -354,6 +365,7 @@ export const TypingDisplay = memo(({
               key={achievement.id}
               achievement={achievement.type}
               onComplete={() => removeEffect('achievements', achievement.id)}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>
@@ -367,6 +379,7 @@ export const TypingDisplay = memo(({
               streak={streak.streak}
               multiplier={streak.multiplier}
               isActive={true}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>
@@ -379,6 +392,7 @@ export const TypingDisplay = memo(({
               key={levelUp.id}
               newLevel={levelUp.newLevel}
               onComplete={() => removeEffect('levelUps', levelUp.id)}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>
@@ -390,6 +404,7 @@ export const TypingDisplay = memo(({
               key={pattern.id}
               pattern={pattern}
               onComplete={() => removePatternCelebration(pattern.id)}
+              fullScreen={fullScreen}
             />
           ))}
         </AnimatePresence>

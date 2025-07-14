@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
 
-const GameModeSelector = ({ currentMode, onModeChange, language }) => {
+const GameModeSelector = ({ currentMode, onModeChange, language, compact = false }) => {
   const modes = [
     {
       id: 'editor',
@@ -26,18 +26,19 @@ const GameModeSelector = ({ currentMode, onModeChange, language }) => {
   ];
 
   return (
-    <Box bg="#111" border="1px solid #333" p={3} mb={4}>
+    <Box bg="#111" border="1px solid #333" p={compact ? 2 : 3}>
       <Text fontSize="xs" color="#666" mb={3} fontFamily="'Courier New', monospace">
         │ GAME MODE SELECTION
       </Text>
       
-      <HStack spacing={2}>
+      <HStack spacing={compact ? 1 : 2} flexWrap={compact ? "wrap" : "nowrap"}>
         {modes.map((mode) => (
           <MotionBox
             key={mode.id}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            flex={1}
+            flex={compact ? "none" : 1}
+            minW={compact ? "120px" : "auto"}
           >
             <Button
               bg={currentMode === mode.id ? "#003300" : "#000"}
@@ -46,9 +47,9 @@ const GameModeSelector = ({ currentMode, onModeChange, language }) => {
               borderColor={currentMode === mode.id ? "#00ff00" : "#333"}
               borderRadius="0"
               fontFamily="'Courier New', monospace"
-              fontSize="xs"
+              fontSize={compact ? "xs" : "xs"}
               h="auto"
-              p={3}
+              p={compact ? 2 : 3}
               _hover={{ 
                 bg: currentMode === mode.id ? "#004400" : "#111",
                 borderColor: "#00ff00"
@@ -57,11 +58,13 @@ const GameModeSelector = ({ currentMode, onModeChange, language }) => {
               w="100%"
             >
               <VStack spacing={1}>
-                <Text fontSize="lg">{mode.icon}</Text>
-                <Text fontSize="xs" fontWeight="bold">{mode.name}</Text>
-                <Text fontSize="xs" color="#888" textAlign="center">
-                  {mode.description}
+                <Text fontSize={compact ? "md" : "lg"}>{mode.icon}</Text>
+                <Text fontSize="xs" fontWeight="bold">
+                  {compact ? mode.name.split(' ')[0] : mode.name}
                 </Text>
+                {!compact && <Text fontSize="xs" color="#888" textAlign="center">
+                  {mode.description}
+                </Text>}
               </VStack>
             </Button>
           </MotionBox>
@@ -80,10 +83,10 @@ const GameModeSelector = ({ currentMode, onModeChange, language }) => {
           <Text fontSize="xs" color="#ffaa00" mb={1}>
             💡 TYPING MODE ACTIVE - COMBO SYSTEM ENABLED
           </Text>
-          <Text fontSize="xs" color="#666">
+          {!compact && <Text fontSize="xs" color="#666">
             Build combos by typing fast and accurately! Higher combos = more points and better effects.
             Current language: {language.toUpperCase()}
-          </Text>
+          </Text>}
         </MotionBox>
       )}
 
@@ -99,10 +102,10 @@ const GameModeSelector = ({ currentMode, onModeChange, language }) => {
           <Text fontSize="xs" color="#ffaa00" mb={1}>
             🚀 HYBRID MODE - TYPE THEN EXECUTE
           </Text>
-          <Text fontSize="xs" color="#666">
+          {!compact && <Text fontSize="xs" color="#666">
             Type code challenges with combo effects, then execute to see results!
             Perfect for learning while gaming.
-          </Text>
+          </Text>}
         </MotionBox>
       )}
     </Box>

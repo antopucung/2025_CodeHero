@@ -16,7 +16,7 @@ import { createPulseAnimation } from "../design/tokens/animations";
 
 const MotionBox = motion(Box);
 
-const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel }) => {
+const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel, fullScreen = false }) => {
   const [engine] = useState(() => new TypingEngine());
   const [effectSystem] = useState(() => new EffectSystem());
   const [isStarted, setIsStarted] = useState(false);
@@ -139,6 +139,10 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         animate={{ opacity: 1, y: 0 }}
         position="relative"
         overflow="hidden"
+        h={fullScreen ? "100%" : "auto"}
+        display={fullScreen ? "flex" : "block"}
+        alignItems={fullScreen ? "center" : "stretch"}
+        justifyContent={fullScreen ? "center" : "stretch"}
       >
         <TerminalPanel title="TYPING CHALLENGE READY" variant="primary">
           <VStack spacing={spacing[4]}>
@@ -146,16 +150,24 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               {...createPulseAnimation(1)}
               color={colors.primary[500]}
               fontWeight={typography.weights.bold}
-              fontSize={typography.sizes.xl}
+              fontSize={fullScreen ? typography.sizes['3xl'] : typography.sizes.xl}
             >
               {challenge.title}
             </Box>
             
-            <Text fontSize={typography.sizes.base} color={colors.terminal.textSecondary}>
+            <Text 
+              fontSize={fullScreen ? typography.sizes.lg : typography.sizes.base} 
+              color={colors.terminal.textSecondary}
+              textAlign="center"
+            >
               {challenge.description}
             </Text>
             
-            <Box fontSize={typography.sizes.xs} color={colors.combo.perfect}>
+            <Box 
+              fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
+              color={colors.combo.perfect}
+              textAlign="center"
+            >
               LANGUAGE: {challenge.language.toUpperCase()} | 
               DIFFICULTY: {challenge.difficulty.toUpperCase()}
             </Box>
@@ -170,12 +182,14 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
                 border={`1px solid ${colors.primary[500]}`}
                 borderRadius="0"
                 fontFamily={typography.fonts.mono}
+                fontSize={fullScreen ? typography.sizes.lg : typography.sizes.base}
+                p={fullScreen ? 8 : 4}
                 _hover={{ 
                   bg: colors.terminal.surface,
                   boxShadow: `0 0 15px ${colors.primary[500]}`
                 }}
                 onClick={startChallenge}
-                size="lg"
+                size={fullScreen ? "xl" : "lg"}
               >
                 🚀 START TYPING CHALLENGE 🚀
               </Button>
@@ -187,7 +201,11 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   }
 
   return (
-    <VStack spacing={spacing[4]} align="stretch">
+    <VStack 
+      spacing={spacing[4]} 
+      align="stretch"
+      h={fullScreen ? "100%" : "auto"}
+    >
       {/* Pattern Bonus Display */}
       <PatternBonusDisplay
         patterns={activePatterns}
@@ -196,15 +214,12 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         }}
       />
       
-      {/* Game Stats */}
-      <GameStats engine={engine} />
-      
       {/* Progress Bar */}
-      <TerminalPanel title="CHALLENGE PROGRESS">
+      <TerminalPanel title="CHALLENGE PROGRESS" variant="primary">
         <Box
           bg={colors.terminal.bg}
           border={`1px solid ${colors.terminal.border}`}
-          h="12px"
+          h={fullScreen ? "16px" : "12px"}
           borderRadius="0"
           overflow="hidden"
           position="relative"
@@ -222,7 +237,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         </Box>
         
         <Text 
-          fontSize={typography.sizes.xs} 
+          fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
           color={colors.terminal.textSecondary}
           textAlign="center"
           mt={spacing[2]}
@@ -232,13 +247,16 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       </TerminalPanel>
       
       {/* Typing Display */}
-      <TypingDisplay
-        text={challenge.code}
-        engine={engine}
-        onCharacterClick={(index) => {
-          console.log('Clicked character at index:', index);
-        }}
-      />
+      <Box flex={fullScreen ? 1 : "none"}>
+        <TypingDisplay
+          text={challenge.code}
+          engine={engine}
+          onCharacterClick={(index) => {
+            console.log('Clicked character at index:', index);
+          }}
+          fullScreen={fullScreen}
+        />
+      </Box>
       
       {/* Completion Message */}
       {engineState.isComplete && (
@@ -263,13 +281,16 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
                 {...createPulseAnimation(1.5)}
                 color={colors.primary[500]}
                 fontWeight={typography.weights.bold}
-                fontSize={typography.sizes['2xl']}
+                fontSize={fullScreen ? typography.sizes['4xl'] : typography.sizes['2xl']}
                 textAlign="center"
               >
                 🎉 CHALLENGE MASTERED! 🎉
               </Box>
               
-              <Box fontSize={typography.sizes.base} textAlign="center">
+              <Box 
+                fontSize={fullScreen ? typography.sizes.lg : typography.sizes.base} 
+                textAlign="center"
+              >
                 <Text color={colors.combo.perfect}>
                   Final Score: {engineState.totalScore}
                 </Text>
@@ -308,7 +329,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       
       {!engineState.isComplete && (
         <Text 
-          fontSize={typography.sizes.xs} 
+          fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
           color={colors.terminal.textSecondary} 
           textAlign="center"
           style={{ opacity: 0.7 }}

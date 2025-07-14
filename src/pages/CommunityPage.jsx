@@ -36,9 +36,14 @@ const CommunityPage = () => {
       thumbnail_url: 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400',
       likes: 245,
       donations: 1250,
+      fundingGoal: 2000,
       tags: ['Unity', 'Game Dev', '2D'],
       difficulty: 'intermediate',
       status: 'completed',
+      acceptsDonations: true,
+      seekingCollaborators: true,
+      collaborationSlots: 2,
+      currentCollaborators: 0,
       price: 0,
       instructor_name: 'CodeMaster99',
       lessons_count: 0,
@@ -55,9 +60,12 @@ const CommunityPage = () => {
       thumbnail_url: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=400',
       likes: 189,
       donations: 890,
+      fundingGoal: 1500,
       tags: ['React', 'Node.js', 'Full-Stack'],
       difficulty: 'advanced',
       status: 'completed',
+      acceptsDonations: true,
+      seekingCollaborators: false,
       price: 0,
       instructor_name: 'WebWizard',
       lessons_count: 0,
@@ -74,9 +82,14 @@ const CommunityPage = () => {
       thumbnail_url: 'https://images.pexels.com/photos/669610/pexels-photo-669610.jpeg?auto=compress&cs=tinysrgb&w=400',
       likes: 156,
       donations: 675,
+      fundingGoal: 1000,
       tags: ['Python', 'Data Science', 'Visualization'],
       difficulty: 'beginner',
       status: 'completed',
+      acceptsDonations: false,
+      seekingCollaborators: true,
+      collaborationSlots: 1,
+      currentCollaborators: 0,
       price: 0,
       instructor_name: 'DataNinja',
       lessons_count: 0,
@@ -339,7 +352,7 @@ const CommunityPage = () => {
                         project={project}
                         onViewDetails={() => navigate(`/project/${project.id}`)}
                         onDonate={() => handleProjectDonate(project)}
-                        onCollaborate={() => handleProjectCollaborate(project)}
+                        onCollaborate={() => handleProjectDonate(project)}
                       />
                     </MotionBox>
                   ))}

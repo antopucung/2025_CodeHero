@@ -9,7 +9,6 @@ import {
   ComboBurstEffect, 
   AnticipationCursor,
   BackgroundWaveEffect,
-  ProgressiveBackgroundEffect,
   ScreenFlashEffect,
   PatternCelebration
 } from './TypingEffects';
@@ -226,10 +225,9 @@ export const TypingDisplay = memo(({
         lineHeight="22px"
       >
         {/* Progressive Background Effect with Intensity Scaling */}
-        <ProgressiveBackgroundEffect
+        <BackgroundWaveEffect
           isActive={engine.state?.isActive && !engine.state?.isComplete}
           combo={engine.state?.combo || 1}
-          perfectStreak={engine.state?.perfectStreak || 0}
           typingSpeed={engine.state?.typingSpeed || 'lame'}
           anticipationLevel={engine.state?.anticipationLevel || 1}
         />

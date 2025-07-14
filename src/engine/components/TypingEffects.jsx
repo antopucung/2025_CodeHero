@@ -1254,3 +1254,102 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
 
 // Enhanced combo multiplier with anticipation effects
 export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, typingSpeed = 'lame' }) => {
+  if (!isActive || multiplier <= 1) return null;
+
+  const getMultiplierColor = (multiplier, typingSpeed) => {
+    const speedColors = {
+      perfect: '#ff6b6b',
+      best: '#ffd93d', 
+      good: '#4ecdc4',
+      lame: '#45b7d1'
+    };
+    
+    if (multiplier >= 5) return '#ff1744';
+    if (multiplier >= 4) return speedColors[typingSpeed] || speedColors.lame;
+    if (multiplier >= 3) return '#ffd93d';
+    if (multiplier >= 2) return '#4ecdc4';
+    return speedColors[typingSpeed] || speedColors.lame;
+  };
+
+  const color = getMultiplierColor(multiplier, typingSpeed);
+  const intensity = Math.min(multiplier / 2, 3) * anticipationLevel;
+
+  return (
+    <motion.div
+      initial={{ scale: 0, x: -50 }}
+      animate={{ 
+        scale: [1, 1.1 + (intensity * 0.1), 1],
+        x: 0,
+        boxShadow: [
+          `0 0 15px ${color}`,
+          `0 0 ${25 * intensity}px ${color}`,
+          `0 0 15px ${color}`
+        ]
+      }}
+      exit={{ scale: 0, x: -50 }}
+      transition={{ 
+        scale: { repeat: Infinity, duration: 1 / intensity },
+        boxShadow: { repeat: Infinity, duration: 1.2 / intensity }
+      }}
+      style={{
+        position: 'fixed',
+        top: '25%',
+        left: '20px',
+        zIndex: 1000,
+        background: `linear-gradient(135deg, ${color}, ${color}cc)`,
+        padding: '15px 20px',
+        borderRadius: '12px',
+        color: multiplier >= 4 ? '#000' : '#fff',
+        fontFamily: "'Courier New', monospace",
+        fontWeight: 'bold',
+        fontSize: '16px',
+        textAlign: 'center',
+        minWidth: '100px',
+        border: `2px solid ${color}`,
+        transform: 'perspective(100px) rotateY(10deg)'
+      }}
+    >
+      <motion.div
+        animate={{
+          scale: [1, 1.1, 1],
+          rotate: [0, 2, -2, 0]
+        }}
+        transition={{
+          duration: 0.8 / intensity,
+          repeat: Infinity
+        }}
+      >
+        <div style={{ fontSize: '12px', opacity: 0.8 }}>COMBO</div>
+        <div style={{ fontSize: '24px', margin: '5px 0' }}>x{multiplier}</div>
+        <div style={{ fontSize: '10px', opacity: 0.9 }}>MULTIPLIER</div>
+      </motion.div>
+      
+      {/* Multiplier energy particles */}
+      {Array.from({ length: Math.min(multiplier, 6) }).map((_, i) => (
+        <motion.div
+          key={i}
+          animate={{
+            y: [0, -25, -40],
+            opacity: [1, 0.7, 0],
+            scale: [0.3, 1, 0]
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Infinity,
+            delay: i * 0.2
+          }}
+          style={{
+            position: 'absolute',
+            bottom: '100%',
+            left: `${15 + i * 12}%`,
+            width: '3px',
+            height: '6px',
+            background: color,
+            borderRadius: '50%',
+            boxShadow: `0 0 6px ${color}`
+          }}
+        />
+      ))}
+    </motion.div>
+  );
+};

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Box, Text, VStack, HStack, Grid, GridItem, Button, Badge, Image } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 import { useGameProgress } from '../hooks/useGameProgress';
 
 const MotionBox = motion(Box);
 
 const CommunityPage = () => {
+  const navigate = useNavigate();
   const { progress } = useGameProgress();
   const [projects] = useState([
     {
@@ -133,6 +135,7 @@ const CommunityPage = () => {
             <Button
               bg="#ff6b6b"
               color="#fff"
+              onClick={() => navigate('/submit-project')}
               size="sm"
               fontFamily="'Courier New', monospace"
               _hover={{ bg: "#ff8e8e" }}
@@ -301,6 +304,7 @@ const CommunityPage = () => {
             <Button
               bg="#ff6b6b"
               color="#fff"
+              onClick={() => navigate('/submit-project')}
               fontFamily="'Courier New', monospace"
               _hover={{ bg: "#ff8e8e" }}
             >

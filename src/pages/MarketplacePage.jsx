@@ -2,111 +2,50 @@ import React, { useState, useEffect } from 'react';
 import { Box, Text, VStack, HStack, Grid, GridItem, Button, Badge, Image } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
 import { useGameProgress } from '../hooks/useGameProgress';
+import { useUserEnrollment } from '../hooks/useUserEnrollment';
 
 const MotionBox = motion(Box);
 
 const MarketplacePage = () => {
   const navigate = useNavigate();
   const { progress } = useGameProgress();
+  const { getEnrolledCourses } = useUserEnrollment();
   const [courses, setCourses] = useState([]);
+  const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Sample courses data - will be replaced with Supabase data
-  const sampleCourses = [
-    {
-      id: 'unity-csharp-101',
-      title: 'Unity C# Scripting 101',
-      description: 'Learn C# programming fundamentals for Unity game development. Master variables, functions, and game object interactions.',
-      language: 'csharp',
-      difficulty: 'beginner',
-      price: 49.99,
-      thumbnail_url: 'https://images.pexels.com/photos/577585/pexels-photo-577585.jpeg?auto=compress&cs=tinysrgb&w=400',
-      instructor: 'GameDev Master',
-      lessons_count: 25,
-      duration: '8 hours',
-      rating: 4.8,
-      students: 1250
-    },
-    {
-      id: 'python-basics',
-      title: 'Python Programming Fundamentals',
-      description: 'Start your coding journey with Python. Learn syntax, data structures, and build real projects step by step.',
-      language: 'python',
-      difficulty: 'beginner',
-      price: 39.99,
-      thumbnail_url: 'https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=400',
-      instructor: 'Code Ninja',
-      lessons_count: 30,
-      duration: '12 hours',
-      rating: 4.9,
-      students: 2340
-    },
-    {
-      id: 'javascript-advanced',
-      title: 'Advanced JavaScript Patterns',
-      description: 'Master advanced JavaScript concepts including async/await, closures, prototypes, and modern ES6+ features.',
-      language: 'javascript',
-      difficulty: 'advanced',
-      price: 79.99,
-      thumbnail_url: 'https://images.pexels.com/photos/11035380/pexels-photo-11035380.jpeg?auto=compress&cs=tinysrgb&w=400',
-      instructor: 'JS Expert',
-      lessons_count: 35,
-      duration: '15 hours',
-      rating: 4.7,
-      students: 890
-    },
-    {
-      id: 'java-spring-boot',
-      title: 'Java Spring Boot Development',
-      description: 'Build enterprise-grade applications with Spring Boot. Learn REST APIs, database integration, and deployment.',
-      language: 'java',
-      difficulty: 'intermediate',
-      price: 69.99,
-      thumbnail_url: 'https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=400',
-      instructor: 'Enterprise Dev',
-      lessons_count: 40,
-      duration: '20 hours',
-      rating: 4.6,
-      students: 1560
-    },
-    {
-      id: 'react-typescript',
-      title: 'React with TypeScript Mastery',
-      description: 'Build type-safe React applications. Learn hooks, context, state management, and modern development practices.',
-      language: 'typescript',
-      difficulty: 'intermediate',
-      price: 59.99,
-      thumbnail_url: 'https://images.pexels.com/photos/879109/pexels-photo-879109.jpeg?auto=compress&cs=tinysrgb&w=400',
-      instructor: 'Frontend Pro',
-      lessons_count: 28,
-      duration: '14 hours',
-      rating: 4.8,
-      students: 2100
-    },
-    {
-      id: 'php-laravel',
-      title: 'PHP Laravel Web Development',
-      description: 'Create powerful web applications with Laravel. Learn MVC architecture, authentication, and API development.',
-      language: 'php',
-      difficulty: 'intermediate',
-      price: 54.99,
-      thumbnail_url: 'https://images.pexels.com/photos/270348/pexels-photo-270348.jpeg?auto=compress&cs=tinysrgb&w=400',
-      instructor: 'Web Architect',
-      lessons_count: 32,
-      duration: '16 hours',
-      rating: 4.5,
-      students: 980
-    }
-  ];
-
   useEffect(() => {
-    // Simulate loading - will be replaced with Supabase fetch
-    setTimeout(() => {
-      setCourses(sampleCourses);
-      setLoading(false);
-    }, 1000);
+    fetchCourses();
+    fetchEnrolledCourses();
   }, []);
+
+  const fetchCourses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      setCourses(data || []);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchEnrolledCourses = async () => {
+    try {
+      const enrolled = await getEnrolledCourses();
+      setEnrolledCourses(enrolled);
+    } catch (error) {
+      console.error('Error fetching enrolled courses:', error);
+    }
+  };
 
   const getDifficultyColor = (difficulty) => {
     const colors = {
@@ -204,6 +143,33 @@ const MarketplacePage = () => {
               </Text>
               <Text fontSize="xs" color="#666">ACHIEVEMENTS</Text>
             </VStack>
+            
+            {/* Enrolled Courses Quick Access */}
+            {enrolledCourses.length > 0 && (
+              <VStack spacing={2}>
+                <Text fontSize="sm" color="#4ecdc4" fontWeight="bold">
+                  📚 My Courses ({enrolledCourses.length})
+                </Text>
+                <HStack spacing={2} flexWrap="wrap" justify="center">
+                  {enrolledCourses.slice(0, 3).map((course) => (
+                    <Button
+                      key={course.id}
+                      size="xs"
+                      bg="#333"
+                      color="#4ecdc4"
+                      onClick={() => navigate(`/modules/${course.id}`)}
+                      fontFamily="'Courier New', monospace"
+                      _hover={{ bg: "#444" }}
+                    >
+                      {course.title.split(' ').slice(0, 2).join(' ')}
+                    </Button>
+                  ))}
+                  {enrolledCourses.length > 3 && (
+                    <Text fontSize="xs" color="#666">+{enrolledCourses.length - 3} more</Text>
+                  )}
+                </HStack>
+              </VStack>
+            )}
           </HStack>
         </VStack>
       </MotionBox>
@@ -317,17 +283,17 @@ const MarketplacePage = () => {
                     {/* Course Stats */}
                     <VStack spacing={2} align="stretch">
                       <HStack justify="space-between" fontSize="xs" color="#666">
-                        <Text>👨‍🏫 {course.instructor}</Text>
+                        <Text>👨‍🏫 {course.instructor_name}</Text>
                         <Text>⭐ {course.rating}</Text>
                       </HStack>
                       
                       <HStack justify="space-between" fontSize="xs" color="#666">
                         <Text>📚 {course.lessons_count} lessons</Text>
-                        <Text>⏱️ {course.duration}</Text>
+                        <Text>⏱️ {course.duration_hours}h</Text>
                       </HStack>
                       
                       <HStack justify="space-between" fontSize="xs" color="#666">
-                        <Text>👥 {course.students.toLocaleString()} students</Text>
+                        <Text>👥 {course.students_count?.toLocaleString()} students</Text>
                         <Text>🎯 Interactive</Text>
                       </HStack>
                     </VStack>

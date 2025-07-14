@@ -6,6 +6,8 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import MarketplacePage from './pages/MarketplacePage';
 import CommunityPage from './pages/CommunityPage';
+import ModuleDetailPage from './pages/ModuleDetailPage';
+import LessonPage from './pages/LessonPage';
 
 const MotionBox = motion(Box);
 
@@ -44,7 +46,9 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/community" element={<CommunityPage />} />
-            <Route path="/modules/:id" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Module Detail Page - Coming Soon!</div>} />
+            <Route path="/modules/:id" element={<ModuleDetailPage />} />
+            <Route path="/learn/:courseId/:lessonId" element={<LessonPage />} />
+            <Route path="/submit-project" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Project Submission - Coming Soon!</div>} />
           </Routes>
         </MotionBox>
       </Box>

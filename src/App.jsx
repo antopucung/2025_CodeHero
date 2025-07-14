@@ -14,25 +14,32 @@ function App() {
   return (
     <Router>
       <Box 
-        minH="100vh" 
-        maxH="100vh"
+        w="100vw"
+        h="100vh"
         bg="#000000" 
         color="#00ff00" 
         fontFamily="'Courier New', monospace"
         overflow="hidden"
         display="flex"
         flexDirection="column"
+        position="fixed"
+        top="0"
+        left="0"
       >
-        {/* Global Header */}
-        <Header />
+        {/* Global Header - Fixed Height */}
+        <Box flexShrink={0} h="60px" overflow="hidden">
+          <Header />
+        </Box>
         
-        {/* Main Content with Routing */}
+        {/* Main Content - Dynamic Height */}
         <MotionBox
           flex={1}
           overflow="hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
+          display="flex"
+          flexDirection="column"
         >
           <Routes>
             <Route path="/" element={<HomePage />} />

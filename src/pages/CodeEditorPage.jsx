@@ -38,27 +38,29 @@ const CodeEditorPage = () => {
   };
 
   return (
-    <Box h="100%" display="flex" flexDirection="column" overflow="hidden">
-      {/* Page Header */}
+    <Box w="100%" h="100%" display="flex" flexDirection="column" overflow="hidden">
+      {/* Page Header - Fixed Height */}
       <MotionBox
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         bg="#111"
         borderBottom="1px solid #333"
-        p={4}
+        p={3}
+        h="80px"
         flexShrink={0}
+        overflow="hidden"
       >
-        <HStack justify="space-between" align="center">
+        <HStack justify="space-between" align="center" h="100%">
           <VStack align="start" spacing={0}>
-            <Text fontSize="xl" color="#00ff00" fontWeight="bold">
+            <Text fontSize="lg" color="#00ff00" fontWeight="bold">
               ⌨️ Code Editor
             </Text>
-            <Text fontSize="sm" color="#666">
-              Professional IDE with multi-language support
+            <Text fontSize="xs" color="#666">
+              Professional IDE with execution
             </Text>
           </VStack>
           
-          <Box w="300px">
+          <Box w={{ base: "200px", md: "250px" }} h="100%">
             <GameStats 
               progress={progress} 
               compact={true}
@@ -67,12 +69,12 @@ const CodeEditorPage = () => {
         </HStack>
       </MotionBox>
 
-      {/* Main Editor Layout */}
+      {/* Main Editor Layout - Dynamic Height */}
       <Box flex={1} overflow="hidden">
         <HStack h="100%" spacing={0}>
           {/* Code Editor Panel */}
           <MotionBox
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             flex={1}
             bg="#111" 
@@ -81,25 +83,27 @@ const CodeEditorPage = () => {
             flexDirection="column"
             overflow="hidden"
           >
-            {/* Editor Header */}
+            {/* Editor Header - Fixed Height */}
             <Box 
-              p={4} 
+              p={3} 
               borderBottom="1px solid #333" 
+              h="80px"
               flexShrink={0}
               bg="linear-gradient(90deg, #111 0%, #222 50%, #111 100%)"
+              overflow="hidden"
             >
-              <Text fontSize="sm" color="#666" mb={3} fontFamily="'Courier New', monospace">
-                │ CODE EDITOR - WRITE & EXECUTE
+              <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
+                │ CODE EDITOR
               </Text>
               <LanguageSelector language={language} onSelect={onSelect} />
             </Box>
             
-            {/* Monaco Editor */}
+            {/* Monaco Editor - Dynamic Height */}
             <Box flex={1} overflow="hidden">
               <Editor
                 options={{
-                  minimap: { enabled: true },
-                  fontSize: 16,
+                  minimap: { enabled: false },
+                  fontSize: 14,
                   fontFamily: "'Courier New', 'Monaco', monospace",
                   lineNumbers: "on",
                   glyphMargin: false,
@@ -113,13 +117,6 @@ const CodeEditorPage = () => {
                   scrollbar: {
                     vertical: 'auto',
                     horizontal: 'auto'
-                  },
-                  bracketPairColorization: {
-                    enabled: true
-                  },
-                  guides: {
-                    indentation: true,
-                    bracketPairs: true
                   }
                 }}
                 height="100%"
@@ -132,11 +129,11 @@ const CodeEditorPage = () => {
             </Box>
           </MotionBox>
           
-          {/* Output Panel */}
+          {/* Output Panel - Fixed Width */}
           <MotionBox
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 10 }}
             animate={{ opacity: 1, x: 0 }}
-            w="500px"
+            w={{ base: "300px", md: "400px" }}
             overflow="hidden"
             flexShrink={0}
           >

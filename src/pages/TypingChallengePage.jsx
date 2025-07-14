@@ -35,27 +35,29 @@ const TypingChallengePage = () => {
   };
 
   return (
-    <Box h="100%" display="flex" flexDirection="column" overflow="hidden">
-      {/* Page Header */}
+    <Box w="100%" h="100%" display="flex" flexDirection="column" overflow="hidden">
+      {/* Page Header - Fixed Height */}
       <MotionBox
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         bg="#111"
         borderBottom="1px solid #333"
-        p={4}
+        p={3}
+        h="80px"
         flexShrink={0}
+        overflow="hidden"
       >
-        <HStack justify="space-between" align="center">
+        <HStack justify="space-between" align="center" h="100%">
           <VStack align="start" spacing={0}>
-            <Text fontSize="xl" color="#00ff00" fontWeight="bold">
+            <Text fontSize="lg" color="#00ff00" fontWeight="bold">
               🎯 Typing Challenge
             </Text>
-            <Text fontSize="sm" color="#666">
-              Gamified typing with combos, achievements, and progression
+            <Text fontSize="xs" color="#666">
+              Gamified typing with combos and achievements
             </Text>
           </VStack>
           
-          <Box w="300px">
+          <Box w={{ base: "200px", md: "250px" }} h="100%">
             <GameStats 
               progress={progress} 
               currentStats={currentStats}
@@ -65,19 +67,20 @@ const TypingChallengePage = () => {
         </HStack>
       </MotionBox>
 
-      {/* Challenge Setup or Active Challenge */}
+      {/* Challenge Content - Dynamic Height */}
       <Box flex={1} overflow="hidden">
         {!currentChallenge ? (
           <MotionBox
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             h="100%"
             display="flex"
             alignItems="center"
             justifyContent="center"
             bg="linear-gradient(135deg, #000 0%, #111 50%, #000 100%)"
+            overflow="hidden"
           >
-            <VStack spacing={8} maxW="600px" w="100%" p={8}>
+            <VStack spacing={6} maxW="500px" w="100%" p={6}>
               <MotionBox
                 animate={{
                   textShadow: [
@@ -89,20 +92,20 @@ const TypingChallengePage = () => {
                 transition={{ duration: 2, repeat: Infinity }}
                 textAlign="center"
               >
-                <Text fontSize="4xl" fontWeight="bold" color="#ffd93d" mb={4}>
+                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="#ffd93d" mb={3}>
                   🎯 Ready to Type?
                 </Text>
-                <Text fontSize="lg" color="#666" mb={8}>
-                  Choose your challenge settings and start building those combos!
+                <Text fontSize={{ base: "sm", md: "md" }} color="#666" mb={6}>
+                  Choose your challenge settings
                 </Text>
               </MotionBox>
 
               {/* Language Selection */}
-              <VStack spacing={4} w="100%">
-                <Text fontSize="lg" color="#00ff00" fontWeight="bold">
-                  Select Language
+              <VStack spacing={3} w="100%">
+                <Text fontSize="md" color="#00ff00" fontWeight="bold">
+                  Language
                 </Text>
-                <HStack spacing={3} flexWrap="wrap" justify="center">
+                <HStack spacing={2} flexWrap="wrap" justify="center">
                   {languages.map((lang) => (
                     <MotionBox
                       key={lang}
@@ -116,9 +119,10 @@ const TypingChallengePage = () => {
                         borderColor={selectedLanguage === lang ? "#00ff00" : "#333"}
                         borderRadius="4px"
                         fontFamily="'Courier New', monospace"
-                        fontSize="sm"
-                        px={6}
-                        py={3}
+                        fontSize="xs"
+                        px={3}
+                        py={2}
+                        h="auto"
                         _hover={{ 
                           bg: "#111",
                           borderColor: "#00ff00",
@@ -134,11 +138,11 @@ const TypingChallengePage = () => {
               </VStack>
 
               {/* Difficulty Selection */}
-              <VStack spacing={4} w="100%">
-                <Text fontSize="lg" color="#00ff00" fontWeight="bold">
-                  Select Difficulty
+              <VStack spacing={3} w="100%">
+                <Text fontSize="md" color="#00ff00" fontWeight="bold">
+                  Difficulty
                 </Text>
-                <HStack spacing={3} flexWrap="wrap" justify="center">
+                <HStack spacing={2} flexWrap="wrap" justify="center">
                   {difficulties.map((diff) => (
                     <MotionBox
                       key={diff}
@@ -152,9 +156,10 @@ const TypingChallengePage = () => {
                         borderColor={selectedDifficulty === diff ? "#00ff00" : "#333"}
                         borderRadius="4px"
                         fontFamily="'Courier New', monospace"
-                        fontSize="sm"
-                        px={6}
-                        py={3}
+                        fontSize="xs"
+                        px={3}
+                        py={2}
+                        h="auto"
                         _hover={{ 
                           bg: "#111",
                           borderColor: "#00ff00",
@@ -173,50 +178,50 @@ const TypingChallengePage = () => {
               <MotionBox
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                mt={8}
+                mt={4}
               >
                 <Button
                   bg="#ffd93d"
                   color="#000"
-                  borderRadius="8px"
+                  borderRadius="6px"
                   fontFamily="'Courier New', monospace"
-                  fontSize="lg"
+                  fontSize="md"
                   fontWeight="bold"
-                  px={12}
-                  py={6}
+                  px={8}
+                  py={4}
                   h="auto"
                   _hover={{ 
                     bg: "#ffed4e",
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 8px 25px #ffd93d66"
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 4px 20px #ffd93d66"
                   }}
                   onClick={startNewChallenge}
                 >
-                  🚀 START TYPING CHALLENGE 🚀
+                  🚀 START CHALLENGE
                 </Button>
               </MotionBox>
 
-              {/* Challenge Info */}
+              {/* Info */}
               <Box
                 bg="#111"
                 border="1px solid #333"
-                borderRadius="8px"
-                p={4}
+                borderRadius="6px"
+                p={3}
                 w="100%"
                 textAlign="center"
               >
-                <Text fontSize="sm" color="#666" mb={2}>
-                  Selected: {selectedLanguage.toUpperCase()} - {selectedDifficulty.toUpperCase()}
+                <Text fontSize="xs" color="#666" mb={1}>
+                  {selectedLanguage.toUpperCase()} - {selectedDifficulty.toUpperCase()}
                 </Text>
                 <Text fontSize="xs" color="#888">
-                  Available challenges: {getChallengesByLanguage(selectedLanguage).filter(c => c.difficulty === selectedDifficulty).length}
+                  {getChallengesByLanguage(selectedLanguage).filter(c => c.difficulty === selectedDifficulty).length} challenges available
                 </Text>
               </Box>
             </VStack>
           </MotionBox>
         ) : (
           <MotionBox
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             h="100%"
             p={4}

@@ -8,6 +8,7 @@ import { PerformanceOptimizer } from './PerformanceOptimizer.js';
 import { MobileOptimizer } from './MobileOptimizer.js';
 import { SoundManager } from './SoundManager.js';
 import { AnalyticsTracker } from './AnalyticsTracker.js';
+import { ENGINE_CONFIG } from './EngineConfig.js';
 
 export class TypingEngine extends CustomEventEmitter {
   constructor(config = {}) {
@@ -15,20 +16,7 @@ export class TypingEngine extends CustomEventEmitter {
     
     // Configuration
     this.config = {
-      speedThresholds: {
-        perfect: 120,
-        best: 180,
-        good: 250,
-        lame: 999
-      },
-      comboThresholds: {
-        basic: 1,
-        double: 5,
-        triple: 10,
-        perfect: 20,
-        god: 30,
-        legendary: 50
-      },
+      ...ENGINE_CONFIG,
       enableSounds: true,
       enableAnalytics: true,
       performanceMode: 'auto',
@@ -276,7 +264,7 @@ export class TypingEngine extends CustomEventEmitter {
   }
   
   getPerformanceMetrics() {
-    return this.statsCalculator.getPerformanceMetrics();
+    return this.typingProcessor.getPerformanceMetrics();
   }
   
   getTypingRhythm() {

@@ -14,13 +14,13 @@ const GameModeSelector = ({ currentMode, onModeChange, language }) => {
     {
       id: 'typing',
       name: 'TYPING CHALLENGE',
-      description: 'Improve typing with code',
+      description: 'Gamified typing with combos',
       icon: '🎯'
     },
     {
       id: 'hybrid',
       name: 'HYBRID MODE',
-      description: 'Type then execute code',
+      description: 'Type code then execute',
       icon: '🚀'
     }
   ];
@@ -78,11 +78,30 @@ const GameModeSelector = ({ currentMode, onModeChange, language }) => {
           border="1px solid #333"
         >
           <Text fontSize="xs" color="#ffaa00" mb={1}>
-            💡 TYPING MODE ACTIVE
+            💡 TYPING MODE ACTIVE - COMBO SYSTEM ENABLED
           </Text>
           <Text fontSize="xs" color="#666">
-            Complete typing challenges to earn XP and improve your coding speed.
+            Build combos by typing fast and accurately! Higher combos = more points and better effects.
             Current language: {language.toUpperCase()}
+          </Text>
+        </MotionBox>
+      )}
+
+      {currentMode === 'hybrid' && (
+        <MotionBox
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          mt={3}
+          p={2}
+          bg="#000"
+          border="1px solid #333"
+        >
+          <Text fontSize="xs" color="#ffaa00" mb={1}>
+            🚀 HYBRID MODE - TYPE THEN EXECUTE
+          </Text>
+          <Text fontSize="xs" color="#666">
+            Type code challenges with combo effects, then execute to see results!
+            Perfect for learning while gaming.
           </Text>
         </MotionBox>
       )}

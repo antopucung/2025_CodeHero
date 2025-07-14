@@ -37,6 +37,8 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
     isComplete,
     streak,
     combo,
+    maxCombo,
+    totalScore,
     explosions,
     floatingScores,
     screenShake,
@@ -53,10 +55,12 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
     onComplete({
       ...stats,
       challenge: challenge.id,
-      language: challenge.language
+      language: challenge.language,
+      maxCombo,
+      totalScore
     });
     
-    // Simulate level up check (you can integrate with your actual level system)
+    // Simulate level up check
     setTimeout(() => {
       if (currentLevel > oldLevel) {
         setNewLevel(currentLevel);
@@ -64,47 +68,45 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       }
     }, 500);
   }, (charData) => {
-    // Handle character typed for effects
+    // Handle character typed for effects cleanup
     if (charData.isCorrect && charData.score > 0) {
-      // Add floating score with slight delay for visual appeal
       setTimeout(() => {
         setFloatingScores(prev => prev.filter(score => score.id !== charData.id));
-      }, 1500);
+      }, 2000);
     }
     
-    // Remove explosions after animation
     setTimeout(() => {
       setExplosions(prev => prev.filter(exp => 
-        Date.now() - exp.id > 1000
+        Date.now() - exp.id > 1500
       ));
-    }, 1000);
+    }, 1500);
   });
 
   // Update cursor position based on current character
   useEffect(() => {
     if (containerRef.current) {
-      const charWidth = 18; // Approximate width of each block letter
-      const lineHeight = 32;
+      const charWidth = 22; // Width of enhanced block letters
+      const lineHeight = 36;
       const charsPerLine = Math.floor(containerRef.current.offsetWidth / charWidth);
       
       const line = Math.floor(currentIndex / charsPerLine);
       const col = currentIndex % charsPerLine;
       
       setCursorPosition({
-        x: col * charWidth,
-        y: line * lineHeight
+        x: col * charWidth + 10,
+        y: line * lineHeight + 5
       });
     }
   }, [currentIndex]);
 
-  // Clean up floating scores
+  // Clean up effects
   useEffect(() => {
     const cleanup = setInterval(() => {
       setFloatingScores(prev => prev.filter(score => 
-        Date.now() - score.id < 2000
+        Date.now() - score.id < 2500
       ));
       setExplosions(prev => prev.filter(exp => 
-        Date.now() - exp.id < 1500
+        Date.now() - exp.id < 2000
       ));
     }, 1000);
     
@@ -147,10 +149,10 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         position="relative"
         overflow="hidden"
       >
-        <GradientWaveBackground isActive={true} intensity={0.5} />
+        <GradientWaveBackground isActive={true} intensity={0.5} combo={1} />
         
         <VStack spacing={4}>
-          <PulseAnimation isActive={true} color="#00ff00" intensity={1.5}>
+          <PulseAnimation isActive={true} color="#00ff00" intensity={1.5} combo={1}>
             <Text fontSize="lg" color="#00ff00" fontWeight="bold">
               {challenge.title}
             </Text>
@@ -197,23 +199,28 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   return (
     <ScreenShake isShaking={screenShake}>
       <Box bg="#111" border="1px solid #333" p={3} position="relative" overflow="hidden">
-        {/* Background Effects */}
-        <GradientWaveBackground isActive={isActive && !isComplete} intensity={combo / 5} />
+        {/* Enhanced Background Effects */}
+        <GradientWaveBackground 
+          isActive={isActive && !isComplete} 
+          intensity={Math.min(combo / 10, 2)} 
+          combo={combo}
+        />
         
-        {/* Floating Scores */}
+        {/* Enhanced Floating Scores */}
         {floatingScores.map((score) => (
           <FloatingScore
             key={score.id}
             score={score.score}
             x={score.x}
             y={score.y}
+            color={score.color}
             onComplete={() => {
               setFloatingScores(prev => prev.filter(s => s.id !== score.id));
             }}
           />
         ))}
         
-        {/* Character Explosions */}
+        {/* Enhanced Character Explosions */}
         {explosions.map((explosion) => (
           <CharacterExplosion
             key={explosion.id}
@@ -221,37 +228,43 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             x={explosion.x}
             y={explosion.y}
             isCorrect={explosion.isCorrect}
+            combo={explosion.combo}
             onComplete={() => {
               setExplosions(prev => prev.filter(e => e.id !== explosion.id));
             }}
           />
         ))}
         
-        {/* Combo Burst Effects */}
+        {/* Enhanced Combo Burst Effects */}
         <ComboBurstEffect 
-          isActive={combo > 3}
+          isActive={combo > 5}
           combo={combo}
           x={cursorPosition.x}
           y={cursorPosition.y}
         />
         
-        {/* Streak Counter */}
+        {/* Enhanced Streak Counter */}
         <StreakCounter streak={streak} combo={combo} />
         
-        {/* Combo Multiplier */}
+        {/* Enhanced Combo Multiplier */}
         <ComboMultiplier multiplier={combo} isActive={combo > 1} />
         
         <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
           │ TYPING CHALLENGE - {challenge.title.toUpperCase()}
         </Text>
         
-        {/* Progress Bar */}
+        {/* Enhanced Progress Bar */}
         <Box bg="#000" border="1px solid #333" p={2} mb={3} position="relative">
           <HStack justify="space-between" mb={2}>
             <Text fontSize="xs" color="#666">PROGRESS</Text>
-            <HStack spacing={2}>
-              <PulseAnimation isActive={streak > 10} color="#ffaa00">
+            <HStack spacing={4}>
+              <PulseAnimation isActive={streak > 10} color="#ffaa00" combo={combo}>
                 <Text fontSize="xs" color="#ffaa00">STREAK: {streak}</Text>
+              </PulseAnimation>
+              <PulseAnimation isActive={combo > 5} color="#ff6b6b" combo={combo}>
+                <Text fontSize="xs" color={combo >= 50 ? "#ff6b6b" : combo >= 30 ? "#ffd93d" : combo >= 20 ? "#6bcf7f" : combo >= 10 ? "#4ecdc4" : "#00ff00"}>
+                  COMBO: x{combo}
+                </Text>
               </PulseAnimation>
               <Text fontSize="xs" color="#00ff00">{Math.round(progress)}%</Text>
             </HStack>
@@ -259,13 +272,13 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           <JuicyProgressBar progress={progress} color="#00ff00" />
         </Box>
 
-        {/* Live Stats */}
+        {/* Enhanced Live Stats */}
         <HStack justify="space-between" mb={3} fontSize="xs" position="relative">
-          <PulseAnimation isActive={wpm > 50} color="#ffff00" intensity={wpm / 50}>
+          <PulseAnimation isActive={wpm > 50} color="#ffff00" intensity={wpm / 50} combo={combo}>
             <MotionBox
               animate={{ 
                 scale: wpm > 0 ? [1, 1.1, 1] : 1,
-                color: wpm > 50 ? "#ffff00" : "#00ff00"
+                color: wpm > 80 ? "#ff6b6b" : wpm > 60 ? "#ffd93d" : wpm > 40 ? "#6bcf7f" : "#00ff00"
               }}
               transition={{ duration: 0.5 }}
             >
@@ -273,11 +286,11 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             </MotionBox>
           </PulseAnimation>
           
-          <PulseAnimation isActive={accuracy === 100} color="#ffff00">
+          <PulseAnimation isActive={accuracy === 100} color="#ffff00" combo={combo}>
             <MotionBox
               animate={{ 
                 scale: accuracy === 100 ? [1, 1.1, 1] : 1,
-                color: accuracy > 95 ? "#ffff00" : "#00ff00"
+                color: accuracy > 95 ? "#ffff00" : accuracy > 85 ? "#6bcf7f" : "#ff6b6b"
               }}
               transition={{ duration: 0.5 }}
             >
@@ -293,27 +306,13 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           >
             <Text color={errors > 0 ? "#ff4444" : "#00ff00"}>ERRORS: {errors}</Text>
           </MotionBox>
-          
-          {combo > 1 && (
-            <PulseAnimation isActive={true} color="#ffd93d" intensity={combo / 5}>
-              <MotionBox
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                style={{
-                  background: 'linear-gradient(45deg, #ffd93d, #ff6b6b)',
-                  color: '#000',
-                  padding: '2px 8px',
-                  borderRadius: '10px',
-                  fontWeight: 'bold'
-                }}
-              >
-                <Text fontSize="xs">x{combo} COMBO!</Text>
-              </MotionBox>
-            </PulseAnimation>
-          )}
+
+          <PulseAnimation isActive={totalScore > 0} color="#ffd93d" combo={combo}>
+            <Text color="#ffd93d">SCORE: {totalScore}</Text>
+          </PulseAnimation>
         </HStack>
 
-        {/* Block Letter Code Display */}
+        {/* Enhanced Block Letter Code Display */}
         <Box
           ref={containerRef}
           bg="#000"
@@ -324,20 +323,21 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           overflowY="auto"
           position="relative"
         >
-          {/* Advanced Typing Cursor */}
+          {/* Enhanced Advanced Typing Cursor */}
           <AdvancedTypingCursor 
             isVisible={isActive && !isComplete}
             x={cursorPosition.x}
             y={cursorPosition.y}
+            combo={combo}
           />
           
-          {/* Block Letter Typing Effect */}
+          {/* Enhanced Block Letter Typing Effect */}
           <BlockLetterTyping
             text={challenge.code}
             currentIndex={currentIndex}
             getCharacterStatus={getCharacterStatus}
+            combo={combo}
             onCharacterClick={(index) => {
-              // Optional: Allow clicking to jump to character
               console.log('Clicked character at index:', index);
             }}
           />
@@ -367,9 +367,9 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               position="relative"
               overflow="hidden"
             >
-              <GradientWaveBackground isActive={true} intensity={2} />
+              <GradientWaveBackground isActive={true} intensity={2} combo={maxCombo} />
               
-              <PulseAnimation isActive={true} color="#00ff00" intensity={2}>
+              <PulseAnimation isActive={true} color="#00ff00" intensity={2} combo={maxCombo}>
                 <MotionBox
                   animate={{ 
                     scale: [1, 1.05, 1],
@@ -387,19 +387,28 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               </PulseAnimation>
               
               <HStack justify="center" spacing={4} mb={2}>
-                <PulseAnimation isActive={wpm > 50} color="#ffff00">
+                <PulseAnimation isActive={wpm > 50} color="#ffff00" combo={maxCombo}>
                   <Text fontSize="sm" color="#ffff00">WPM: {wpm}</Text>
                 </PulseAnimation>
-                <PulseAnimation isActive={accuracy > 95} color="#ffff00">
+                <PulseAnimation isActive={accuracy > 95} color="#ffff00" combo={maxCombo}>
                   <Text fontSize="sm" color="#ffff00">Accuracy: {accuracy}%</Text>
                 </PulseAnimation>
                 <Text fontSize="sm" color={errors > 0 ? "#ff6b6b" : "#ffff00"}>Errors: {errors}</Text>
+                <PulseAnimation isActive={maxCombo > 10} color="#ffd93d" combo={maxCombo}>
+                  <Text fontSize="sm" color="#ffd93d">Max Combo: x{maxCombo}</Text>
+                </PulseAnimation>
               </HStack>
               
-              {streak > 10 && (
-                <PulseAnimation isActive={true} color="#ffd93d" intensity={2}>
-                  <Text fontSize="sm" color="#ffd93d" fontWeight="bold">
-                    🔥 Max Streak: {streak} 🔥
+              <PulseAnimation isActive={true} color="#ffd93d" intensity={2} combo={maxCombo}>
+                <Text fontSize="lg" color="#ffd93d" fontWeight="bold">
+                  TOTAL SCORE: {totalScore}
+                </Text>
+              </PulseAnimation>
+              
+              {streak > 20 && (
+                <PulseAnimation isActive={true} color="#ff6b6b" intensity={2} combo={maxCombo}>
+                  <Text fontSize="sm" color="#ff6b6b" fontWeight="bold" mt={2}>
+                    🔥 INCREDIBLE STREAK: {streak} 🔥
                   </Text>
                 </PulseAnimation>
               )}
@@ -413,7 +422,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             transition={{ repeat: Infinity, duration: 2 }}
           >
             <Text fontSize="xs" color="#666" mt={2} textAlign="center">
-              Type the code above exactly as shown. Each character becomes a block!
+              Type the code above exactly as shown. Build combos for higher scores!
             </Text>
           </MotionBox>
         )}

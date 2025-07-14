@@ -7,6 +7,7 @@ import Output from "./Output";
 import GameStats from "./GameStats";
 import GameModeSelector from "./GameModeSelector";
 import TypingChallenge from "./TypingChallenge";
+import HybridMode from "./HybridMode";
 import { useGameProgress } from "../hooks/useGameProgress";
 import { getRandomChallenge } from "../data/challenges";
 
@@ -29,8 +30,8 @@ const CodeEditor = () => {
     setLanguage(language);
     setValue(CODE_SNIPPETS[language]);
     
-    // Generate new challenge for typing mode
-    if (gameMode === 'typing') {
+    // Generate new challenge for typing and hybrid modes
+    if (gameMode === 'typing' || gameMode === 'hybrid') {
       const challenge = getRandomChallenge(language);
       setCurrentChallenge(challenge);
     }
@@ -39,7 +40,7 @@ const CodeEditor = () => {
   const handleModeChange = (mode) => {
     setGameMode(mode);
     
-    if (mode === 'typing') {
+    if (mode === 'typing' || mode === 'hybrid') {
       const challenge = getRandomChallenge(language);
       setCurrentChallenge(challenge);
     } else {
@@ -52,6 +53,27 @@ const CodeEditor = () => {
     setCurrentStats(stats);
     
     // Generate next challenge after a delay
+    setTimeout(() => {
+      if (gameMode === 'typing') {
+        const nextChallenge = getRandomChallenge(language);
+        setCurrentChallenge(nextChallenge);
+        setCurrentStats(null);
+      }
+    }, 3000);
+  };
+
+  const handleHybridComplete = (typingStats, executionStats) => {
+    // Combine typing and execution stats for hybrid mode
+    const combinedStats = {
+      ...typingStats,
+      executionSuccess: !executionStats.error,
+      executionOutput: executionStats.output
+    };
+    
+    completeChallenge(combinedStats, language);
+    setCurrentStats(combinedStats);
+    
+    // Generate next challenge
     setTimeout(() => {
       const nextChallenge = getRandomChallenge(language);
       setCurrentChallenge(nextChallenge);
@@ -93,6 +115,14 @@ const CodeEditor = () => {
             challenge={currentChallenge}
             currentLevel={progress.level}
             onComplete={handleChallengeComplete}
+            isActive={true}
+          />
+        ) : gameMode === 'hybrid' && currentChallenge ? (
+          <HybridMode
+            challenge={currentChallenge}
+            language={language}
+            currentLevel={progress.level}
+            onComplete={handleHybridComplete}
             isActive={true}
           />
         ) : (

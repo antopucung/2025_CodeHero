@@ -1312,6 +1312,50 @@ export const PatternCelebration = ({ patterns, onComplete }) => {
   );
 };
 
+// Screen flash effect for major achievements and errors
+export const ScreenFlashEffect = ({ isActive, type = 'success', intensity = 1, onComplete }) => {
+  if (!isActive) return null;
+
+  const getFlashColor = (type) => {
+    const colors = {
+      success: 'rgba(0, 255, 0, 0.3)',
+      achievement: 'rgba(255, 215, 0, 0.4)',
+      combo: 'rgba(255, 107, 107, 0.3)',
+      perfect: 'rgba(0, 255, 255, 0.3)',
+      error: 'rgba(255, 0, 0, 0.4)'
+    };
+    return colors[type] || colors.success;
+  };
+
+  const flashColor = getFlashColor(type);
+  const duration = type === 'error' ? 0.3 : 0.5;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ 
+        opacity: [0, intensity, 0],
+        scale: [1, 1.02, 1]
+      }}
+      transition={{ 
+        duration: duration,
+        ease: "easeInOut"
+      }}
+      onAnimationComplete={onComplete}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: flashColor,
+        pointerEvents: 'none',
+        zIndex: 9999
+      }}
+    />
+  );
+};
+
 // Enhanced combo multiplier with anticipation effects
 export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, typingSpeed = 'lame' }) => {
   if (!isActive || multiplier <= 1) return null;

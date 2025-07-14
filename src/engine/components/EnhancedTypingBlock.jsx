@@ -125,7 +125,15 @@ export const EnhancedTypingBlock = memo(({
       
       // Concept-aware backgrounds with gradients
       const gradient = codeGradients[concept.type];
-      if (!gradient) return getBackground();
+      if (!gradient) {
+        // Fallback to default backgrounds when gradient not found
+        switch (status) {
+          case 'incorrect': return 'rgba(229, 62, 62, 0.95)';
+          case 'current': return 'rgba(49, 130, 206, 0.85)';
+          case 'correct': return 'rgba(56, 161, 105, 0.15)';
+          default: return 'rgba(74, 85, 104, 0.05)';
+        }
+      }
       
       switch (status) {
         case 'incorrect': 

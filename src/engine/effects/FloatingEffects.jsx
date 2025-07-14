@@ -145,27 +145,30 @@ export const PatternCelebration = ({ patterns, onComplete }) => {
           }}
           exit={{ opacity: 0 }}
           transition={{ 
-            duration: 3,
+            duration: 2, // Faster to avoid blocking
             delay: index * 0.2
           }}
           onAnimationComplete={() => index === patterns.length - 1 && onComplete && onComplete()}
           style={{
             position: 'fixed',
-            top: '40%',
+            top: '25%', // Higher position
             left: '50%',
             transform: 'translateX(-50%)',
-            zIndex: 1001,
+            zIndex: 200, // Lower z-index
             background: `linear-gradient(45deg, ${pattern.color}, ${pattern.color}cc)`,
-            padding: '20px 30px',
+            padding: '15px 25px', // Smaller padding
             borderRadius: '15px',
             color: '#fff',
             fontFamily: "'Courier New', monospace",
             fontWeight: 'bold',
-            fontSize: '18px',
+            fontSize: '16px', // Smaller font
             textAlign: 'center',
             border: `3px solid ${pattern.color}`,
-            boxShadow: `0 0 30px ${pattern.color}`
+            boxShadow: `0 0 30px ${pattern.color}`,
+            cursor: 'pointer',
+            pointerEvents: 'auto'
           }}
+          onClick={() => onComplete && onComplete()} // Click to dismiss
         >
           <motion.div
             animate={{

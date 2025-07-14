@@ -229,7 +229,15 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       {showLevelUp && (
         <MegaLevelUpCelebration
           newLevel={showLevelUp}
-          onComplete={() => setShowLevelUp(false)}
+          onComplete={() => {
+            setShowLevelUp(false);
+            // Ensure typing can continue immediately
+            setTimeout(() => {
+              if (containerRef.current) {
+                containerRef.current.focus();
+              }
+            }, 100);
+          }}
         />
       )}
       
@@ -237,7 +245,15 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       {showAchievement && (
         <MegaAchievementUnlock
           achievement={showAchievement}
-          onComplete={() => setShowAchievement(null)}
+          onComplete={() => {
+            setShowAchievement(null);
+            // Ensure typing can continue immediately
+            setTimeout(() => {
+              if (containerRef.current) {
+                containerRef.current.focus();
+              }
+            }, 100);
+          }}
         />
       )}
       
@@ -309,17 +325,28 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           transition={{ 
             boxShadow: { repeat: Infinity, duration: 1.5 }
           }}
-          position="absolute"
-          top="50%"
+          position="fixed"
+          top="30%" // Moved up to be less intrusive
           left="50%"
           transform="translate(-50%, -50%)"
-          zIndex={1000}
+          zIndex={999} // Lower z-index
           bg={colors.terminal.surface}
           border={`2px solid ${colors.primary[500]}`}
           borderRadius="8px"
           p={4}
-          maxW="400px"
-          w="90%"
+          maxW="350px" // Smaller
+          w="85%" // Less wide
+          cursor="pointer"
+          onClick={() => {
+            // Allow clicking to dismiss or continue
+            if (onComplete) {
+              onComplete({
+                ...engineState,
+                challenge: challenge.id,
+                language: challenge.language
+              });
+            }
+          }}
         >
           <VStack spacing={3}>
             <Box

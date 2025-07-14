@@ -4,7 +4,7 @@ import { Text as ChakraText } from '@chakra-ui/react';
 
 // Streak multiplier visual effect
 export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
-  if (!isActive || streak < 10) return null;
+  if (!isActive || streak < 15) return null; // Higher threshold to reduce clutter
 
   const getStreakColor = (streak) => {
     if (streak >= 50) return '#ff1744';
@@ -18,7 +18,7 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
   const intensity = Math.min(streak / 20, 3);
 
   return (
-    // Simplified streak display without background panel
+    // Non-blocking streak display
     <motion.div
       initial={{ scale: 0, y: -20 }}
       animate={{ 
@@ -37,15 +37,16 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
       }}
       style={{
         position: 'fixed',
-        top: '15%',
+        top: '10%', // Moved higher to avoid blocking
         right: '20px',
-        zIndex: 1000,
+        zIndex: 100, // Much lower z-index
         color: color,
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
-        fontSize: '24px',
+        fontSize: '20px', // Smaller
         textAlign: 'center',
-        pointerEvents: 'none'
+        pointerEvents: 'none', // Ensure it doesn't block clicks
+        opacity: 0.9 // Slightly transparent
       }}
     >
       🔥 {streak}
@@ -55,7 +56,7 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
 
 // Combo multiplier visual effect
 export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, typingSpeed = 'lame' }) => {
-  if (!isActive || multiplier <= 1) return null;
+  if (!isActive || multiplier <= 2) return null; // Higher threshold
 
   const getMultiplierColor = (multiplier, typingSpeed) => {
     const speedColors = {
@@ -76,7 +77,7 @@ export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, t
   const intensity = Math.min(multiplier / 2, 3) * anticipationLevel;
 
   return (
-    // Simplified combo display without background panel
+    // Non-blocking combo display
     <motion.div
       initial={{ scale: 0, y: -20 }}
       animate={{ 
@@ -95,15 +96,16 @@ export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, t
       }}
       style={{
         position: 'fixed',
-        top: '25%',
+        top: '10%', // Moved higher
         left: '20px',
-        zIndex: 1000,
+        zIndex: 100, // Much lower z-index
         color: color,
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
-        fontSize: '20px',
+        fontSize: '18px', // Smaller
         textAlign: 'center',
-        pointerEvents: 'none'
+        pointerEvents: 'none', // Ensure it doesn't block clicks
+        opacity: 0.9 // Slightly transparent
       }}
     >
       x{multiplier}
@@ -116,12 +118,18 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
   const [phase, setPhase] = React.useState('buildup');
 
   React.useEffect(() => {
+    // Much faster progression to avoid blocking
+    const autoComplete = setTimeout(() => {
+      onComplete && onComplete();
+    }, 3000); // Auto-complete after 3 seconds
+    
     // Phase progression
-    const timer1 = setTimeout(() => setPhase('explosion'), 1000);
-    const timer2 = setTimeout(() => setPhase('celebration'), 2500);
-    const timer3 = setTimeout(() => setPhase('complete'), 5000);
+    const timer1 = setTimeout(() => setPhase('explosion'), 600);
+    const timer2 = setTimeout(() => setPhase('celebration'), 1500);
+    const timer3 = setTimeout(() => setPhase('complete'), 2800);
     
     return () => {
+      clearTimeout(autoComplete);
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
@@ -172,12 +180,15 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 10000,
+        zIndex: 9997, // Lower z-index
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.9)'
+        background: 'rgba(0, 0, 0, 0.8)', // Less opaque
+        backdropFilter: 'blur(2px)',
+        cursor: 'pointer'
       }}
+      onClick={() => onComplete && onComplete()} // Click to dismiss
     >
       {phase === 'buildup' && (
         <motion.div

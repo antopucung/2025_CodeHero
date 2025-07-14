@@ -8,6 +8,11 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
   const [phase, setPhase] = React.useState('buildup');
 
   useEffect(() => {
+    // Auto-complete after shorter duration to prevent blocking
+    const autoComplete = setTimeout(() => {
+      if (onComplete) onComplete();
+    }, 4000); // Reduced from 6000ms
+    
     // Massive confetti celebration
     const celebrate = () => {
       const colors = ['#ff6b6b', '#ffd93d', '#4ecdc4', '#9c27b0', '#00e5ff'];
@@ -68,11 +73,12 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
     celebrate();
     
     // Phase progression
-    const timer1 = setTimeout(() => setPhase('explosion'), 1000);
-    const timer2 = setTimeout(() => setPhase('celebration'), 2500);
-    const timer3 = setTimeout(() => setPhase('complete'), 6000);
+    const timer1 = setTimeout(() => setPhase('explosion'), 800);
+    const timer2 = setTimeout(() => setPhase('celebration'), 2000);
+    const timer3 = setTimeout(() => setPhase('complete'), 3500);
     
     return () => {
+      clearTimeout(autoComplete);
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
@@ -92,12 +98,15 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 10000,
+        zIndex: 9999, // Reduced z-index
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(0, 0, 0, 0.95)'
+        background: 'rgba(0, 0, 0, 0.85)', // Less opaque
+        backdropFilter: 'blur(2px)', // Add blur instead of solid overlay
+        cursor: 'pointer' // Indicate it's clickable
       }}
+      onClick={() => onComplete && onComplete()} // Click to dismiss
     >
       {phase === 'buildup' && (
         <motion.div
@@ -303,6 +312,11 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
   const data = getAchievementData(achievement);
 
   useEffect(() => {
+    // Auto-dismiss after shorter duration
+    const autoDismiss = setTimeout(() => {
+      if (onComplete) onComplete();
+    }, 3000); // Reduced from longer duration
+    
     // Massive achievement celebration
     const celebrate = () => {
       const colors = [data.color, '#ffd93d', '#ff6b6b', '#4ecdc4'];
@@ -333,6 +347,10 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
     };
     
     celebrate();
+    
+    return () => {
+      clearTimeout(autoDismiss);
+    };
   }, [data.color]);
 
   return (
@@ -340,28 +358,31 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
       initial={{ scale: 0, opacity: 0, rotate: -360 }}
       animate={{ 
         scale: [0, 1.5, 1],
-        opacity: [0, 1, 1, 0],
+        opacity: [0, 1, 1, 1, 0], // Keep visible longer before fade
         rotate: [0, 720, 0],
-        y: [0, -30, 0, -150]
+        y: [0, -20, 0, 0, -100] // Less dramatic movement
       }}
       transition={{ 
-        duration: 5,
-        times: [0, 0.3, 0.8, 1]
+        duration: 3, // Reduced duration
+        times: [0, 0.3, 0.7, 0.9, 1]
       }}
       onAnimationComplete={onComplete}
+      onClick={() => onComplete && onComplete()} // Click to dismiss
       style={{
         position: 'fixed',
-        top: '15%',
+        top: '20%', // Moved down to be less intrusive
         left: '50%',
         transform: 'translateX(-50%)',
-        zIndex: 10000,
+        zIndex: 9998, // Lower z-index
         background: `linear-gradient(135deg, ${data.color}, ${data.color}cc, #000)`,
         border: `6px solid ${data.color}`,
         borderRadius: '25px',
         padding: '40px',
         textAlign: 'center',
-        minWidth: '400px',
-        boxShadow: `0 0 80px ${data.color}, inset 0 0 40px rgba(0,0,0,0.3)`
+        minWidth: '350px', // Smaller width
+        maxWidth: '90vw', // Responsive width
+        boxShadow: `0 0 80px ${data.color}, inset 0 0 40px rgba(0,0,0,0.3)`,
+        cursor: 'pointer' // Indicate it's clickable
       }}
     >
       {/* Achievement burst background */}

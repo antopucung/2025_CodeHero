@@ -1,97 +1,187 @@
-// Design System - Color Tokens
+// Enhanced Design System - Color Tokens with Psychology
+import { colorPsychology, getStateColor, getComboLevel, getSpeedLevel } from './colorPsychology';
+
+// Base color palette optimized for typing and focus
 export const colors = {
-  // Base colors
+  // Primary brand colors - professional and focused
   primary: {
-    50: '#e6fffa',
-    100: '#b3fff0',
-    200: '#80ffe6',
-    300: '#4dffdc',
-    400: '#1affd2',
-    500: '#00ff00', // Main green
-    600: '#00e600',
-    700: '#00cc00',
-    800: '#00b300',
-    900: '#009900'
+    50: '#EBF8FF',
+    100: '#BEE3F8',
+    200: '#90CDF4',
+    300: '#63B3ED',
+    400: '#4299E1',
+    500: '#3182CE', // Main blue - enhances focus and concentration
+    600: '#2C5282',
+    700: '#2A4365',
+    800: '#1A365D',
+    900: '#153E75'
   },
   
-  // Terminal colors
+  // Terminal/environment colors - optimized for extended use
   terminal: {
-    bg: '#000000',
-    surface: '#111111',
-    border: '#333333',
-    text: '#00ff00',
-    textSecondary: '#666666',
-    textMuted: '#888888'
+    bg: '#1A202C',      // Dark blue-gray - reduces eye strain
+    surface: '#2D3748',  // Slightly lighter - creates depth
+    border: '#4A5568',   // Medium gray - subtle definition
+    text: '#F7FAFC',     // Near white - maximum readability
+    textSecondary: '#E2E8F0', // Light gray - secondary info
+    textMuted: '#A0AEC0',     // Medium gray - less important
+    accent: '#3182CE'    // Blue - interactive elements
   },
   
-  // Performance colors
-  performance: {
-    perfect: {
-      primary: '#ff6b6b',
-      secondary: '#ff8e8e',
-      gradient: 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 25%, #ffb3b3 50%, #ff8e8e 75%, #ff6b6b 100%)',
-      glow: '#ff6b6b',
-      shadow: '0 0 40px #ff6b6b, 0 0 20px #ff8e8e, inset 0 0 20px rgba(255, 107, 107, 0.4)'
+  // Typing state colors - based on cognitive psychology
+  typing: {
+    pending: {
+      primary: '#4A5568',
+      background: 'rgba(74, 85, 104, 0.1)',
+      border: '#718096'
     },
-    best: {
-      primary: '#ffd93d',
-      secondary: '#ffed4e',
-      gradient: 'linear-gradient(135deg, #ffd93d 0%, #ffed4e 25%, #fff176 50%, #ffed4e 75%, #ffd93d 100%)',
-      glow: '#ffd93d',
-      shadow: '0 0 35px #ffd93d, 0 0 15px #ffc107, inset 0 0 15px rgba(255, 217, 61, 0.4)'
+    current: {
+      primary: '#3182CE',
+      background: 'rgba(49, 130, 206, 0.15)',
+      border: '#3182CE',
+      glow: '#3182CE'
     },
-    good: {
-      primary: '#4ecdc4',
-      secondary: '#5ed9d1',
-      gradient: 'linear-gradient(135deg, #4ecdc4 0%, #5ed9d1 25%, #80deea 50%, #5ed9d1 75%, #4ecdc4 100%)',
-      glow: '#4ecdc4',
-      shadow: '0 0 30px #4ecdc4, 0 0 12px #00bcd4, inset 0 0 12px rgba(78, 205, 196, 0.3)'
+    correct: {
+      primary: '#38A169',
+      background: 'rgba(56, 161, 105, 0.12)',
+      border: '#38A169',
+      glow: '#38A169'
     },
-    lame: {
-      primary: '#00e676',
-      secondary: '#00ff00',
-      gradient: 'linear-gradient(135deg, #00e676 0%, #00ff00 25%, #69f0ae 50%, #00ff00 75%, #00e676 100%)',
-      glow: '#00ff00',
-      shadow: '0 0 20px #00ff00, 0 0 8px #00e676, inset 0 0 8px rgba(0, 255, 0, 0.3)'
-    },
-    error: {
-      primary: '#ff1744',
-      secondary: '#ff4569',
-      gradient: 'linear-gradient(45deg, #ff1744, #ff4569, #ff1744)',
-      glow: '#ff1744',
-      shadow: '0 0 30px #ff1744, inset 0 0 20px rgba(255, 23, 68, 0.4)'
+    incorrect: {
+      primary: '#E53E3E',
+      background: 'rgba(229, 62, 62, 0.15)',
+      border: '#E53E3E',
+      glow: '#E53E3E'
     }
   },
   
-  // Combo colors
-  combo: {
-    basic: '#45b7d1',
-    double: '#4ecdc4',
-    triple: '#6bcf7f',
-    perfect: '#ffd93d',
-    god: '#ff6b6b',
-    legendary: '#ff1744'
+  // Speed-based performance colors
+  performance: {
+    perfect: {
+      primary: '#805AD5',
+      secondary: '#9F7AEA',
+      gradient: 'linear-gradient(135deg, #805AD5 0%, #9F7AEA 50%, #B794F6 100%)',
+      glow: '#805AD5',
+      shadow: '0 0 20px rgba(128, 90, 213, 0.4)'
+    },
+    best: {
+      primary: '#D69E2E',
+      secondary: '#ECC94B',
+      gradient: 'linear-gradient(135deg, #D69E2E 0%, #ECC94B 50%, #F6E05E 100%)',
+      glow: '#D69E2E',
+      shadow: '0 0 20px rgba(214, 158, 46, 0.4)'
+    },
+    good: {
+      primary: '#319795',
+      secondary: '#4FD1C7',
+      gradient: 'linear-gradient(135deg, #319795 0%, #4FD1C7 50%, #81E6D9 100%)',
+      glow: '#319795',
+      shadow: '0 0 20px rgba(49, 151, 149, 0.4)'
+    },
+    slow: {
+      primary: '#718096',
+      secondary: '#A0AEC0',
+      gradient: 'linear-gradient(135deg, #718096 0%, #A0AEC0 50%, #CBD5E0 100%)',
+      glow: '#718096',
+      shadow: '0 0 20px rgba(113, 128, 150, 0.4)'
+    },
+    error: {
+      primary: '#E53E3E',
+      secondary: '#F56565',
+      gradient: 'linear-gradient(45deg, #E53E3E, #F56565)',
+      glow: '#E53E3E',
+      shadow: '0 0 20px rgba(229, 62, 62, 0.4)'
+    }
   },
   
-  // Achievement colors
+  // Combo and streak colors for progressive motivation
+  combo: {
+    low: '#4299E1',      // Light blue - encouraging
+    medium: '#38A169',   // Green - positive momentum
+    high: '#D69E2E',     // Gold - achievement
+    epic: '#805AD5',     // Purple - mastery
+    legendary: '#E53E3E' // Red - peak performance
+  },
+  
+  // UI element colors
+  interface: {
+    primary: {
+      bg: '#3182CE',
+      hover: '#2C5282',
+      active: '#2A4365',
+      text: '#FFFFFF'
+    },
+    secondary: {
+      bg: '#4A5568',
+      hover: '#2D3748',
+      active: '#1A202C',
+      text: '#E2E8F0'
+    },
+    success: {
+      bg: '#38A169',
+      hover: '#2F855A',
+      active: '#276749',
+      text: '#FFFFFF'
+    },
+    warning: {
+      bg: '#D69E2E',
+      hover: '#B7791F',
+      active: '#975A16',
+      text: '#1A202C'
+    },
+    error: {
+      bg: '#E53E3E',
+      hover: '#C53030',
+      active: '#9C1C1C',
+      text: '#FFFFFF'
+    }
+  },
+  
+  // Achievement and celebration colors
   achievement: {
-    bronze: '#cd7f32',
-    silver: '#c0c0c0',
-    gold: '#ffd700',
-    platinum: '#e5e4e2',
-    diamond: '#b9f2ff'
+    bronze: '#CD7F32',
+    silver: '#C0C0C0',
+    gold: '#FFD700',
+    platinum: '#E5E4E2',
+    diamond: '#B9F2FF'
   }
 };
 
+// Enhanced color helper functions
 export const getPerformanceColor = (speed) => {
-  return colors.performance[speed] || colors.performance.lame;
+  return colors.performance[speed] || colors.performance.slow;
 };
 
 export const getComboColor = (combo) => {
-  if (combo >= 50) return colors.combo.legendary;
-  if (combo >= 30) return colors.combo.god;
-  if (combo >= 20) return colors.combo.perfect;
-  if (combo >= 10) return colors.combo.triple;
-  if (combo >= 5) return colors.combo.double;
-  return colors.combo.basic;
+  const level = getComboLevel(combo);
+  return colors.combo[level];
 };
+
+export const getTypingStateColor = (state, speed = null, combo = 1) => {
+  return getStateColor(state, speed, combo);
+};
+
+// Muscle memory color mappings for consistent learning
+export const muscleMemoryColors = {
+  // Key categories for consistent color coding
+  keyTypes: {
+    vowels: colors.primary[400],      // Blue - frequent, important
+    consonants: colors.terminal.textMuted, // Gray - neutral, common
+    numbers: colors.performance.best.primary, // Gold - special attention
+    symbols: colors.performance.perfect.primary, // Purple - requires focus
+    space: colors.performance.good.primary // Teal - rhythm marker
+  },
+  
+  // Code syntax colors for programming typing
+  syntax: {
+    keywords: colors.performance.error.primary,  // Red - language keywords
+    strings: colors.performance.good.primary,    // Teal - string literals
+    numbers: colors.performance.best.primary,    // Gold - numeric values
+    operators: colors.performance.perfect.primary, // Purple - operators
+    brackets: colors.combo.medium,               // Green - structural elements
+    comments: colors.terminal.textMuted         // Gray - comments
+  }
+};
+
+// Export color psychology system
+export { colorPsychology, getStateColor, getComboLevel, getSpeedLevel };

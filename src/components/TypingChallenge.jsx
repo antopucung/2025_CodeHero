@@ -9,7 +9,7 @@ import { TypingDisplay } from "../engine/components/TypingDisplay";
 import { GameStats } from "../engine/components/GameStats";
 import { TerminalPanel } from "../design/components/TerminalPanel";
 import { PatternBonusDisplay } from "../design/components/PatternBonusDisplay";
-import { colors } from "../design/tokens/colors";
+import { colors, colorPsychology } from "../design/tokens/colors";
 import { typography } from "../design/tokens/typography";
 import { spacing } from "../design/tokens/spacing";
 import { createPulseAnimation } from "../design/tokens/animations";
@@ -148,7 +148,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           <VStack spacing={spacing[4]}>
             <Box
               {...createPulseAnimation(1)}
-              color={colors.primary[500]}
+              color={colorPsychology.interface.primary.background}
               fontWeight={typography.weights.bold}
               fontSize={fullScreen ? typography.sizes['3xl'] : typography.sizes.xl}
             >
@@ -157,7 +157,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             
             <Text 
               fontSize={fullScreen ? typography.sizes.lg : typography.sizes.base} 
-              color={colors.terminal.textSecondary}
+              color={colorPsychology.environment.text.secondary}
               textAlign="center"
             >
               {challenge.description}
@@ -165,7 +165,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             
             <Box 
               fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
-              color={colors.combo.perfect}
+              color={colorPsychology.speedColors.best.primary}
               textAlign="center"
             >
               LANGUAGE: {challenge.language.toUpperCase()} | 

@@ -1,14 +1,14 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { colors, getPerformanceColor } from '../../design/tokens/colors';
+import { colors, getTypingStateColor, muscleMemoryColors } from '../../design/tokens/colors';
 import { spacing } from '../../design/tokens/spacing';
 import { typography } from '../../design/tokens/typography';
 
 export const TypingBlock = memo(({
   char,
   status = 'pending',
-  speed = 'lame',
-  upgrade = { level: 0, speed: 'lame' },
+  speed = 'slow',
+  upgrade = { level: 0, speed: 'slow' },
   combo = 1,
   anticipationLevel = 1,
   onClick,
@@ -17,68 +17,103 @@ export const TypingBlock = memo(({
   fullScreen = false
 }) => {
   const getBlockStyle = () => {
+    // Get base color from psychology system
+    const stateColor = getTypingStateColor(status, speed, combo);
+    
+    // Apply muscle memory colors for specific character types
+    const muscleMemoryColor = getMuscleMemoryColor(char);
+    
     switch (status) {
       case 'incorrect':
         return {
-          background: 'linear-gradient(45deg, #ff1744, #ff4569, #ff1744)',
-          borderColor: '#ff1744',
-          boxShadow: `0 0 15px #ff1744`,
-          color: '#fff'
+          background: colors.performance.error.gradient,
+          borderColor: colors.performance.error.primary,
+          boxShadow: `0 0 15px ${colors.performance.error.glow}`,
+          color: '#FFFFFF'
         };
         
       case 'current':
-        // Dynamic anticipation colors based on typing speed prediction
-        const anticipationColors = {
-          perfect: { bg: 'linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 50%, #ff6b6b 100%)', glow: '#ff6b6b' },
-          best: { bg: 'linear-gradient(135deg, #ffd93d 0%, #ffed4e 50%, #ffd93d 100%)', glow: '#ffd93d' },
-          good: { bg: 'linear-gradient(135deg, #4ecdc4 0%, #5ed9d1 50%, #4ecdc4 100%)', glow: '#4ecdc4' },
-          lame: { bg: 'linear-gradient(135deg, #00ff00 0%, #00e676 50%, #00ff00 100%)', glow: '#00ff00' }
-        };
-        
-        const currentColors = anticipationColors[speed] || anticipationColors.lame;
-        const pulseIntensity = anticipationLevel * 2;
-        
+        // Enhanced anticipation with muscle memory hints
+        const anticipationIntensity = Math.min(anticipationLevel * 2, 3);
         return {
-          background: currentColors.bg,
-          borderColor: currentColors.glow,
-          boxShadow: `0 0 ${15 * pulseIntensity}px ${currentColors.glow}`,
-          color: speed === 'perfect' || speed === 'best' ? '#000' : '#fff'
+          background: stateColor.gradient || `linear-gradient(135deg, ${stateColor.primary}, ${stateColor.secondary || stateColor.primary}cc)`,
+          borderColor: stateColor.primary,
+          boxShadow: `0 0 ${15 * anticipationIntensity}px ${stateColor.glow}, inset 0 0 10px rgba(255,255,255,0.1)`,
+          color: '#FFFFFF',
+          // Subtle muscle memory hint
+          borderBottom: muscleMemoryColor ? `3px solid ${muscleMemoryColor}` : undefined
         };
         
       case 'correct':
-        // Stable colors based on combo level with upgrade effects
-        const comboColor = combo >= 50 ? '#ff6b6b' :
-                          combo >= 30 ? '#ffd93d' :
-                          combo >= 20 ? '#6bcf7f' :
-                          combo >= 10 ? '#4ecdc4' :
-                          '#45b7d1';
-        
-        const upgradeMultiplier = 1 + (upgrade.level * 0.3);
+        // Success state with combo progression
+        const comboIntensity = Math.min(1 + (combo / 20), 2);
+        const upgradeGlow = upgrade.level > 0 ? upgrade.level * 5 : 0;
         
         return {
-          background: `linear-gradient(135deg, ${comboColor}44, ${comboColor}22)`,
-          borderColor: comboColor,
-          boxShadow: `0 0 ${(8 + Math.min(combo / 5, 15)) * upgradeMultiplier}px ${comboColor}`,
-          color: comboColor
+          background: `linear-gradient(135deg, ${stateColor.primary}44, ${stateColor.primary}22)`,
+          borderColor: stateColor.primary,
+          boxShadow: `0 0 ${(12 + upgradeGlow) * comboIntensity}px ${stateColor.glow}`,
+          color: stateColor.primary,
+          // Success reinforcement
+          borderTop: `2px solid ${stateColor.primary}`
         };
         
-      default:
+      default: // pending
         return {
-          background: 'transparent',
+          background: 'rgba(74, 85, 104, 0.05)',
           borderColor: colors.terminal.border,
-          color: colors.terminal.textSecondary
+          color: colors.terminal.textMuted,
+          // Subtle muscle memory preview
+          borderBottom: muscleMemoryColor ? `1px solid ${muscleMemoryColor}33` : undefined
         };
     }
   };
   
+  const getMuscleMemoryColor = (char) => {
+    if (!char || char === ' ' || char === '\n') return null;
+    
+    const lowerChar = char.toLowerCase();
+    
+    // Vowels - important for rhythm
+    if ('aeiou'.includes(lowerChar)) {
+      return muscleMemoryColors.keyTypes.vowels;
+    }
+    
+    // Numbers - special attention
+    if ('0123456789'.includes(char)) {
+      return muscleMemoryColors.keyTypes.numbers;
+    }
+    
+    // Common programming symbols
+    if ('(){}[]<>'.includes(char)) {
+      return muscleMemoryColors.syntax.brackets;
+    }
+    
+    if ('+-*/=!&|'.includes(char)) {
+      return muscleMemoryColors.syntax.operators;
+    }
+    
+    if ('"\'`'.includes(char)) {
+      return muscleMemoryColors.syntax.strings;
+    }
+    
+    // Default consonants
+    if (/[a-z]/i.test(char)) {
+      return muscleMemoryColors.keyTypes.consonants;
+    }
+    
+    // Other symbols
+    return muscleMemoryColors.keyTypes.symbols;
+  };
+  
   const getAnimationProps = () => {
     if (status === 'current') {
-      // Dynamic pulsing based on anticipation
-      const pulseScale = 1 + (anticipationLevel * 0.1);
+      // Dynamic pulsing based on anticipation and muscle memory
+      const pulseScale = 1 + (anticipationLevel * 0.08);
       return {
         scale: [1, pulseScale, 1],
         transition: { 
-          duration: 0.6 / Math.max(1, anticipationLevel), 
+          duration: Math.max(0.4, 0.8 / anticipationLevel), 
           repeat: Infinity,
           ease: "easeInOut"
         }
@@ -86,40 +121,40 @@ export const TypingBlock = memo(({
     }
     
     if (status === 'correct') {
-      // Explosive success animation
-      const intensity = 1 + (upgrade.level * 0.2);
+      // Success celebration with upgrade effects
+      const intensity = 1 + (upgrade.level * 0.15);
       return {
-        scale: [1, 1.3 + (intensity * 0.1), 1.1 + (intensity * 0.05)],
-        rotate: [0, 5 * intensity, 0],
-        transition: { duration: 0.6 }
+        scale: [1, 1.25 + (intensity * 0.08), 1.08 + (intensity * 0.03)],
+        rotate: [0, 3 * intensity, 0],
+        transition: { duration: 0.5 }
       };
     }
     
     if (status === 'incorrect') {
-      // Error shake animation
+      // Error feedback - clear but not overwhelming
       return {
-        scale: [1, 1.2, 0.9, 1.1, 1],
-        rotate: [0, -5, 5, -3, 0],
-        x: [0, -3, 3, -2, 0],
+        scale: [1, 1.15, 0.95, 1.05, 1],
+        rotate: [0, -3, 3, -2, 0],
+        x: [0, -2, 2, -1, 0],
         transition: { duration: 0.4 }
       };
     }
     
     return {
       scale: 1,
-      opacity: status === 'pending' ? 0.4 : 1,
-      transition: { duration: 0.1 }
+      opacity: status === 'pending' ? 0.6 : 1,
+      transition: { duration: 0.15 }
     };
   };
   
   const blockStyle = getBlockStyle();
   
-  // Fixed dimensions for consistent spacing
+  // Responsive dimensions
   const isSpace = char === ' ';
-  const width = isSpace ? '10px' : '20px';
-  const height = '26px';
-  const fontSize = '14px';
-  const lineHeight = '24px';
+  const width = isSpace ? (fullScreen ? '12px' : '8px') : (fullScreen ? '22px' : '18px');
+  const height = fullScreen ? '28px' : '24px';
+  const fontSize = fullScreen ? '15px' : '13px';
+  const lineHeight = fullScreen ? '26px' : '22px';
   
   return (
     <motion.div
@@ -129,9 +164,9 @@ export const TypingBlock = memo(({
         display: 'inline-block',
         width,
         height,
-        margin: fullScreen ? '2px' : '1px',
-        border: `1px solid ${blockStyle.borderColor}`,
-        borderRadius: fullScreen ? '4px' : '2px',
+        margin: fullScreen ? '2px 1px' : '1px',
+        border: `2px solid ${blockStyle.borderColor}`,
+        borderRadius: fullScreen ? '6px' : '4px',
         textAlign: 'center',
         lineHeight,
         fontFamily: typography.fonts.mono,
@@ -147,36 +182,36 @@ export const TypingBlock = memo(({
     >
       {isSpace ? '' : char === '\n' ? '↵' : char}
       
-      {/* Enhanced upgrade indicator */}
+      {/* Enhanced upgrade indicator with psychology colors */}
       {status === 'correct' && upgrade.level > 0 && (
         <motion.div
           initial={{ scale: 0, opacity: 1 }}
           animate={{
-            scale: [0, 1.5, 0],
-            opacity: [1, 0.8, 0],
+            scale: [0, 1.8, 0],
+            opacity: [1, 0.9, 0],
             rotate: [0, 180, 360]
           }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 1.2 }}
           style={{
             position: 'absolute',
-            top: '-8px',
-            right: '-8px',
-            width: `${(fullScreen ? 12 : 8) + (upgrade.level * 2)}px`,
-            height: `${(fullScreen ? 12 : 8) + (upgrade.level * 2)}px`,
-            background: blockStyle.borderColor,
+            top: '-10px',
+            right: '-10px',
+            width: `${10 + (upgrade.level * 2)}px`,
+            height: `${10 + (upgrade.level * 2)}px`,
+            background: `radial-gradient(circle, ${blockStyle.borderColor}, ${blockStyle.borderColor}aa)`,
             borderRadius: '50%',
-            boxShadow: `0 0 ${10 + (upgrade.level * 5)}px ${blockStyle.borderColor}`,
+            boxShadow: `0 0 ${12 + (upgrade.level * 3)}px ${blockStyle.borderColor}`,
             zIndex: 10
           }}
         />
       )}
       
-      {/* Speed indicator for current character */}
-      {status === 'current' && speed !== 'lame' && (
+      {/* Speed indicator with psychology-based colors */}
+      {status === 'current' && speed !== 'slow' && (
         <motion.div
           animate={{
-            opacity: [0.3, 0.8, 0.3],
-            scale: [1, 1.2, 1]
+            opacity: [0.4, 0.9, 0.4],
+            scale: [1, 1.15, 1]
           }}
           transition={{
             duration: 0.8,
@@ -184,41 +219,44 @@ export const TypingBlock = memo(({
           }}
           style={{
             position: 'absolute',
-            top: fullScreen ? '-16px' : '-12px',
+            top: fullScreen ? '-18px' : '-14px',
             left: '50%',
             transform: 'translateX(-50%)',
             fontSize: fullScreen ? '10px' : '8px',
-            color: blockStyle.borderColor,
+            color: colors.performance[speed]?.primary || blockStyle.borderColor,
             fontWeight: 'bold',
-            textShadow: `0 0 5px ${blockStyle.borderColor}`,
-            zIndex: 10
+            textShadow: `0 0 6px ${colors.performance[speed]?.glow || blockStyle.borderColor}`,
+            zIndex: 10,
+            padding: '1px 4px',
+            background: 'rgba(0,0,0,0.7)',
+            borderRadius: '3px'
           }}
         >
           {speed.toUpperCase()}
         </motion.div>
       )}
       
-      {/* Error X indicator with enhanced animation */}
+      {/* Enhanced error indicator */}
       {showError && status === 'incorrect' && (
         <motion.div
           initial={{ scale: 0, rotate: -90 }}
           animate={{ 
-            scale: [1, 1.8, 1.3],
-            rotate: [0, 15, -15, 0],
-            opacity: [1, 0.7, 1]
+            scale: [1, 1.6, 1.2],
+            rotate: [0, 12, -12, 0],
+            opacity: [1, 0.8, 1]
           }}
           transition={{ 
-            duration: 0.8,
-            opacity: { repeat: 3, duration: 0.2 }
+            duration: 0.6,
+            opacity: { repeat: 2, duration: 0.25 }
           }}
           style={{
             position: 'absolute',
-            top: fullScreen ? '-16px' : '-12px',
-            right: fullScreen ? '-16px' : '-12px',
-            color: '#ff1744',
-            fontSize: fullScreen ? '24px' : '18px',
+            top: fullScreen ? '-18px' : '-14px',
+            right: fullScreen ? '-18px' : '-14px',
+            color: colors.performance.error.primary,
+            fontSize: fullScreen ? '20px' : '16px',
             fontWeight: 'bold',
-            textShadow: '0 0 10px #ff1744',
+            textShadow: `0 0 8px ${colors.performance.error.glow}`,
             zIndex: 10
           }}
         >
@@ -226,45 +264,45 @@ export const TypingBlock = memo(({
         </motion.div>
       )}
 
-      {/* Enhanced wave ripple effect for correct typing */}
+      {/* Success ripple effects with psychology-based timing */}
       {status === 'correct' && (
         <>
           <motion.div
             initial={{ scale: 0, opacity: 0.8 }}
             animate={{
-              scale: [0, 2 + (upgrade.level * 0.3), 3 + (upgrade.level * 0.5)],
-              opacity: [0.8, 0.4, 0]
+              scale: [0, 2.2 + (upgrade.level * 0.3), 3.5 + (upgrade.level * 0.5)],
+              opacity: [0.8, 0.5, 0]
             }}
-            transition={{ duration: 1 + (upgrade.level * 0.2) }}
+            transition={{ duration: 1.2 + (upgrade.level * 0.2) }}
             style={{
               position: 'absolute',
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: `${(fullScreen ? 60 : 40) + (upgrade.level * 10)}px`,
-              height: `${(fullScreen ? 60 : 40) + (upgrade.level * 10)}px`,
+              width: `${(fullScreen ? 50 : 35) + (upgrade.level * 8)}px`,
+              height: `${(fullScreen ? 50 : 35) + (upgrade.level * 8)}px`,
               border: `2px solid ${blockStyle.borderColor}`,
               borderRadius: '50%',
               pointerEvents: 'none'
             }}
           />
           
-          {/* Additional upgrade ripples */}
+          {/* Additional ripple for high upgrades */}
           {upgrade.level >= 2 && (
             <motion.div
               initial={{ scale: 0, opacity: 0.6 }}
               animate={{
-                scale: [0, 1.5, 2.5],
+                scale: [0, 1.8, 3],
                 opacity: [0.6, 0.3, 0]
               }}
-              transition={{ duration: 1.2, delay: 0.2 }}
+              transition={{ duration: 1.5, delay: 0.2 }}
               style={{
                 position: 'absolute',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: `${(fullScreen ? 90 : 60) + (upgrade.level * 15)}px`,
-                height: `${(fullScreen ? 90 : 60) + (upgrade.level * 15)}px`,
+                width: `${(fullScreen ? 70 : 50) + (upgrade.level * 12)}px`,
+                height: `${(fullScreen ? 70 : 50) + (upgrade.level * 12)}px`,
                 border: `3px solid ${blockStyle.borderColor}`,
                 borderRadius: '50%',
                 pointerEvents: 'none'

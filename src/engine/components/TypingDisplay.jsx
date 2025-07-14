@@ -12,7 +12,7 @@ import {
   ScreenFlashEffect,
   PatternCelebration
 } from '../effects';
-import { colors } from '../../design/tokens/colors';
+import { colors, colorPsychology } from '../../design/tokens/colors';
 import { spacing } from '../../design/tokens/spacing';
 
 export const TypingDisplay = memo(({
@@ -251,7 +251,7 @@ export const TypingDisplay = memo(({
       
       <Box
         ref={containerRef}
-        bg={colors.terminal.bg}
+        bg={colorPsychology.environment.background}
         flex={1}
         overflow="auto"
         p={3}
@@ -259,6 +259,11 @@ export const TypingDisplay = memo(({
         fontFamily="monospace"
         fontSize="14px"
         lineHeight="28px"
+        // Enhanced focus environment
+        style={{
+          background: `linear-gradient(135deg, ${colorPsychology.environment.background} 0%, ${colorPsychology.environment.surface} 100%)`,
+          transition: 'background 0.3s ease'
+        }}
       >
         {/* Progressive Background Effect with Intensity Scaling */}
         <BackgroundWaveEffect

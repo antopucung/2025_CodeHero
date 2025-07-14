@@ -202,9 +202,10 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
 
   return (
     <VStack 
-      spacing={spacing[4]} 
+      spacing={fullScreen ? 2 : spacing[4]} 
       align="stretch"
       h={fullScreen ? "100%" : "auto"}
+      overflow="hidden"
     >
       {/* Pattern Bonus Display */}
       <PatternBonusDisplay
@@ -216,7 +217,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       
       {/* Progress Bar */}
       <TerminalPanel title="CHALLENGE PROGRESS" variant="primary">
-        <Box
+        <Box 
           bg={colors.terminal.bg}
           border={`1px solid ${colors.terminal.border}`}
           h={fullScreen ? "16px" : "12px"}
@@ -239,7 +240,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         <Text 
           fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
           color={colors.terminal.textSecondary}
-          textAlign="center"
+          textAlign="center" 
           mt={spacing[2]}
         >
           {Math.round(engine.getProgress())}% Complete
@@ -247,7 +248,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       </TerminalPanel>
       
       {/* Typing Display */}
-      <Box flex={fullScreen ? 1 : "none"}>
+      <Box flex={fullScreen ? 1 : "none"} overflow="hidden">
         <TypingDisplay
           text={challenge.code}
           engine={engine}

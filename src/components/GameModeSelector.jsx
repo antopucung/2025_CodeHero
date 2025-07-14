@@ -26,19 +26,19 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
   ];
 
   return (
-    <Box bg="#111" border="1px solid #333" p={compact ? 2 : 3}>
-      <Text fontSize="xs" color="#666" mb={3} fontFamily="'Courier New', monospace">
+    <Box bg="#111" border="1px solid #333" p={compact ? 2 : 3} h="100%" overflow="hidden">
+      <Text fontSize="xs" color="#666" mb={compact ? 1 : 3} fontFamily="'Courier New', monospace">
         │ GAME MODE SELECTION
       </Text>
       
-      <HStack spacing={compact ? 1 : 2} flexWrap={compact ? "wrap" : "nowrap"}>
+      <HStack spacing={compact ? 1 : 2} flexWrap="nowrap" h="calc(100% - 20px)">
         {modes.map((mode) => (
           <MotionBox
             key={mode.id}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            flex={compact ? "none" : 1}
-            minW={compact ? "120px" : "auto"}
+            flex={1}
+            h="100%"
           >
             <Button
               bg={currentMode === mode.id ? "#003300" : "#000"}
@@ -48,7 +48,8 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
               borderRadius="0"
               fontFamily="'Courier New', monospace"
               fontSize={compact ? "xs" : "xs"}
-              h="auto"
+              h="100%"
+              minH="60px"
               p={compact ? 2 : 3}
               _hover={{ 
                 bg: currentMode === mode.id ? "#004400" : "#111",
@@ -58,11 +59,11 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
               w="100%"
             >
               <VStack spacing={1}>
-                <Text fontSize={compact ? "md" : "lg"}>{mode.icon}</Text>
-                <Text fontSize="xs" fontWeight="bold">
+                <Text fontSize={compact ? "sm" : "md"}>{mode.icon}</Text>
+                <Text fontSize={compact ? "xs" : "xs"} fontWeight="bold">
                   {compact ? mode.name.split(' ')[0] : mode.name}
                 </Text>
-                {!compact && <Text fontSize="xs" color="#888" textAlign="center">
+                {!compact && <Text fontSize="xs" color="#888" textAlign="center" noOfLines={2}>
                   {mode.description}
                 </Text>}
               </VStack>
@@ -73,7 +74,7 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
       
       {currentMode === 'typing' && (
         <MotionBox
-          initial={{ opacity: 0, height: 0 }}
+          initial={{ opacity: 0, height: compact ? 0 : "auto" }}
           animate={{ opacity: 1, height: 'auto' }}
           mt={3}
           p={2}
@@ -83,7 +84,7 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
           <Text fontSize="xs" color="#ffaa00" mb={1}>
             💡 TYPING MODE ACTIVE - COMBO SYSTEM ENABLED
           </Text>
-          {!compact && <Text fontSize="xs" color="#666">
+          {!compact && <Text fontSize="xs" color="#666" noOfLines={2}>
             Build combos by typing fast and accurately! Higher combos = more points and better effects.
             Current language: {language.toUpperCase()}
           </Text>}
@@ -92,7 +93,7 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
 
       {currentMode === 'hybrid' && (
         <MotionBox
-          initial={{ opacity: 0, height: 0 }}
+          initial={{ opacity: 0, height: compact ? 0 : "auto" }}
           animate={{ opacity: 1, height: 'auto' }}
           mt={3}
           p={2}
@@ -102,7 +103,7 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
           <Text fontSize="xs" color="#ffaa00" mb={1}>
             🚀 HYBRID MODE - TYPE THEN EXECUTE
           </Text>
-          {!compact && <Text fontSize="xs" color="#666">
+          {!compact && <Text fontSize="xs" color="#666" noOfLines={2}>
             Type code challenges with combo effects, then execute to see results!
             Perfect for learning while gaming.
           </Text>}

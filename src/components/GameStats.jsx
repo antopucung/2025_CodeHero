@@ -8,7 +8,7 @@ import { spacing } from "../design/tokens/spacing";
 
 const MotionBox = motion(Box);
 
-const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
+const GameStats = ({ progress, currentStats = null, streak = 0, compact = false }) => {
   const xpForNextLevel = progress.level * 100;
   const xpProgress = (progress.xp / xpForNextLevel) * 100;
   
@@ -22,36 +22,39 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
     <MotionBox 
       bg={colors.terminal.surface}
       border={`1px solid ${colors.terminal.border}`}
-      p={spacing[3]}
-      mb={spacing[4]}
+      p={compact ? spacing[2] : spacing[3]}
+      h="100%"
+      overflow="hidden"
       whileHover={{ 
         borderColor: colors.primary[500],
         boxShadow: `0 0 10px ${colors.primary[500]}33`
       }}
       transition={{ duration: 0.3 }}
     >
-      <Text fontSize={typography.sizes.xs} color={colors.terminal.textSecondary} mb={spacing[2]} fontFamily={typography.fonts.mono}>
+      <Text fontSize={compact ? "xs" : typography.sizes.xs} color={colors.terminal.textSecondary} mb={compact ? 1 : spacing[2]} fontFamily={typography.fonts.mono}>
         │ PLAYER STATS
       </Text>
       
-      <VStack spacing={spacing[2]} align="stretch">
+      <VStack spacing={compact ? 1 : spacing[2]} align="stretch" h="calc(100% - 20px)" overflow="hidden">
         {/* Level and XP */}
         <HStack justify="space-between" align="center">
           <PulseAnimation isActive={true} color={colors.primary[500]} intensity={1.5}>
-            <Text fontSize={typography.sizes.sm} color={colors.primary[500]} fontFamily={typography.fonts.mono} fontWeight={typography.weights.bold}>
+            <Text fontSize={compact ? "xs" : typography.sizes.sm} color={colors.primary[500]} fontFamily={typography.fonts.mono} fontWeight={typography.weights.bold}>
               LEVEL {progress.level}
             </Text>
           </PulseAnimation>
-          <Text fontSize={typography.sizes.xs} color={colors.terminal.textSecondary}>
+          <Text fontSize={compact ? "xs" : typography.sizes.xs} color={colors.terminal.textSecondary}>
             {progress.xp}/{xpForNextLevel} XP
           </Text>
         </HStack>
         
-        <JuicyProgressBar progress={xpProgress} color={colors.primary[500]} />
+        <Box h={compact ? "4px" : "8px"}>
+          <JuicyProgressBar progress={xpProgress} color={colors.primary[500]} />
+        </Box>
         
         {/* Performance indicator */}
-        {performanceMode !== 'high' && (
-          <HStack justify="space-between" fontSize={typography.sizes.xs}>
+        {!compact && performanceMode !== 'high' && (
+          <HStack justify="space-between" fontSize="xs">
             <Text color={colors.terminal.textSecondary}>PERFORMANCE</Text>
             <Text color={fps >= 55 ? colors.performance.good.primary : fps >= 45 ? colors.performance.best.primary : colors.performance.error.primary}>
               {performanceMode.toUpperCase()} ({fps} FPS) [{Math.round(effectScale * 100)}%]
@@ -60,8 +63,8 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
         )}
         
         {/* Effect scale indicator for low performance */}
-        {effectScale < 0.8 && (
-          <HStack justify="space-between" fontSize={typography.sizes.xs}>
+        {!compact && effectScale < 0.8 && (
+          <HStack justify="space-between" fontSize="xs">
             <Text color={colors.terminal.textSecondary}>EFFECTS</Text>
             <Text color={effectScale < 0.5 ? colors.performance.error.primary : colors.performance.best.primary}>
               {Math.round(effectScale * 100)}% INTENSITY
@@ -87,7 +90,7 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
             }}
             border="1px solid #333"
             borderRadius="4px"
-            p={2}
+            p={compact ? 1 : 2}
             bg={currentStats.combo >= 20 ? "#001100" : "#000"}
           >
             <HStack justify="space-between">
@@ -137,7 +140,7 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
                 }}
                 mt={2}
                 textAlign="center"
-                bg="linear-gradient(45deg, #ff6b6b, #ffd93d)"
+                bg={compact ? "#ff6b6b" : "linear-gradient(45deg, #ff6b6b, #ffd93d)"}
                 color="#000"
                 p={1}
                 borderRadius="4px"
@@ -150,7 +153,7 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
         )}
 
         {/* Best Stats */}
-        <MotionBox 
+        {!compact && <MotionBox 
           borderTop="1px solid #333" 
           pt={2} 
           mt={2}
@@ -180,10 +183,10 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
               </PulseAnimation>
             </VStack>
           </HStack>
-        </MotionBox>
+        </MotionBox>}
 
         {/* Achievements */}
-        {progress.achievements.length > 0 && (
+        {!compact && progress.achievements.length > 0 && (
           <MotionBox 
             borderTop="1px solid #333" 
             pt={2}

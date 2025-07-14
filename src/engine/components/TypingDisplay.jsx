@@ -239,20 +239,20 @@ export const TypingDisplay = memo(({
     <TerminalPanel 
       title={fullScreen ? "FULL SCREEN TYPING CHALLENGE" : "ADDICTIVE TYPING INTERFACE"} 
       variant="primary"
+      padding="small"
     >
       <Box
         ref={containerRef}
         bg={colors.terminal.bg}
         border={`1px solid ${colors.terminal.border}`}
-        p={spacing[3]}
-        minH={fullScreen ? "400px" : "200px"}
-        maxH={fullScreen ? "none" : "400px"}
+        p={fullScreen ? spacing[2] : spacing[3]}
+        minH={fullScreen ? "300px" : "200px"}
         h={fullScreen ? "100%" : "auto"}
         overflowY="auto"
         position="relative"
         fontFamily="monospace"
-        fontSize={fullScreen ? "16px" : "12px"}
-        lineHeight={fullScreen ? "32px" : "22px"}
+        fontSize={fullScreen ? "14px" : "12px"}
+        lineHeight={fullScreen ? "28px" : "22px"}
       >
         {/* Progressive Background Effect with Intensity Scaling */}
         <BackgroundWaveEffect

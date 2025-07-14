@@ -548,19 +548,28 @@ export const EnhancedProjectCard = ({
         </HStack>
 
         {/* Action Buttons */}
-        <HStack spacing={designSystem.spacing[2]} mt={designSystem.spacing[2]}>
+        <HStack spacing={designSystem.spacing[2]} mt={designSystem.spacing[2]} w="100%">
           {project.acceptsDonations && (
             <Button
               bg="#FFD700"
               color="#000"
               size="sm"
-              flex={1}
+              flex="1"
+              minW="0"
+              maxW="100%"
+              h={designSystem.spacing[8]}
+              fontSize={designSystem.typography.sizes.xs}
+              fontWeight={designSystem.typography.weights.bold}
+              borderRadius={designSystem.radii.base}
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
               onClick={(e) => {
                 e.stopPropagation();
                 onDonate?.(project);
               }}
             >
-              💰 Donate
+              💰 DONATE
             </Button>
           )}
           {project.seekingCollaborators && (
@@ -568,25 +577,51 @@ export const EnhancedProjectCard = ({
               bg="#4ECDC4"
               color="#000"
               size="sm"
-              flex={1}
+              flex="1"
+              minW="0"
+              maxW="100%"
+              h={designSystem.spacing[8]}
+              fontSize={designSystem.typography.sizes.xs}
+              fontWeight={designSystem.typography.weights.bold}
+              borderRadius={designSystem.radii.base}
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
               onClick={(e) => {
                 e.stopPropagation();
                 onCollaborate?.(project);
               }}
             >
-              🤝 Collaborate
+              🤝 COLLAB
             </Button>
           )}
           <Button
             variant="secondary"
             size="sm"
-            flex={project.acceptsDonations || project.seekingCollaborators ? 0 : 1}
+            flex={project.acceptsDonations || project.seekingCollaborators ? "0 0 auto" : "1"}
+            minW={project.acceptsDonations || project.seekingCollaborators ? designSystem.spacing[12] : "0"}
+            maxW="100%"
+            h={designSystem.spacing[8]}
+            fontSize={designSystem.typography.sizes.xs}
+            fontWeight={designSystem.typography.weights.bold}
+            borderRadius={designSystem.radii.base}
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            bg={designSystem.colors.backgrounds.surface}
+            color={designSystem.colors.text.primary}
+            borderColor={designSystem.colors.borders.default}
+            _hover={{
+              bg: designSystem.colors.backgrounds.elevated,
+              borderColor: designSystem.colors.brand.primary,
+              color: designSystem.colors.brand.primary
+            }}
             onClick={(e) => {
               e.stopPropagation();
               onViewDetails?.(project);
             }}
           >
-            👁️ View
+            👁️ VIEW
           </Button>
         </HStack>
       </Box>

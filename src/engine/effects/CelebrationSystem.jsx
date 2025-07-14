@@ -55,9 +55,8 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
     <motion.div
       initial={{ scale: 0, opacity: 0, rotate: -180 }}
       animate={{ 
-        scale: [0, 1.3, 1], 
-        opacity: 1,
-        rotate: [0, 360, 0]
+        scale: [0, 1.2, 1], 
+        opacity: 1
       }}
       exit={{ 
         scale: 0,
@@ -65,9 +64,8 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
         rotate: 180
       }}
       transition={{ 
-        duration: 1.5, 
-        ease: "backOut",
-        rotate: { duration: 2 }
+        duration: 1.2, 
+        ease: "backOut"
       }}
       onAnimationComplete={onComplete}
       style={{
@@ -77,60 +75,33 @@ export const MegaLevelUpCelebration = ({ newLevel, onComplete }) => {
         transform: 'translate(-50%, -50%)',
         zIndex: 10000,
         textAlign: 'center',
-        background: 'linear-gradient(45deg, #000, #111, #000)',
-        border: '4px solid #00ff00',
-        padding: '40px',
-        borderRadius: '20px',
-        boxShadow: '0 0 60px #00ff00, inset 0 0 30px rgba(0, 255, 0, 0.1)'
+        background: 'rgba(0, 0, 0, 0.95)',
+        padding: '50px',
+        borderRadius: '12px',
+        boxShadow: '0 0 40px rgba(0, 255, 0, 0.3)'
       }}
     >
       <motion.div
         animate={{ 
-          scale: [1, 1.15, 1],
+          scale: [1, 1.05, 1],
           textShadow: [
             '0 0 25px #00ff00',
-            '0 0 50px #00ff00, 0 0 25px #ffff00',
+            '0 0 35px #00ff00',
             '0 0 25px #00ff00'
           ]
         }}
         transition={{ 
-          repeat: Infinity, 
-          duration: 2.5 
+          repeat: 2, 
+          duration: 1.5 
         }}
       >
-        <motion.div
-          animate={{
-            rotate: [0, 15, -15, 0],
-            scale: [1, 1.08, 1]
-          }}
-          transition={{
-            duration: 1,
-            repeat: Infinity
-          }}
-        >
-          <div style={{ fontSize: '4xl', color: '#00ff00', fontWeight: 'bold', marginBottom: '20px' }}>
-            🎉 LEVEL UP! 🎉
-          </div>
-        </motion.div>
+        <div style={{ fontSize: '4xl', color: '#00ff00', fontWeight: 'bold', marginBottom: '20px' }}>
+          🎉 LEVEL UP! 🎉
+        </div>
         
-        <motion.div
-          animate={{
-            scale: [1, 1.25, 1],
-            textShadow: [
-              '0 0 20px #ffff00',
-              '0 0 40px #ffff00, 0 0 20px #ffd93d',
-              '0 0 20px #ffff00'
-            ]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity
-          }}
-        >
-          <div style={{ fontSize: '6xl', color: '#ffff00', fontWeight: 'bold', textShadow: '0 0 35px #ffff00' }}>
-            {newLevel}
-          </div>
-        </motion.div>
+        <div style={{ fontSize: '6xl', color: '#ffff00', fontWeight: 'bold', textShadow: '0 0 35px #ffff00' }}>
+          {newLevel}
+        </div>
         
         <motion.div
           initial={{ y: 30, opacity: 0 }}
@@ -228,16 +199,14 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
 
   return (
     <motion.div
-      initial={{ scale: 0, opacity: 0, rotate: -180 }}
+      initial={{ scale: 0, opacity: 0 }}
       animate={{ 
         scale: [0, 1.3, 1],
-        opacity: [0, 1, 1, 0],
-        rotate: [0, 360, 0],
-        y: [0, -20, 0, -100]
+        opacity: [0, 1, 1, 0]
       }}
       transition={{ 
-        duration: 4,
-        times: [0, 0.3, 0.8, 1]
+        duration: 3,
+        times: [0, 0.3, 0.9, 1]
       }}
       onAnimationComplete={onComplete}
       style={{
@@ -246,90 +215,43 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
         left: '50%',
         transform: 'translateX(-50%)',
         zIndex: 10000,
-        background: `linear-gradient(135deg, ${data.color}, ${data.color}cc, #000)`,
-        border: `4px solid ${data.color}`,
-        borderRadius: '20px',
+        background: `rgba(0, 0, 0, 0.95)`,
+        borderRadius: '12px',
         padding: '30px',
         textAlign: 'center',
         minWidth: '350px',
-        boxShadow: `0 0 50px ${data.color}, inset 0 0 30px rgba(0,0,0,0.3)`
+        boxShadow: `0 0 30px ${data.color}66`
       }}
     >
-      {/* Achievement burst background */}
-      <motion.div
-        animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.3, 0.6, 0.3]
-        }}
-        transition={{ duration: 2, repeat: Infinity }}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `radial-gradient(circle, ${data.color}33, transparent)`,
-          borderRadius: '16px'
-        }}
-      />
-      
       {/* Rarity indicator */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          textShadow: [
-            `0 0 10px ${data.color}`,
-            `0 0 25px ${data.color}`,
-            `0 0 10px ${data.color}`
-          ]
-        }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-        style={{
-          color: data.color,
-          fontSize: '12px',
-          fontWeight: 'bold',
-          marginBottom: '10px',
-          letterSpacing: '2px'
-        }}
-      >
+      <div style={{
+        color: data.color,
+        fontSize: '12px',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+        letterSpacing: '2px'
+      }}>
         {data.rarity} ACHIEVEMENT
-      </motion.div>
+      </div>
       
       {/* Achievement icon */}
-      <motion.div
-        animate={{
-          scale: [1, 1.3, 1],
-          rotate: [0, 15, -15, 0]
-        }}
-        transition={{ duration: 2, repeat: Infinity }}
-        style={{
-          fontSize: '60px',
-          marginBottom: '15px'
-        }}
-      >
+      <div style={{
+        fontSize: '60px',
+        marginBottom: '15px'
+      }}>
         {data.icon}
-      </motion.div>
+      </div>
       
       {/* Achievement title */}
-      <motion.div
-        animate={{
-          textShadow: [
-            `0 0 15px ${data.color}`,
-            `0 0 30px ${data.color}`,
-            `0 0 15px ${data.color}`
-          ]
-        }}
-        transition={{ duration: 1.8, repeat: Infinity }}
-        style={{
-          color: '#fff',
-          fontSize: '24px',
-          fontWeight: 'bold',
-          marginBottom: '10px',
-          fontFamily: "'Courier New', monospace"
-        }}
-      >
+      <div style={{
+        color: '#fff',
+        fontSize: '24px',
+        fontWeight: 'bold',
+        marginBottom: '10px',
+        fontFamily: "'Courier New', monospace"
+      }}>
         {data.title}
-      </motion.div>
+      </div>
       
       {/* Achievement description */}
       <div
@@ -341,32 +263,6 @@ export const MegaAchievementUnlock = ({ achievement, onComplete }) => {
       >
         {data.desc}
       </div>
-      
-      {/* Orbiting achievement particles */}
-      {Array.from({ length: 8 }).map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            rotate: [0, 360],
-            scale: [0.8, 1.4, 0.8]
-          }}
-          transition={{
-            rotate: { duration: 3, repeat: Infinity, delay: i * 0.2 },
-            scale: { duration: 1.5, repeat: Infinity, delay: i * 0.1 }
-          }}
-          style={{
-            position: 'absolute',
-            width: '8px',
-            height: '8px',
-            background: data.color,
-            borderRadius: '50%',
-            top: '50%',
-            left: '50%',
-            transformOrigin: `${60 + i * 10}px 0px`,
-            boxShadow: `0 0 12px ${data.color}`
-          }}
-        />
-      ))}
     </motion.div>
   );
 };

@@ -33,7 +33,6 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
       animate={{ 
         scale: [1, 1.2 + (pulseIntensity * 0.1), 1], 
         y: 0,
-        rotate: [0, 5, -5, 0],
         boxShadow: [
           `0 0 20px ${streakColor}`,
           `0 0 ${40 * pulseIntensity}px ${streakColor}`,
@@ -43,7 +42,6 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
       exit={{ scale: 0, y: 20 }}
       transition={{ 
         scale: { repeat: Infinity, duration: 1.2 / pulseIntensity },
-        rotate: { repeat: Infinity, duration: 2 / pulseIntensity },
         boxShadow: { repeat: Infinity, duration: 1.5 / pulseIntensity }
       }}
       style={{
@@ -57,36 +55,17 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
         color: streak >= 30 ? '#000' : '#fff',
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
-        fontSize: '16px',
+        fontSize: '14px',
         textAlign: 'center',
-        border: `3px solid ${streakColor}`,
-        transform: 'perspective(100px) rotateX(5deg)'
+        border: `2px solid ${streakColor}`,
+        borderRadius: '8px'
       }}
     >
-      <motion.div
-        animate={{
-          scale: [1, 1.1 + (pulseIntensity * 0.05), 1],
-          rotate: [0, 10, -10, 0]
-        }}
-        transition={{
-          duration: 0.8 / pulseIntensity,
-          repeat: Infinity
-        }}
-      >
-        🔥 {streak} STREAK!
-      </motion.div>
+      🔥 {streak} STREAK!
       {multiplier > 1 && (
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          style={{ 
-            fontSize: '12px', 
-            marginTop: '5px',
-            textShadow: `0 0 10px ${streakColor}`
-          }}
-        >
+        <div style={{ fontSize: '10px', marginTop: '2px' }}>
           x{multiplier} COMBO ACTIVE
-        </motion.div>
+        </div>
       )}
     </motion.div>
   );
@@ -128,7 +107,6 @@ export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, t
       animate={{ 
         scale: [1, 1.2 + (anticipationLevel * 0.1), 1], 
         y: 0,
-        rotate: [0, 8, -8, 0],
         boxShadow: [
           `0 0 30px ${style.glow}`,
           `0 0 ${60 * pulseIntensity}px ${style.glow}`,
@@ -137,7 +115,6 @@ export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, t
       }}
       transition={{ 
         scale: { repeat: Infinity, duration: 1 / anticipationLevel },
-        rotate: { repeat: Infinity, duration: 1.8 / anticipationLevel },
         boxShadow: { repeat: Infinity, duration: 1.4 / anticipationLevel }
       }}
       style={{
@@ -151,62 +128,25 @@ export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, t
         color: style.color,
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
-        fontSize: '22px',
+        fontSize: '16px',
         textAlign: 'center',
-        minWidth: '90px',
-        minHeight: '90px',
+        minWidth: '70px',
+        minHeight: '70px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'column',
-        border: `5px solid ${style.glow}`,
-        transform: 'perspective(100px) rotateX(12deg)'
+        border: `2px solid ${style.glow}`,
+        borderRadius: '8px'
       }}
     >
-      <motion.div
-        animate={{
-          scale: [1, 1.15, 1],
-          rotate: [0, 20, -20, 0]
-        }}
-        transition={{
-          duration: 1.2 / anticipationLevel,
-          repeat: Infinity
-        }}
-      >
-        <div>x{multiplier}</div>
-        <div style={{ fontSize: '12px', marginTop: '6px' }}>COMBO</div>
-        {typingSpeed !== 'lame' && (
-          <div style={{ fontSize: '8px', marginTop: '2px', opacity: 0.8 }}>
-            {typingSpeed.toUpperCase()}
-          </div>
-        )}
-      </motion.div>
-      
-      {/* Enhanced orbiting particles */}
-      {Array.from({ length: 4 }).map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            rotate: [0, 360],
-            scale: [0.6, 1.4, 0.6]
-          }}
-          transition={{
-            rotate: { duration: 2.5 / anticipationLevel, repeat: Infinity, delay: i * 0.2 },
-            scale: { duration: 1.2 / anticipationLevel, repeat: Infinity, delay: i * 0.15 }
-          }}
-          style={{
-            position: 'absolute',
-            width: '10px',
-            height: '10px',
-            background: style.glow,
-            borderRadius: '50%',
-            top: '50%',
-            left: '50%',
-            transformOrigin: `${35 + i * 8}px 0px`,
-            boxShadow: `0 0 15px ${style.glow}`
-          }}
-        />
-      ))}
+      <div>x{multiplier}</div>
+      <div style={{ fontSize: '10px', marginTop: '2px' }}>COMBO</div>
+      {typingSpeed !== 'lame' && (
+        <div style={{ fontSize: '8px', marginTop: '1px', opacity: 0.8 }}>
+          {typingSpeed.toUpperCase()}
+        </div>
+      )}
     </motion.div>
   );
 };

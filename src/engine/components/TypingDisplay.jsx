@@ -34,6 +34,8 @@ export const TypingDisplay = memo(({
     streakEffects: [],
     levelUps: []
   });
+  const [performanceMode, setPerformanceMode] = useState('high');
+  const [effectScale, setEffectScale] = useState(1);
   
   // Optimized cursor position calculation
   const updateCursorPosition = useCallback(() => {
@@ -91,14 +93,21 @@ export const TypingDisplay = memo(({
   // Handle visual effects from engine state
   useEffect(() => {
     if (!engine.state) return;
+    
+    // Get performance settings
+    const perfStats = engine.getOptimizationSettings();
+    if (perfStats?.performance) {
+      setPerformanceMode(perfStats.performance.mode);
+      setEffectScale(perfStats.performance.effectScale || 1);
+    }
 
     // Handle screen flash effects for major events
-    if (engine.state.combo >= 50 && engine.state.combo % 10 === 0) {
+    if (engine.state.combo >= 50 && engine.state.combo % 10 === 0 && effectScale > 0.5) {
       setScreenFlash({ active: true, type: 'combo', intensity: Math.min(engine.state.combo / 50, 2) });
       setTimeout(() => setScreenFlash({ active: false, type: 'success', intensity: 1 }), 300);
     }
     
-    if (engine.state.perfectStreak >= 15) {
+    if (engine.state.perfectStreak >= 15 && effectScale > 0.3) {
       setScreenFlash({ active: true, type: 'perfect', intensity: 1.5 });
       setTimeout(() => setScreenFlash({ active: false, type: 'success', intensity: 1 }), 400);
     }
@@ -115,37 +124,43 @@ export const TypingDisplay = memo(({
     }
 
     // Add floating scores
-    if (engine.state.floatingScores && engine.state.floatingScores.length > 0) {
+    if (engine.state.floatingScores && engine.state.floatingScores.length > 0 && effectScale > 0.2) {
       const newScores = engine.state.floatingScores.filter(
         score => !activeEffects.floatingScores.some(active => active.id === score.id)
       );
       
-      if (newScores.length > 0) {
+      // Limit concurrent floating scores based on performance
+      const maxScores = performanceMode === 'low' ? 3 : performanceMode === 'medium' ? 5 : 8;
+      if (newScores.length > 0 && activeEffects.floatingScores.length < maxScores) {
         setActiveEffects(prev => ({
           ...prev,
-          floatingScores: [...prev.floatingScores, ...newScores]
+          floatingScores: [...prev.floatingScores, ...newScores.slice(0, maxScores - prev.floatingScores.length)]
         }));
       }
     }
 
     // Add explosions
-    if (engine.state.explosions && engine.state.explosions.length > 0) {
+    if (engine.state.explosions && engine.state.explosions.length > 0 && effectScale > 0.2) {
       const newExplosions = engine.state.explosions.filter(
         explosion => !activeEffects.explosions.some(active => active.id === explosion.id)
       );
       
-      if (newExplosions.length > 0) {
+      // Limit concurrent explosions
+      const maxExplosions = performanceMode === 'low' ? 2 : performanceMode === 'medium' ? 4 : 6;
+      if (newExplosions.length > 0 && activeEffects.explosions.length < maxExplosions) {
         setActiveEffects(prev => ({
           ...prev,
-          explosions: [...prev.explosions, ...newExplosions]
+          explosions: [...prev.explosions, ...newExplosions.slice(0, maxExplosions - prev.explosions.length)]
         }));
       }
     }
 
     // Add combo bursts for high combos
-    if (engine.state.combo >= 10 && engine.state.combo % 5 === 0) {
+    if (engine.state.combo >= 10 && engine.state.combo % 5 === 0 && effectScale > 0.4) {
       const burstId = `combo-${engine.state.combo}-${Date.now()}`;
-      if (!activeEffects.comboBursts.some(burst => burst.combo === engine.state.combo)) {
+      const maxBursts = performanceMode === 'low' ? 1 : performanceMode === 'medium' ? 2 : 4;
+      if (!activeEffects.comboBursts.some(burst => burst.combo === engine.state.combo) && 
+          activeEffects.comboBursts.length < maxBursts) {
         setActiveEffects(prev => ({
           ...prev,
           comboBursts: [...prev.comboBursts, {
@@ -158,7 +173,7 @@ export const TypingDisplay = memo(({
         }));
       }
     }
-  }, [engine.state, activeEffects, cursorPosition, patternCelebrations]);
+  }, [engine.state, activeEffects, cursorPosition, patternCelebrations, effectScale, performanceMode]);
 
   // Cleanup expired effects
   useEffect(() => {
@@ -166,13 +181,18 @@ export const TypingDisplay = memo(({
       const now = Date.now();
       setActiveEffects(prev => ({
         floatingScores: prev.floatingScores.filter(effect => now - effect.id < 3000),
-        explosions: prev.explosions.filter(effect => now - effect.id < 2000),
-        comboBursts: prev.comboBursts.filter(effect => now - effect.id < 2000),
-        characterUpgrades: prev.characterUpgrades.filter(effect => now - effect.createdAt < 3000),
-        achievements: prev.achievements.filter(effect => now - effect.createdAt < 6000),
-        streakEffects: prev.streakEffects.filter(effect => now - effect.createdAt < 8000),
-        levelUps: prev.levelUps.filter(effect => now - effect.createdAt < 6000)
+        explosions: prev.explosions.filter(effect => now - effect.id < (performanceMode === 'low' ? 1000 : 2000)),
+        comboBursts: prev.comboBursts.filter(effect => now - effect.id < (performanceMode === 'low' ? 1000 : 2000)),
+        characterUpgrades: prev.characterUpgrades.filter(effect => now - (effect.createdAt || effect.id) < (performanceMode === 'low' ? 2000 : 3000)),
+        achievements: prev.achievements.filter(effect => now - (effect.createdAt || effect.id) < (performanceMode === 'low' ? 4000 : 6000)),
+        streakEffects: prev.streakEffects.filter(effect => now - (effect.createdAt || effect.id) < (performanceMode === 'low' ? 5000 : 8000)),
+        levelUps: prev.levelUps.filter(effect => now - (effect.createdAt || effect.id) < (performanceMode === 'low' ? 4000 : 6000))
       }));
+      
+      // More aggressive cleanup for pattern celebrations in low performance
+      if (performanceMode === 'low') {
+        setPatternCelebrations(prev => prev.filter(pattern => now - pattern.id < 2000));
+      }
     }, 1000);
     
     // Cleanup pattern celebrations
@@ -230,10 +250,11 @@ export const TypingDisplay = memo(({
       >
         {/* Progressive Background Effect with Intensity Scaling */}
         <BackgroundWaveEffect
-          isActive={engine.state?.isActive && !engine.state?.isComplete}
+          isActive={engine.state?.isActive && !engine.state?.isComplete && effectScale > 0.3}
           combo={engine.state?.combo || 1}
           typingSpeed={engine.state?.typingSpeed || 'lame'}
-          anticipationLevel={engine.state?.anticipationLevel || 1}
+          anticipationLevel={(engine.state?.anticipationLevel || 1) * effectScale}
+          intensity={effectScale}
         />
         
         {/* Screen Flash Effects */}
@@ -248,7 +269,7 @@ export const TypingDisplay = memo(({
           isVisible={engine.state?.isActive && !engine.state?.isComplete}
           position={cursorPosition}
           typingSpeed={engine.state?.typingSpeed || 'lame'}
-          anticipationLevel={engine.state?.anticipationLevel || 1}
+          anticipationLevel={(engine.state?.anticipationLevel || 1) * effectScale}
           combo={engine.state?.combo || 1}
         />
         
@@ -265,7 +286,7 @@ export const TypingDisplay = memo(({
 
         {/* Floating Scores */}
         <AnimatePresence>
-          {activeEffects.floatingScores.map((score) => (
+          {activeEffects.floatingScores.slice(0, performanceMode === 'low' ? 3 : 8).map((score) => (
             <FloatingScore
               key={score.id}
               score={score.score}
@@ -282,7 +303,7 @@ export const TypingDisplay = memo(({
 
         {/* Character Explosions */}
         <AnimatePresence>
-          {activeEffects.explosions.map((explosion) => (
+          {activeEffects.explosions.slice(0, performanceMode === 'low' ? 2 : 6).map((explosion) => (
             <CharacterExplosion
               key={explosion.id}
               char={explosion.char}
@@ -299,7 +320,7 @@ export const TypingDisplay = memo(({
 
         {/* Combo Burst Effects */}
         <AnimatePresence>
-          {activeEffects.comboBursts.map((burst) => (
+          {activeEffects.comboBursts.slice(0, performanceMode === 'low' ? 1 : 4).map((burst) => (
             <ComboBurstEffect
               key={burst.id}
               isActive={true}
@@ -313,7 +334,8 @@ export const TypingDisplay = memo(({
 
         {/* Character Upgrade Effects */}
         <AnimatePresence>
-          {activeEffects.characterUpgrades.map((upgrade) => (
+          {performanceMode !== 'low' && 
+           activeEffects.characterUpgrades.slice(0, 3).map((upgrade) => (
             <CharacterUpgradeEffect
               key={upgrade.id}
               char={upgrade.char}
@@ -326,7 +348,8 @@ export const TypingDisplay = memo(({
 
         {/* Achievement Unlocks */}
         <AnimatePresence>
-          {activeEffects.achievements.map((achievement) => (
+          {performanceMode !== 'low' && 
+           activeEffects.achievements.slice(0, 1).map((achievement) => (
             <AchievementUnlock
               key={achievement.id}
               achievement={achievement.type}
@@ -337,7 +360,8 @@ export const TypingDisplay = memo(({
 
         {/* Streak Multiplier Effects */}
         <AnimatePresence>
-          {activeEffects.streakEffects.map((streak) => (
+          {performanceMode !== 'low' && 
+           activeEffects.streakEffects.slice(0, 1).map((streak) => (
             <StreakMultiplierEffect
               key={streak.id}
               streak={streak.streak}
@@ -349,7 +373,8 @@ export const TypingDisplay = memo(({
 
         {/* Level Up Transformations */}
         <AnimatePresence>
-          {activeEffects.levelUps.map((levelUp) => (
+          {performanceMode !== 'low' && 
+           activeEffects.levelUps.slice(0, 1).map((levelUp) => (
             <LevelUpTransformation
               key={levelUp.id}
               newLevel={levelUp.newLevel}
@@ -360,7 +385,7 @@ export const TypingDisplay = memo(({
         
         {/* Pattern Celebrations */}
         <AnimatePresence>
-          {patternCelebrations.map((pattern) => (
+          {patternCelebrations.slice(0, performanceMode === 'low' ? 1 : 3).map((pattern) => (
             <PatternCelebration
               key={pattern.id}
               pattern={pattern}

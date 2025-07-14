@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
-import { Box, Text, VStack, HStack, Grid, GridItem, Button, Badge, Image, Tabs, TabList, TabPanels, Tab, TabPanel, Input, Select, Textarea } from "@chakra-ui/react";
+import { Box, Grid, GridItem, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { useGameProgress } from '../hooks/useGameProgress';
-import { PageLayout, SectionLayout } from '../design/layouts/PageLayout';
-import { Card } from '../design/components/Card';
-import { Text as CustomText, Heading } from '../design/components/Typography';
-import { Button as CustomButton } from '../design/components/Button';
+import { PageLayout, SectionLayout, GridLayout } from '../design/layouts/PageLayout';
+import { Text } from '../design/components/Typography';
+import { Button } from '../design/components/Button';
 import { PageHeader } from '../design/components/PageHeader';
+import { 
+  CommissionCard, 
+  CollaborationCard, 
+  CreatorCard, 
+  FeaturedCreatorsSidebar,
+  TipsCard 
+} from '../design/components/CommunityComponents';
+import { CourseCard } from '../design/components/Card';
 import { designSystem } from '../design/system/DesignSystem';
 
 const MotionBox = motion(Box);
@@ -25,12 +32,18 @@ const CommunityPage = () => {
       creator: 'CodeMaster99',
       description: 'A complete Space Invaders clone built with Unity and C#. Features power-ups, multiple levels, and particle effects.',
       language: 'csharp',
-      thumbnail: 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400',
+      thumbnail_url: 'https://images.pexels.com/photos/442576/pexels-photo-442576.jpeg?auto=compress&cs=tinysrgb&w=400',
       likes: 245,
       donations: 1250,
       tags: ['Unity', 'Game Dev', '2D'],
       difficulty: 'intermediate',
-      status: 'completed'
+      status: 'completed',
+      price: 0,
+      instructor_name: 'CodeMaster99',
+      lessons_count: 0,
+      duration_hours: 0,
+      rating: 4.9,
+      students_count: 0
     },
     {
       id: 2,
@@ -38,12 +51,18 @@ const CommunityPage = () => {
       creator: 'WebWizard',
       description: 'Full-stack e-commerce platform with React frontend, Node.js backend, and Stripe integration.',
       language: 'javascript',
-      thumbnail: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=400',
+      thumbnail_url: 'https://images.pexels.com/photos/265087/pexels-photo-265087.jpeg?auto=compress&cs=tinysrgb&w=400',
       likes: 189,
       donations: 890,
       tags: ['React', 'Node.js', 'Full-Stack'],
       difficulty: 'advanced',
-      status: 'completed'
+      status: 'completed',
+      price: 0,
+      instructor_name: 'WebWizard',
+      lessons_count: 0,
+      duration_hours: 0,
+      rating: 4.8,
+      students_count: 0
     },
     {
       id: 3,
@@ -51,12 +70,18 @@ const CommunityPage = () => {
       creator: 'DataNinja',
       description: 'Interactive data visualization tool using Python, Pandas, and Matplotlib. Perfect for analyzing CSV files.',
       language: 'python',
-      thumbnail: 'https://images.pexels.com/photos/669610/pexels-photo-669610.jpeg?auto=compress&cs=tinysrgb&w=400',
+      thumbnail_url: 'https://images.pexels.com/photos/669610/pexels-photo-669610.jpeg?auto=compress&cs=tinysrgb&w=400',
       likes: 156,
       donations: 675,
       tags: ['Python', 'Data Science', 'Visualization'],
       difficulty: 'beginner',
-      status: 'completed'
+      status: 'completed',
+      price: 0,
+      instructor_name: 'DataNinja',
+      lessons_count: 0,
+      duration_hours: 0,
+      rating: 4.7,
+      students_count: 0
     }
   ]);
 
@@ -166,31 +191,6 @@ const CommunityPage = () => {
     }
   ]);
 
-  const getLanguageIcon = (language) => {
-    const icons = {
-      javascript: '🟨',
-      typescript: '🔷',
-      python: '🐍',
-      java: '☕',
-      csharp: '🔵',
-      php: '🐘'
-    };
-    return icons[language] || '💻';
-  };
-
-  const getDifficultyColor = (difficulty) => {
-    const colors = {
-      beginner: designSystem.colors.status.success,
-      intermediate: designSystem.colors.status.warning,
-      advanced: designSystem.colors.status.error
-    };
-    return colors[difficulty] || designSystem.colors.status.info;
-  };
-
-  const getBudgetRange = (budget) => {
-    return `$${budget.min.toLocaleString()} - $${budget.max.toLocaleString()}`;
-  };
-
   // Community stats for header
   const stats = [
     { value: showcaseProjects.length, label: 'PROJECTS' },
@@ -198,6 +198,39 @@ const CommunityPage = () => {
     { value: `$${showcaseProjects.reduce((sum, p) => sum + p.donations, 0).toLocaleString()}`, label: 'DONATED' },
     { value: commissionRequests.length, label: 'OPEN JOBS' }
   ];
+
+  // Event handlers
+  const handleProjectView = (project) => {
+    console.log('View project:', project);
+  };
+
+  const handleProjectDonate = (project) => {
+    console.log('Donate to project:', project);
+  };
+
+  const handleProjectHire = (project) => {
+    console.log('Hire creator:', project.creator);
+  };
+
+  const handleCommissionView = (commission) => {
+    navigate(`/commission/${commission.id}`);
+  };
+
+  const handleCommissionApply = (commission) => {
+    navigate(`/commission/${commission.id}`);
+  };
+
+  const handleCollaborationView = (collaboration) => {
+    console.log('View collaboration:', collaboration);
+  };
+
+  const handleCreatorView = (creator) => {
+    console.log('View creator profile:', creator);
+  };
+
+  const handleCreatorHire = (creator) => {
+    console.log('Hire creator:', creator);
+  };
 
   return (
     <PageLayout background="primary">
@@ -208,647 +241,233 @@ const CommunityPage = () => {
       />
       
       <SectionLayout spacing="default">
-        <Tabs index={activeTab} onChange={setActiveTab} variant="soft-rounded" colorScheme="green">
-          <TabList bg={designSystem.colors.backgrounds.secondary} p={1} borderRadius={designSystem.radii.lg}>
-            <Tab 
-              color={designSystem.colors.text.muted}
-              _selected={{ 
-                color: designSystem.colors.text.inverse,
-                bg: designSystem.colors.brand.primary 
-              }}
-              fontFamily={designSystem.typography.fonts.mono}
-              fontSize={designSystem.typography.sizes.sm}
-              fontWeight={designSystem.typography.weights.bold}
-            >
-              🎨 SHOWCASE
-            </Tab>
-            <Tab 
-              color={designSystem.colors.text.muted}
-              _selected={{ 
-                color: designSystem.colors.text.inverse,
-                bg: designSystem.colors.brand.secondary 
-              }}
-              fontFamily={designSystem.typography.fonts.mono}
-              fontSize={designSystem.typography.sizes.sm}
-              fontWeight={designSystem.typography.weights.bold}
-            >
-              💼 COMMISSIONS
-            </Tab>
-            <Tab 
-              color={designSystem.colors.text.muted}
-              _selected={{ 
-                color: designSystem.colors.text.inverse,
-                bg: designSystem.colors.brand.accent 
-              }}
-              fontFamily={designSystem.typography.fonts.mono}
-              fontSize={designSystem.typography.sizes.sm}
-              fontWeight={designSystem.typography.weights.bold}
-            >
-              🤝 COLLABORATIONS
-            </Tab>
-            <Tab 
-              color={designSystem.colors.text.muted}
-              _selected={{ 
-                color: designSystem.colors.text.inverse,
-                bg: designSystem.colors.brand.error 
-              }}
-              fontFamily={designSystem.typography.fonts.mono}
-              fontSize={designSystem.typography.sizes.sm}
-              fontWeight={designSystem.typography.weights.bold}
-            >
-              👨‍💻 CREATORS
-            </Tab>
-          </TabList>
+        <Tabs 
+          index={activeTab} 
+          onChange={setActiveTab} 
+          variant="soft-rounded" 
+          colorScheme="green"
+        >
+          <Box
+            bg={designSystem.colors.backgrounds.secondary}
+            p={designSystem.spacing[1]}
+            borderRadius={designSystem.radii.lg}
+            border={`1px solid ${designSystem.colors.borders.default}`}
+          >
+            <TabList>
+              <Tab 
+                color={designSystem.colors.text.muted}
+                _selected={{ 
+                  color: designSystem.colors.text.inverse,
+                  bg: designSystem.colors.brand.primary 
+                }}
+                fontFamily={designSystem.typography.fonts.mono}
+                fontSize={designSystem.typography.sizes.sm}
+                fontWeight={designSystem.typography.weights.bold}
+              >
+                🎨 SHOWCASE
+              </Tab>
+              <Tab 
+                color={designSystem.colors.text.muted}
+                _selected={{ 
+                  color: designSystem.colors.text.inverse,
+                  bg: designSystem.colors.brand.secondary 
+                }}
+                fontFamily={designSystem.typography.fonts.mono}
+                fontSize={designSystem.typography.sizes.sm}
+                fontWeight={designSystem.typography.weights.bold}
+              >
+                💼 COMMISSIONS
+              </Tab>
+              <Tab 
+                color={designSystem.colors.text.muted}
+                _selected={{ 
+                  color: designSystem.colors.text.inverse,
+                  bg: designSystem.colors.brand.accent 
+                }}
+                fontFamily={designSystem.typography.fonts.mono}
+                fontSize={designSystem.typography.sizes.sm}
+                fontWeight={designSystem.typography.weights.bold}
+              >
+                🤝 COLLABORATIONS
+              </Tab>
+              <Tab 
+                color={designSystem.colors.text.muted}
+                _selected={{ 
+                  color: designSystem.colors.text.inverse,
+                  bg: designSystem.colors.brand.error 
+                }}
+                fontFamily={designSystem.typography.fonts.mono}
+                fontSize={designSystem.typography.sizes.sm}
+                fontWeight={designSystem.typography.weights.bold}
+              >
+                👨‍💻 CREATORS
+              </Tab>
+            </TabList>
+          </Box>
 
           <TabPanels>
             {/* PROJECT SHOWCASE TAB */}
-            <TabPanel p={0} pt={6}>
-              <VStack spacing={6}>
-                <HStack justify="space-between" w="100%">
-                  <CustomText size="xl" color="brand" fontWeight="bold">
+            <TabPanel p={0} pt={designSystem.spacing[6]}>
+              <SectionLayout spacing="loose">
+                <Box display="flex" justifyContent="space-between" alignItems="center" w="100%">
+                  <Text size="xl" color="brand" fontWeight={designSystem.typography.weights.bold}>
                     Featured Community Projects
-                  </CustomText>
-                  <CustomButton
+                  </Text>
+                  <Button
                     bg={designSystem.colors.brand.primary}
                     color={designSystem.colors.text.inverse}
                     onClick={() => navigate('/submit-project')}
                     size="sm"
                   >
                     + Submit Project
-                  </CustomButton>
-                </HStack>
+                  </Button>
+                </Box>
 
-                <Grid 
-                  templateColumns={{ 
-                    base: "1fr", 
-                    md: "repeat(2, 1fr)", 
-                    lg: "repeat(3, 1fr)" 
-                  }} 
-                  gap={6}
-                  w="100%"
+                <GridLayout 
+                  columns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
+                  gap="default"
                 >
                   {showcaseProjects.map((project, index) => (
-                    <GridItem key={project.id}>
-                      <MotionBox
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: index * 0.1 }}
-                        whileHover={{ 
-                          scale: 1.02,
-                          boxShadow: `0 0 25px ${designSystem.colors.brand.primary}33`
-                        }}
-                        whileTap={{ scale: 0.98 }}
-                        bg={designSystem.colors.backgrounds.secondary}
-                        border={`1px solid ${designSystem.colors.borders.default}`}
-                        borderRadius={designSystem.radii.lg}
-                        overflow="hidden"
-                        cursor="pointer"
-                        _hover={{
-                          borderColor: designSystem.colors.brand.primary
-                        }}
-                        transition="all 0.3s ease"
-                        h="100%"
-                        display="flex"
-                        flexDirection="column"
-                      >
-                        {/* Project Thumbnail */}
-                        <Box position="relative" h="200px" overflow="hidden">
-                          <Image
-                            src={project.thumbnail}
-                            alt={project.title}
-                            w="100%"
-                            h="100%"
-                            objectFit="cover"
-                          />
-                          <Box
-                            position="absolute"
-                            top="10px"
-                            left="10px"
-                            display="flex"
-                            gap={2}
-                          >
-                            <Badge bg={getDifficultyColor(project.difficulty)} color="white" fontSize="xs">
-                              {project.difficulty.toUpperCase()}
-                            </Badge>
-                            <Badge bg={designSystem.colors.backgrounds.overlay} color="white" fontSize="xs">
-                              {getLanguageIcon(project.language)} {project.language.toUpperCase()}
-                            </Badge>
-                          </Box>
-                        </Box>
-
-                        {/* Project Content */}
-                        <VStack p={4} align="stretch" spacing={3} flex={1}>
-                          <Text
-                            fontSize="lg"
-                            fontWeight="bold"
-                            color={designSystem.colors.brand.primary}
-                            noOfLines={2}
-                            minH="48px"
-                          >
-                            {project.title}
-                          </Text>
-
-                          <HStack spacing={2}>
-                            <Text fontSize="sm" color={designSystem.colors.brand.accent} fontWeight="bold">
-                              by {project.creator}
-                            </Text>
-                          </HStack>
-
-                          <Text
-                            fontSize="sm"
-                            color={designSystem.colors.text.secondary}
-                            noOfLines={3}
-                            flex={1}
-                          >
-                            {project.description}
-                          </Text>
-
-                          {/* Tags */}
-                          <HStack spacing={1} flexWrap="wrap">
-                            {project.tags.map((tag, i) => (
-                              <Badge key={i} bg={designSystem.colors.backgrounds.surface} color={designSystem.colors.text.secondary} fontSize="xs">
-                                {tag}
-                              </Badge>
-                            ))}
-                          </HStack>
-
-                          {/* Project Stats */}
-                          <HStack justify="space-between" fontSize="sm">
-                            <HStack spacing={3}>
-                              <HStack spacing={1}>
-                                <Text color={designSystem.colors.brand.error}>❤️</Text>
-                                <Text color={designSystem.colors.text.secondary}>{project.likes}</Text>
-                              </HStack>
-                              <HStack spacing={1}>
-                                <Text color={designSystem.colors.brand.accent}>💰</Text>
-                                <Text color={designSystem.colors.text.secondary}>${project.donations}</Text>
-                              </HStack>
-                            </HStack>
-                          </HStack>
-
-                          {/* Action Buttons */}
-                          <HStack spacing={2}>
-                            <Button
-                              bg={designSystem.colors.backgrounds.surface}
-                              color={designSystem.colors.text.secondary}
-                              size="sm"
-                              flex={1}
-                              fontFamily={designSystem.typography.fonts.mono}
-                              fontSize="xs"
-                              _hover={{ bg: designSystem.colors.backgrounds.elevated }}
-                            >
-                              👀 View
-                            </Button>
-                            <Button
-                              bg={designSystem.colors.brand.accent}
-                              color={designSystem.colors.text.inverse}
-                              size="sm"
-                              flex={1}
-                              fontFamily={designSystem.typography.fonts.mono}
-                              fontSize="xs"
-                              _hover={{ bg: designSystem.colors.brand.accent }}
-                            >
-                              💝 Donate
-                            </Button>
-                            <Button
-                              bg={designSystem.colors.brand.primary}
-                              color={designSystem.colors.text.inverse}
-                              size="sm"
-                              flex={1}
-                              fontFamily={designSystem.typography.fonts.mono}
-                              fontSize="xs"
-                              _hover={{ bg: designSystem.colors.brand.primary }}
-                            >
-                              🤝 Hire
-                            </Button>
-                          </HStack>
-                        </VStack>
-                      </MotionBox>
-                    </GridItem>
+                    <MotionBox
+                      key={project.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                    >
+                      <CourseCard
+                        course={project}
+                        onView={() => handleProjectView(project)}
+                        onEnroll={() => handleProjectDonate(project)}
+                        isEnrolled={false}
+                      />
+                    </MotionBox>
                   ))}
-                </Grid>
-              </VStack>
+                </GridLayout>
+              </SectionLayout>
             </TabPanel>
 
             {/* COMMISSION BOARD TAB */}
-            <TabPanel p={0} pt={6}>
-              <VStack spacing={6}>
-                <HStack justify="space-between" w="100%" align="start">
-                  <VStack align="start" spacing={1}>
-                    <CustomText size="xl" color="secondary" fontWeight="bold">
+            <TabPanel p={0} pt={designSystem.spacing[6]}>
+              <SectionLayout spacing="loose">
+                <Box display="flex" justifyContent="space-between" alignItems="start" w="100%">
+                  <Box>
+                    <Text size="xl" color="secondary" fontWeight={designSystem.typography.weights.bold}>
                       Active Commission Requests
-                    </CustomText>
-                    <CustomText size="sm" color="muted">
+                    </Text>
+                    <Text size="sm" color="muted">
                       {commissionRequests.length} open projects • Total budget: $15,000+
-                    </CustomText>
-                  </VStack>
-                  <CustomButton
+                    </Text>
+                  </Box>
+                  <Button
                     bg={designSystem.colors.brand.secondary}
                     color={designSystem.colors.text.inverse}
                     onClick={() => navigate('/post-commission')}
                     size="sm"
                   >
                     + Post Project
-                  </CustomButton>
-                </HStack>
+                  </Button>
+                </Box>
 
                 <Grid 
-                  templateColumns={{ 
-                    base: "1fr", 
-                    lg: "2fr 1fr" 
-                  }} 
-                  gap={6}
+                  templateColumns={{ base: "1fr", lg: "2fr 1fr" }} 
+                  gap={designSystem.spacing[6]}
                   w="100%"
                 >
                   {/* Commission Requests */}
-                  <VStack spacing={4} align="stretch">
+                  <Box display="flex" flexDirection="column" gap={designSystem.spacing[4]}>
                     {commissionRequests.map((request, index) => (
-                      <MotionBox
+                      <CommissionCard
                         key={request.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                      >
-                        <Card
-                          variant="elevated"
-                          p={6}
-                          _hover={{
-                            borderColor: designSystem.colors.brand.secondary,
-                            boxShadow: `0 0 20px ${designSystem.colors.brand.secondary}33`
-                          }}
-                        >
-                          <VStack spacing={4} align="stretch">
-                            <HStack justify="space-between" align="start">
-                              <VStack align="start" spacing={1} flex={1}>
-                                <CustomText size="lg" color="secondary" fontWeight="bold">
-                                  {request.title}
-                                </CustomText>
-                                <HStack spacing={2}>
-                                  <CustomText size="sm" color="muted">
-                                    by {request.client}
-                                  </CustomText>
-                                  <Text color={designSystem.colors.text.muted}>•</Text>
-                                  <CustomText size="sm" color="muted">
-                                    {request.posted}
-                                  </CustomText>
-                                </HStack>
-                              </VStack>
-                              <VStack align="end" spacing={1}>
-                                <Badge bg={getDifficultyColor(request.difficulty)} color="white" fontSize="xs">
-                                  {request.difficulty.toUpperCase()}
-                                </Badge>
-                                <Badge bg={designSystem.colors.backgrounds.surface} color="white" fontSize="xs">
-                                  {getLanguageIcon(request.language)} {request.language.toUpperCase()}
-                                </Badge>
-                              </VStack>
-                            </HStack>
-
-                            <CustomText size="sm" color="secondary" lineHeight="1.6">
-                              {request.description}
-                            </CustomText>
-
-                            <HStack spacing={1} flexWrap="wrap">
-                              {request.tags.map((tag, i) => (
-                                <Badge key={i} bg={designSystem.colors.brand.secondary} color="white" fontSize="xs">
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </HStack>
-
-                            <HStack justify="space-between" align="center">
-                              <VStack align="start" spacing={0}>
-                                <CustomText size="sm" color="muted">Budget</CustomText>
-                                <CustomText size="lg" color="accent" fontWeight="bold">
-                                  {getBudgetRange(request.budget)}
-                                </CustomText>
-                              </VStack>
-                              <VStack align="center" spacing={0}>
-                                <CustomText size="sm" color="muted">Timeline</CustomText>
-                                <CustomText size="sm" color="secondary" fontWeight="bold">
-                                  {request.timeline}
-                                </CustomText>
-                              </VStack>
-                              <VStack align="end" spacing={0}>
-                                <CustomText size="sm" color="muted">Applications</CustomText>
-                                <CustomText size="lg" color="brand" fontWeight="bold">
-                                  {request.applications}
-                                </CustomText>
-                              </VStack>
-                            </HStack>
-
-                            <HStack spacing={2}>
-                              <CustomButton
-                                variant="secondary"
-                                size="sm"
-                                flex={1}
-                              >
-                                📋 View Details
-                              </CustomButton>
-                              <CustomButton
-                                bg={designSystem.colors.brand.secondary}
-                                color={designSystem.colors.text.inverse}
-                                size="sm"
-                                flex={1}
-                              >
-                                🚀 Apply Now
-                              </CustomButton>
-                            </HStack>
-                          </VStack>
-                        </Card>
-                      </MotionBox>
+                        request={request}
+                        onViewDetails={handleCommissionView}
+                        onApply={handleCommissionApply}
+                      />
                     ))}
-                  </VStack>
+                  </Box>
 
-                  {/* Featured Creators Sidebar */}
-                  <VStack spacing={4} align="stretch">
-                    <Card variant="default" p={4}>
-                      <CustomText size="md" color="brand" fontWeight="bold" mb={3}>
-                        🌟 Featured Creators
-                      </CustomText>
-                      <VStack spacing={3} align="stretch">
-                        {featuredCreators.map((creator) => (
-                          <Box
-                            key={creator.id}
-                            bg={designSystem.colors.backgrounds.secondary}
-                            p={3}
-                            borderRadius={designSystem.radii.md}
-                            border={`1px solid ${designSystem.colors.borders.default}`}
-                            _hover={{
-                              borderColor: designSystem.colors.brand.primary,
-                              cursor: 'pointer'
-                            }}
-                          >
-                            <HStack spacing={3}>
-                              <Image
-                                src={creator.avatar}
-                                alt={creator.name}
-                                w="40px"
-                                h="40px"
-                                borderRadius="full"
-                                objectFit="cover"
-                              />
-                              <VStack align="start" spacing={1} flex={1}>
-                                <HStack justify="space-between" w="100%">
-                                  <CustomText size="sm" color="brand" fontWeight="bold">
-                                    {creator.name}
-                                  </CustomText>
-                                  <Badge 
-                                    bg={creator.available ? designSystem.colors.status.success : designSystem.colors.status.warning} 
-                                    color="white" 
-                                    fontSize="xs"
-                                  >
-                                    {creator.available ? 'AVAILABLE' : 'BUSY'}
-                                  </Badge>
-                                </HStack>
-                                <CustomText size="xs" color="muted">
-                                  ⭐ {creator.rating} • {creator.completedProjects} projects
-                                </CustomText>
-                                <CustomText size="xs" color="secondary">
-                                  {creator.hourlyRate}/hr
-                                </CustomText>
-                                <HStack spacing={1} flexWrap="wrap">
-                                  {creator.specialties.slice(0, 2).map((skill, i) => (
-                                    <Badge key={i} bg={designSystem.colors.backgrounds.surface} color={designSystem.colors.text.muted} fontSize="xs">
-                                      {skill}
-                                    </Badge>
-                                  ))}
-                                </HStack>
-                              </VStack>
-                            </HStack>
-                          </Box>
-                        ))}
-                      </VStack>
-                    </Card>
+                  {/* Sidebar */}
+                  <Box display="flex" flexDirection="column" gap={designSystem.spacing[4]}>
+                    <FeaturedCreatorsSidebar 
+                      creators={featuredCreators}
+                      onCreatorClick={handleCreatorView}
+                    />
 
-                    <Card variant="default" p={4}>
-                      <CustomText size="md" color="accent" fontWeight="bold" mb={3}>
-                        💡 Quick Tips
-                      </CustomText>
-                      <VStack spacing={2} align="start" fontSize="xs" color={designSystem.colors.text.muted}>
-                        <CustomText size="xs">✓ Be specific about your requirements</CustomText>
-                        <CustomText size="xs">✓ Set realistic budgets and timelines</CustomText>
-                        <CustomText size="xs">✓ Check creator portfolios before hiring</CustomText>
-                        <CustomText size="xs">✓ Use escrow for secure payments</CustomText>
-                      </VStack>
-                    </Card>
-                  </VStack>
+                    <TipsCard
+                      title="Quick Tips"
+                      icon="💡"
+                      tips={[
+                        "✓ Be specific about your requirements",
+                        "✓ Set realistic budgets and timelines",
+                        "✓ Check creator portfolios before hiring",
+                        "✓ Use escrow for secure payments"
+                      ]}
+                    />
+                  </Box>
                 </Grid>
-              </VStack>
+              </SectionLayout>
             </TabPanel>
 
             {/* ACTIVE COLLABORATIONS TAB */}
-            <TabPanel p={0} pt={6}>
-              <VStack spacing={6}>
-                <HStack justify="space-between" w="100%">
-                  <CustomText size="xl" color="accent" fontWeight="bold">
+            <TabPanel p={0} pt={designSystem.spacing[6]}>
+              <SectionLayout spacing="loose">
+                <Box display="flex" justifyContent="space-between" alignItems="center" w="100%">
+                  <Text size="xl" color="accent" fontWeight={designSystem.typography.weights.bold}>
                     Active Collaborations
-                  </CustomText>
-                  <CustomText size="sm" color="muted">
+                  </Text>
+                  <Text size="sm" color="muted">
                     {activeCollaborations.length} ongoing projects
-                  </CustomText>
-                </HStack>
+                  </Text>
+                </Box>
 
-                <VStack spacing={4} w="100%">
+                <Box display="flex" flexDirection="column" gap={designSystem.spacing[4]} w="100%">
                   {activeCollaborations.map((collab, index) => (
-                    <MotionBox
+                    <CollaborationCard
                       key={collab.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      w="100%"
-                    >
-                      <Card variant="elevated" p={6}>
-                        <VStack spacing={4} align="stretch">
-                          <HStack justify="space-between" align="start">
-                            <VStack align="start" spacing={1}>
-                              <CustomText size="lg" color="accent" fontWeight="bold">
-                                {collab.title}
-                              </CustomText>
-                              <HStack spacing={2}>
-                                <CustomText size="sm" color="brand">
-                                  {collab.creator}
-                                </CustomText>
-                                <Text color={designSystem.colors.text.muted}>•</Text>
-                                <CustomText size="sm" color="muted">
-                                  {collab.client}
-                                </CustomText>
-                              </HStack>
-                            </VStack>
-                            <Badge bg={designSystem.colors.brand.accent} color="white">
-                              {collab.status.replace('_', ' ').toUpperCase()}
-                            </Badge>
-                          </HStack>
-
-                          <HStack spacing={6}>
-                            <VStack align="start" spacing={1} flex={1}>
-                              <CustomText size="sm" color="muted">Progress</CustomText>
-                              <HStack w="100%" spacing={2}>
-                                <Box 
-                                  flex={1} 
-                                  bg={designSystem.colors.backgrounds.surface} 
-                                  h="8px" 
-                                  borderRadius="4px"
-                                  overflow="hidden"
-                                >
-                                  <Box
-                                    bg={designSystem.colors.brand.accent}
-                                    h="100%"
-                                    w={`${collab.progress}%`}
-                                    transition="width 0.3s"
-                                  />
-                                </Box>
-                                <CustomText size="sm" color="accent" fontWeight="bold">
-                                  {collab.progress}%
-                                </CustomText>
-                              </HStack>
-                            </VStack>
-                            <VStack align="center" spacing={0}>
-                              <CustomText size="sm" color="muted">Budget</CustomText>
-                              <CustomText size="lg" color="brand" fontWeight="bold">
-                                ${collab.budget.toLocaleString()}
-                              </CustomText>
-                            </VStack>
-                            <VStack align="end" spacing={0}>
-                              <CustomText size="sm" color="muted">Deadline</CustomText>
-                              <CustomText size="sm" color="secondary" fontWeight="bold">
-                                {collab.deadline}
-                              </CustomText>
-                            </VStack>
-                          </HStack>
-
-                          <HStack justify="space-between" align="center">
-                            <CustomText size="xs" color="muted">
-                              Last update: {collab.lastUpdate}
-                            </CustomText>
-                            <HStack spacing={2}>
-                              <CustomButton variant="secondary" size="sm">
-                                💬 Chat
-                              </CustomButton>
-                              <CustomButton variant="secondary" size="sm">
-                                📁 Files
-                              </CustomButton>
-                              <CustomButton
-                                bg={designSystem.colors.brand.accent}
-                                color={designSystem.colors.text.inverse}
-                                size="sm"
-                              >
-                                📊 Details
-                              </CustomButton>
-                            </HStack>
-                          </HStack>
-                        </VStack>
-                      </Card>
-                    </MotionBox>
+                      collab={collab}
+                      onViewDetails={handleCollaborationView}
+                    />
                   ))}
-                </VStack>
-              </VStack>
+                </Box>
+              </SectionLayout>
             </TabPanel>
 
             {/* CREATORS DIRECTORY TAB */}
-            <TabPanel p={0} pt={6}>
-              <VStack spacing={6}>
-                <HStack justify="space-between" w="100%">
-                  <CustomText size="xl" color="error" fontWeight="bold">
+            <TabPanel p={0} pt={designSystem.spacing[6]}>
+              <SectionLayout spacing="loose">
+                <Box display="flex" justifyContent="space-between" alignItems="center" w="100%">
+                  <Text size="xl" color="error" fontWeight={designSystem.typography.weights.bold}>
                     Creator Directory
-                  </CustomText>
-                  <CustomButton
+                  </Text>
+                  <Button
                     bg={designSystem.colors.brand.error}
                     color={designSystem.colors.text.inverse}
                     onClick={() => navigate('/creator-profile')}
                     size="sm"
                   >
                     + Create Profile
-                  </CustomButton>
-                </HStack>
+                  </Button>
+                </Box>
 
-                <Grid 
-                  templateColumns={{ 
-                    base: "1fr", 
-                    md: "repeat(2, 1fr)", 
-                    lg: "repeat(3, 1fr)" 
-                  }} 
-                  gap={6}
-                  w="100%"
+                <GridLayout 
+                  columns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
+                  gap="default"
                 >
                   {featuredCreators.map((creator, index) => (
-                    <GridItem key={creator.id}>
-                      <MotionBox
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                        whileHover={{ scale: 1.05 }}
-                      >
-                        <Card variant="elevated" textAlign="center">
-                          <VStack spacing={4}>
-                            <Box position="relative">
-                              <Image
-                                src={creator.avatar}
-                                alt={creator.name}
-                                w="80px"
-                                h="80px"
-                                borderRadius="full"
-                                objectFit="cover"
-                                border={`3px solid ${designSystem.colors.brand.primary}`}
-                              />
-                              <Badge 
-                                position="absolute"
-                                bottom="0"
-                                right="0"
-                                bg={creator.available ? designSystem.colors.status.success : designSystem.colors.status.warning} 
-                                color="white" 
-                                fontSize="xs"
-                                borderRadius="full"
-                              >
-                                {creator.available ? '🟢' : '🟡'}
-                              </Badge>
-                            </Box>
-                            
-                            <VStack spacing={2}>
-                              <CustomText size="lg" color="brand" fontWeight="bold">
-                                {creator.name}
-                              </CustomText>
-                              <HStack spacing={3}>
-                                <CustomText size="sm" color="accent">
-                                  ⭐ {creator.rating}
-                                </CustomText>
-                                <CustomText size="sm" color="secondary">
-                                  {creator.completedProjects} projects
-                                </CustomText>
-                              </HStack>
-                              <CustomText size="sm" color="muted">
-                                {creator.hourlyRate}/hour
-                              </CustomText>
-                            </VStack>
-
-                            <HStack spacing={1} flexWrap="wrap" justify="center">
-                              {creator.specialties.map((skill, i) => (
-                                <Badge key={i} bg={designSystem.colors.brand.primary} color="white" fontSize="xs">
-                                  {skill}
-                                </Badge>
-                              ))}
-                            </HStack>
-
-                            <HStack spacing={2} w="100%">
-                              <CustomButton variant="secondary" size="sm" flex={1}>
-                                📁 Portfolio
-                              </CustomButton>
-                              <CustomButton
-                                bg={creator.available ? designSystem.colors.brand.primary : designSystem.colors.interactive.disabled}
-                                color={designSystem.colors.text.inverse}
-                                size="sm"
-                                flex={1}
-                                disabled={!creator.available}
-                              >
-                                {creator.available ? '🤝 Hire' : '💬 Message'}
-                              </CustomButton>
-                            </HStack>
-                          </VStack>
-                        </Card>
-                      </MotionBox>
-                    </GridItem>
+                    <MotionBox
+                      key={creator.id}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    >
+                      <CreatorCard
+                        creator={creator}
+                        onViewProfile={handleCreatorView}
+                        onHire={handleCreatorHire}
+                      />
+                    </MotionBox>
                   ))}
-                </Grid>
-              </VStack>
+                </GridLayout>
+              </SectionLayout>
             </TabPanel>
           </TabPanels>
         </Tabs>

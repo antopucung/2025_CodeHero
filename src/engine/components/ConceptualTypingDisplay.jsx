@@ -68,60 +68,69 @@ export const ConceptualTypingDisplay = memo(({
     }
   }, [text, codeFormatter, conceptDetector]);
   
-  // Enhanced cursor position with concept-aware spacing
+  // Fixed cursor position calculation
   const updateCursorPosition = useCallback(() => {
     if (!containerRef.current || !engine.state || !structuredCode.length) return;
     
     const currentIndex = engine.state.currentIndex;
-    const containerWidth = containerRef.current.offsetWidth;
     
-    // Calculate position with concept-aware spacing
+    // Calculate accurate cursor position
     let x = 0;
     let y = 0;
     let currentLine = 0;
+    let currentCol = 0;
     
     for (let i = 0; i < Math.min(currentIndex, structuredCode.length); i++) {
       const item = structuredCode[i];
-      const concept = conceptMap.get(i);
       
       if (item.isNewline) {
         currentLine++;
-        x = item.indentLevel * (fullScreen ? 16 : 12);
+        currentCol = 0;
+        x = (item.indentLevel || 0) * (fullScreen ? 16 : 12);
         y = currentLine * (fullScreen ? 32 : 28);
       } else {
-        // Concept-aware character width
-        let charWidth = fullScreen ? 22 : 18;
-        
-        if (concept) {
-          switch (concept.type) {
-            case 'bracket':
-            case 'operator':
-              charWidth = fullScreen ? 24 : 20;
-              break;
-            case 'keyword':
-            case 'function':
-              charWidth = fullScreen ? 23 : 19;
-              break;
-          }
-        }
-        
-        // Add spacing
-        const spacing = concept?.type === 'operator' ? 
-          (fullScreen ? 4 : 3) : (fullScreen ? 2 : 1.5);
-        
-        x += charWidth + spacing;
-        
-        // Handle line wrapping
-        if (x > containerWidth - 50) {
-          currentLine++;
-          x = item.indentLevel * (fullScreen ? 16 : 12);
-          y = currentLine * (fullScreen ? 32 : 28);
-        }
+        // Standard character width with spacing
+        const charWidth = fullScreen ? 24 : 20; // width + spacing
+        x += charWidth;
+        currentCol++;
       }
     }
     
     setCursorPosition({ x, y });
-  }, [engine.state?.currentIndex, structuredCode, conceptMap, fullScreen]);
+  }, [engine.state?.currentIndex, structuredCode, fullScreen]);
+  
+  // Update cursor position when index changes
+  useEffect(() => {
+    updateCursorPosition();
+  }, [updateCursorPosition]);
+  
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      updateCursorPosition();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [updateCursorPosition]);
+  
+  // Track error positions
+  useEffect(() => {
+    if (engine.state?.errors > 0) {
+      const currentIndex = engine.state.currentIndex;
+      if (engine.getCharacterStatus(currentIndex - 1) === 'incorrect') {
+        setErrorPositions(prev => new Set([...prev, currentIndex - 1]));
+        
+        setTimeout(() => {
+          setErrorPositions(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(currentIndex - 1);
+            return newSet;
+          });
+        }, 1000);
+      }
+    }
+  }, [engine.state?.errors, engine.state?.currentIndex]);
   
   // Update cursor position when index changes
   useEffect(() => {
@@ -424,6 +433,47 @@ export const ConceptualTypingDisplay = memo(({
         />
 
         {/* Enhanced Cursor */}
+        <motion.div
+          animate={{
+            opacity: [1, 0.3, 1],
+            scaleY: [1, 1.1, 1]
+          }}
+          transition={{
+            duration: 0.8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          style={{
+            position: 'absolute',
+            left: `${cursorPosition.x}px`,
+            top: `${cursorPosition.y}px`,
+            width: '2px',
+            height: fullScreen ? '26px' : '22px',
+            background: '#3182CE',
+            borderRadius: '1px',
+            zIndex: 1000,
+            pointerEvents: 'none',
+            boxShadow: '0 0 8px #3182CE'
+          }}
+        />
+        
+        {/* Backup cursor for debugging */}
+        {process.env.NODE_ENV === 'development' && (
+          <div
+            style={{
+              position: 'absolute',
+              left: `${cursorPosition.x - 1}px`,
+              top: `${cursorPosition.y - 1}px`,
+              width: '4px',
+              height: fullScreen ? '28px' : '24px',
+              border: '1px solid red',
+              pointerEvents: 'none',
+              zIndex: 999
+            }}
+          />
+        )}
+        
+        {/* Old cursor for comparison
         <AnticipationCursor
           isVisible={engine.state?.isActive && !engine.state?.isComplete}
           position={cursorPosition}
@@ -432,6 +482,7 @@ export const ConceptualTypingDisplay = memo(({
           combo={engine.state?.combo || 1}
           reduced={performanceMode === 'low'}
         />
+        */
         
         {/* Code Lines with Enhanced Layout */}
         <Box

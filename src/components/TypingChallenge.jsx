@@ -333,13 +333,8 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           left="50%"
           transform="translateX(-50%)"
           zIndex={999} // Lower z-index
-          bg={colors.terminal.surface}
-          border={`2px solid ${colors.primary[500]}`}
-          borderRadius="8px"
-          p={3}
-          maxW="300px"
-          w="80%"
-          cursor="pointer"
+          textAlign="center"
+          pointerEvents="none"
           onClick={() => {
             // Allow clicking to dismiss or continue
             if (onComplete) {
@@ -358,28 +353,27 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               fontWeight={typography.weights.bold}
               fontSize="md"
               textAlign="center"
+              style={{ textShadow: `0 0 20px ${colors.primary[500]}` }}
             >
               🎉 COMPLETED! 🎉
             </Box>
             
             <Box textAlign="center">
-              <Text color={colors.combo.perfect} fontSize="sm">
+              <Text color={colors.combo.perfect} fontSize="sm" style={{ textShadow: `0 0 15px ${colors.combo.perfect}` }}>
                 Score: {engineState.totalScore}
               </Text>
-              <Text color={colors.terminal.textSecondary} fontSize="xs" mt={1}>
+              <Text color={colors.terminal.textSecondary} fontSize="xs" mt={1} style={{ textShadow: '0 0 10px #666' }}>
                 WPM: {engineState.wpm} | Accuracy: {engineState.accuracy}%
               </Text>
             </Box>
             
             {engineState.perfectStreak > 5 && (
               <Box
-                bg={colors.performance.perfect.primary}
                 color="#fff"
-                p={1}
                 textAlign="center"
                 fontWeight={typography.weights.bold}
                 fontSize="xs"
-                borderRadius="4px"
+                style={{ textShadow: `0 0 20px ${colors.performance.perfect.primary}` }}
               >
                 ⚡ PERFECT STREAK: {engineState.perfectStreak} ⚡
               </Box>

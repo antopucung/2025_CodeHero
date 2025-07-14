@@ -82,33 +82,59 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
     const waveScale = isActive ? 1 + Math.sin(waveOffset * 2) * 0.1 : 1;
     
     // Spring effect for correct characters
-    const springEffect = status === 'correct' ? {
-      scale: [1, 1.3, 1.1, 1.2, 1.1],
-      rotate: [0, 5, -3, 2, 0],
-      y: [0, -8, -4, -6, -2]
-    } : {};
+    const getAnimateProps = () => {
+      const baseProps = {
+        scale: status === 'current' ? waveScale * 1.2 : 
+               status === 'correct' ? 1.1 : 
+               status === 'incorrect' ? 1 : 1,
+        opacity: status === 'pending' ? 0.4 : 1,
+        y: waveY,
+        background: colors.bg,
+        borderColor: colors.border,
+        boxShadow: colors.shadow
+      };
+
+      if (status === 'correct') {
+        return {
+          ...baseProps,
+          scale: [1, 1.3, 1.1, 1.2, 1.1],
+          rotate: [0, 5, -3, 2, 0],
+          y: [waveY, waveY - 8, waveY - 4, waveY - 6, waveY - 2]
+        };
+      }
+
+      if (status === 'incorrect') {
+        return {
+          ...baseProps,
+          scale: [1, 1.2, 0.9, 1.1, 1],
+          rotate: [0, -3, 3, -2, 0]
+        };
+      }
+
+      return baseProps;
+    };
+
+    const getTransitionProps = () => {
+      if (status === 'correct' || status === 'incorrect') {
+        return {
+          duration: status === 'correct' ? 0.6 : 0.3
+        };
+      }
+      
+      return {
+        duration: 0.3,
+        type: "spring",
+        stiffness: 300,
+        damping: 20
+      };
+    };
 
     return (
       <motion.div
         key={index}
         initial={{ scale: 0.8, opacity: 0.6 }}
-        animate={{ 
-          scale: status === 'current' ? waveScale * 1.2 : 
-                 status === 'correct' ? 1.1 : 
-                 status === 'incorrect' ? [1, 1.2, 0.9, 1.1, 1] : 1,
-          opacity: status === 'pending' ? 0.4 : 1,
-          y: waveY,
-          background: colors.bg,
-          borderColor: colors.border,
-          boxShadow: colors.shadow,
-          ...springEffect
-        }}
-        transition={{ 
-          duration: status === 'correct' ? 0.6 : 0.3,
-          type: "spring",
-          stiffness: status === 'correct' ? 200 : 300,
-          damping: status === 'correct' ? 15 : 20
-        }}
+        animate={getAnimateProps()}
+        transition={getTransitionProps()}
         whileHover={{ scale: 1.05, y: -2 }}
         onClick={() => onCharacterClick && onCharacterClick(index)}
         style={{

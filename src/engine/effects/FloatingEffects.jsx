@@ -19,25 +19,21 @@ export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed
       return { scale: [0.5, 1.2, 1], rotate: [0, 45, 0], textShadow: [`0 0 5px ${color}`, `0 0 15px ${color}`, `0 0 5px ${color}`] };
     }
     
-    if (combo >= 50) return {
-      scale: [0.5, 2.5 * speedMultiplier * patternMultiplier, 1.8],
-      rotate: [0, 360 + (patterns * 90), 180],
-      textShadow: [`0 0 10px ${color}`, `0 0 40px ${color}`, `0 0 25px ${color}`]
-    };
+    // Simplified effects for better performance
     if (combo >= 30) return {
-      scale: [0.5, 2 * speedMultiplier * patternMultiplier, 1.5],
-      rotate: [0, 270 + (patterns * 60), 135],
-      textShadow: [`0 0 8px ${color}`, `0 0 35px ${color}`, `0 0 20px ${color}`]
+      scale: [0.5, 1.8, 1.3],
+      rotate: [0, 180, 90],
+      textShadow: [`0 0 8px ${color}`, `0 0 25px ${color}`, `0 0 15px ${color}`]
     };
     if (combo >= 10) return {
-      scale: [0.5, 1.8 * speedMultiplier * patternMultiplier, 1.3],
-      rotate: [0, 180 + (patterns * 45), 90],
-      textShadow: [`0 0 6px ${color}`, `0 0 30px ${color}`, `0 0 15px ${color}`]
+      scale: [0.5, 1.5, 1.2],
+      rotate: [0, 90, 45],
+      textShadow: [`0 0 6px ${color}`, `0 0 20px ${color}`, `0 0 10px ${color}`]
     };
     return {
-      scale: [0.5, 1.5 * speedMultiplier * patternMultiplier, 1.1],
-      rotate: [0, 90 + (patterns * 30), 45],
-      textShadow: [`0 0 5px ${color}`, `0 0 25px ${color}`, `0 0 12px ${color}`]
+      scale: [0.5, 1.3, 1.1],
+      rotate: [0, 45, 0],
+      textShadow: [`0 0 5px ${color}`, `0 0 15px ${color}`, `0 0 8px ${color}`]
     };
   };
 

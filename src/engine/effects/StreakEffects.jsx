@@ -18,81 +18,95 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
   const intensity = Math.min(streak / 20, 3);
 
   return (
+    // Simplified streak display without background panel
     <motion.div
-      initial={{ scale: 0, x: 100 }}
+      initial={{ scale: 0, y: -20 }}
       animate={{ 
-        scale: [1, 1.2 + (intensity * 0.1), 1],
-        x: 0,
-        boxShadow: [
+        scale: [1, 1.1, 1],
+        y: 0,
+        textShadow: [
+          `0 0 10px ${color}`,
           `0 0 20px ${color}`,
-          `0 0 ${40 * intensity}px ${color}`,
-          `0 0 20px ${color}`
+          `0 0 10px ${color}`
         ]
       }}
-      exit={{ scale: 0, x: 100 }}
+      exit={{ scale: 0, y: -20 }}
       transition={{ 
-        scale: { repeat: Infinity, duration: 1.2 / intensity },
-        boxShadow: { repeat: Infinity, duration: 1.5 / intensity }
+        scale: { repeat: Infinity, duration: 1.5 },
+        textShadow: { repeat: Infinity, duration: 2 }
       }}
       style={{
         position: 'fixed',
-        top: '35%',
+        top: '15%',
         right: '20px',
         zIndex: 1000,
-        background: `linear-gradient(135deg, ${color}, ${color}cc)`,
-        padding: '20px',
-        borderRadius: '15px',
-        color: streak >= 30 ? '#000' : '#fff',
+        color: color,
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
-        fontSize: '18px',
+        fontSize: '24px',
         textAlign: 'center',
-        minWidth: '120px',
-        border: `3px solid ${color}`,
-        transform: 'perspective(100px) rotateY(-10deg)'
+        pointerEvents: 'none'
       }}
     >
-      <motion.div
-        animate={{
-          scale: [1, 1.15, 1],
-          rotate: [0, 5, -5, 0]
-        }}
-        transition={{
-          duration: 1 / intensity,
-          repeat: Infinity
-        }}
-      >
-        <div style={{ fontSize: '14px', opacity: 0.8 }}>STREAK</div>
-        <div style={{ fontSize: '28px', margin: '5px 0' }}>{streak}</div>
-        <div style={{ fontSize: '12px', opacity: 0.9 }}>x{multiplier} MULTIPLIER</div>
-      </motion.div>
-      
-      {/* Streak fire particles */}
-      {Array.from({ length: Math.min(streak / 5, 8) }).map((_, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            y: [0, -30, -50],
-            opacity: [1, 0.5, 0],
-            scale: [0.5, 1, 0]
-          }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            delay: i * 0.3
-          }}
-          style={{
-            position: 'absolute',
-            bottom: '100%',
-            left: `${20 + i * 15}%`,
-            width: '4px',
-            height: '8px',
-            background: color,
-            borderRadius: '50%',
-            boxShadow: `0 0 8px ${color}`
-          }}
-        />
-      ))}
+      🔥 {streak}
+    </motion.div>
+  );
+};
+
+// Combo multiplier visual effect
+export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, typingSpeed = 'lame' }) => {
+  if (!isActive || multiplier <= 1) return null;
+
+  const getMultiplierColor = (multiplier, typingSpeed) => {
+    const speedColors = {
+      perfect: '#ff6b6b',
+      best: '#ffd93d', 
+      good: '#4ecdc4',
+      lame: '#45b7d1'
+    };
+    
+    if (multiplier >= 5) return '#ff1744';
+    if (multiplier >= 4) return speedColors[typingSpeed] || speedColors.lame;
+    if (multiplier >= 3) return '#ffd93d';
+    if (multiplier >= 2) return '#4ecdc4';
+    return speedColors[typingSpeed] || speedColors.lame;
+  };
+
+  const color = getMultiplierColor(multiplier, typingSpeed);
+  const intensity = Math.min(multiplier / 2, 3) * anticipationLevel;
+
+  return (
+    // Simplified combo display without background panel
+    <motion.div
+      initial={{ scale: 0, y: -20 }}
+      animate={{ 
+        scale: [1, 1.15, 1],
+        y: 0,
+        textShadow: [
+          `0 0 10px ${color}`,
+          `0 0 20px ${color}`,
+          `0 0 10px ${color}`
+        ]
+      }}
+      exit={{ scale: 0, y: -20 }}
+      transition={{ 
+        scale: { repeat: Infinity, duration: 1.2 },
+        textShadow: { repeat: Infinity, duration: 1.8 }
+      }}
+      style={{
+        position: 'fixed',
+        top: '25%',
+        left: '20px',
+        zIndex: 1000,
+        color: color,
+        fontFamily: "'Courier New', monospace",
+        fontWeight: 'bold',
+        fontSize: '20px',
+        textAlign: 'center',
+        pointerEvents: 'none'
+      }}
+    >
+      x{multiplier}
     </motion.div>
   );
 };

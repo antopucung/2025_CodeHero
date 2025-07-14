@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, HStack, VStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Heading, Text } from './Typography';
+import { Heading, Text, Caption } from './Typography';
 import { Button } from './Button';
 import { designSystem } from '../system/DesignSystem';
 

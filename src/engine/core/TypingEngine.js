@@ -17,8 +17,10 @@ export class TypingEngine extends CustomEventEmitter {
     // Configuration
     this.config = {
       ...ENGINE_CONFIG,
-      enableSounds: true,
-      enableAnalytics: true,
+      enableSounds: false,
+      enableAnalytics: false,
+      enableEffects: false,
+      minimalistMode: true,
       performanceMode: 'auto',
       ...config
     };
@@ -27,13 +29,13 @@ export class TypingEngine extends CustomEventEmitter {
     this.engineState = new EngineState();
     this.performanceOptimizer = new PerformanceOptimizer();
     this.mobileOptimizer = new MobileOptimizer();
-    this.soundManager = new SoundManager();
-    this.analyticsTracker = new AnalyticsTracker();
+    this.soundManager = this.config.enableSounds ? new SoundManager() : null;
+    this.analyticsTracker = this.config.enableAnalytics ? new AnalyticsTracker() : null;
     
     // Initialize processing systems
     this.typingProcessor = new TypingProcessor(this.engineState, this.config);
     this.statsCalculator = new StatsCalculator(this.engineState);
-    this.effectManager = new EffectManager(this.engineState, this.performanceOptimizer);
+    this.effectManager = this.config.enableEffects ? new EffectManager(this.engineState, this.performanceOptimizer) : null;
     
     // Callbacks
     this.onComplete = null;
@@ -47,15 +49,17 @@ export class TypingEngine extends CustomEventEmitter {
     // Start performance monitoring
     this.performanceOptimizer.startMonitoring();
     
-    // Initialize sound system (requires user interaction)
-    if (this.config.enableSounds) {
+    // Initialize sound system only if enabled
+    if (this.config.enableSounds && this.soundManager) {
       document.addEventListener('click', () => {
         this.soundManager.initialize();
       }, { once: true });
     }
     
-    // Start effect system
-    this.effectManager.startEffectSystem();
+    // Start effect system only if enabled
+    if (this.config.enableEffects && this.effectManager) {
+      this.effectManager.startEffectSystem();
+    }
     
     // Setup event listeners between systems
     this.setupEventListeners();
@@ -73,7 +77,7 @@ export class TypingEngine extends CustomEventEmitter {
     });
     
     this.typingProcessor.on('characterProcessed', (data) => {
-      if (this.config.enableAnalytics) {
+      if (this.config.enableAnalytics && this.analyticsTracker) {
         this.analyticsTracker.trackKeystroke(
           data.char, 
           data.isCorrect, 
@@ -89,89 +93,93 @@ export class TypingEngine extends CustomEventEmitter {
     });
     
     this.typingProcessor.on('correctChar', (data) => {
-      // Play sounds
-      if (this.config.enableSounds && this.soundManager.isInitialized) {
+      // Play sounds only if enabled
+      if (this.config.enableSounds && this.soundManager && this.soundManager.isInitialized) {
         this.soundManager.playKeypressSound(data.speed);
         this.soundManager.playCorrectSound(data.combo);
       }
       
-      // Add visual effects
-      this.effectManager.addFloatingScore(data.score, data.speed, data.combo, data.patterns.length);
-      this.effectManager.addCharacterExplosion(data.char, true, data.speed, data.combo, data.patterns.length);
-      
-      // Upgrade character
-      this.effectManager.upgradeCharacter(this.engineState.getCurrentIndex() - 1, data.speed, data.combo);
-      
-      // Trigger confetti for high scores
-      if (data.score > 100 || data.combo >= 20) {
-        this.effectManager.triggerConfetti(data.combo);
+      // Add visual effects only if enabled
+      if (this.config.enableEffects && this.effectManager) {
+        this.effectManager.addFloatingScore(data.score, data.speed, data.combo, data.patterns.length);
+        this.effectManager.addCharacterExplosion(data.char, true, data.speed, data.combo, data.patterns.length);
+        this.effectManager.upgradeCharacter(this.engineState.getCurrentIndex() - 1, data.speed, data.combo);
+        
+        if (data.score > 100 || data.combo >= 20) {
+          this.effectManager.triggerConfetti(data.combo);
+        }
+        
+        data.patterns.forEach(pattern => {
+          this.effectManager.celebratePattern(pattern);
+          if (this.config.enableSounds && this.soundManager && this.soundManager.isInitialized) {
+            this.soundManager.playPatternMatchSound(pattern.bonus);
+          }
+          if (this.config.enableAnalytics && this.analyticsTracker) {
+            this.analyticsTracker.trackPatternMatch(pattern);
+          }
+        });
       }
       
-      // Pattern celebrations
-      data.patterns.forEach(pattern => {
-        this.effectManager.celebratePattern(pattern);
-        if (this.config.enableSounds && this.soundManager.isInitialized) {
-          this.soundManager.playPatternMatchSound(pattern.bonus);
-        }
-        if (this.config.enableAnalytics) {
-          this.analyticsTracker.trackPatternMatch(pattern);
-        }
-      });
-      
       // Combo milestone sounds
-      if (data.combo > 0 && data.combo % 10 === 0 && this.config.enableSounds) {
+      if (data.combo > 0 && data.combo % 10 === 0 && this.config.enableSounds && this.soundManager) {
         this.soundManager.playComboSound(data.combo);
       }
     });
     
     this.typingProcessor.on('incorrectChar', (data) => {
-      // Play error sound
-      if (this.config.enableSounds && this.soundManager.isInitialized) {
+      // Play error sound only if enabled
+      if (this.config.enableSounds && this.soundManager && this.soundManager.isInitialized) {
         this.soundManager.playErrorSound();
       }
       
-      // Add error effects
-      this.effectManager.addCharacterExplosion(data.char, false, 'error', 0, 0);
-      this.effectManager.addBonusEffect('error_shake', 1);
+      // Add error effects only if enabled
+      if (this.config.enableEffects && this.effectManager) {
+        this.effectManager.addCharacterExplosion(data.char, false, 'error', 0, 0);
+        this.effectManager.addBonusEffect('error_shake', 1);
+      }
     });
     
     this.typingProcessor.on('levelUp', (data) => {
-      // Play level up sound
-      if (this.config.enableSounds && this.soundManager.isInitialized) {
+      // Play level up sound only if enabled
+      if (this.config.enableSounds && this.soundManager && this.soundManager.isInitialized) {
         this.soundManager.playLevelUpSound(data.newLevel);
       }
       
-      // Track level up
-      if (this.config.enableAnalytics) {
+      // Track level up only if enabled
+      if (this.config.enableAnalytics && this.analyticsTracker) {
         this.analyticsTracker.trackAchievement(`level_${data.newLevel}`);
       }
       
-      // Celebrate level up
-      this.effectManager.celebrateLevelUp(data.oldLevel, data.newLevel);
+      // Celebrate level up only if enabled
+      if (this.config.enableEffects && this.effectManager) {
+        this.effectManager.celebrateLevelUp(data.oldLevel, data.newLevel);
+      }
       
       this.emit('levelUp', data);
     });
     
     this.typingProcessor.on('achievement', (achievement) => {
-      // Play achievement sound
-      if (this.config.enableSounds && this.soundManager.isInitialized) {
+      // Play achievement sound only if enabled
+      if (this.config.enableSounds && this.soundManager && this.soundManager.isInitialized) {
         this.soundManager.playAchievementSound('legendary');
       }
       
-      // Track achievement
-      if (this.config.enableAnalytics) {
+      // Track achievement only if enabled
+      if (this.config.enableAnalytics && this.analyticsTracker) {
         this.analyticsTracker.trackAchievement(achievement);
       }
       
-      // Celebrate achievement
-      this.effectManager.unlockAchievement(achievement);
+      // Celebrate achievement only if enabled
+      if (this.config.enableEffects && this.effectManager) {
+        this.effectManager.unlockAchievement(achievement);
+      }
     });
     
     this.typingProcessor.on('complete', (finalStats) => {
       this.statsCalculator.stopCalculating();
       
-      // Track completion
-      if (this.config.enableAnalytics) {
+      // Track completion only if enabled
+      if (this.config.enableAnalytics && this.analyticsTracker) {
         this.analyticsTracker.trackChallengeComplete(finalStats, {
           language: 'javascript', // TODO: Get from challenge
           difficulty: 'intermediate', // TODO: Get from challenge
@@ -179,8 +187,8 @@ export class TypingEngine extends CustomEventEmitter {
         });
       }
       
-      // Play completion sound
-      if (this.config.enableSounds && this.soundManager.isInitialized) {
+      // Play completion sound only if enabled
+      if (this.config.enableSounds && this.soundManager && this.soundManager.isInitialized) {
         this.soundManager.playChallengeComplete(finalStats.totalScore);
       }
       
@@ -277,7 +285,9 @@ export class TypingEngine extends CustomEventEmitter {
   
   // Cleanup methods
   cleanupEffects() {
-    this.effectManager.cleanupEffects();
+    if (this.effectManager) {
+      this.effectManager.cleanupEffects();
+    }
     this.performanceOptimizer.optimizeActiveEffects();
     this.updateOptimizationData();
   }
@@ -285,10 +295,16 @@ export class TypingEngine extends CustomEventEmitter {
   destroy() {
     // Stop all systems
     this.statsCalculator.destroy();
-    this.effectManager.destroy();
+    if (this.effectManager) {
+      this.effectManager.destroy();
+    }
     this.performanceOptimizer.destroy();
-    this.soundManager.destroy();
-    this.analyticsTracker.destroy();
+    if (this.soundManager) {
+      this.soundManager.destroy();
+    }
+    if (this.analyticsTracker) {
+      this.analyticsTracker.destroy();
+    }
     
     // Clear event listeners
     this.typingProcessor.removeAllListeners();

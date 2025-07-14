@@ -335,27 +335,6 @@ export const EnhancedTypingBlock = memo(({
       {isSpace ? '' : isTab ? '→' : isNewline ? '↵' : char}
       
       {/* Optimized concept indicator - only for important concepts */}
-      {concept && status === 'correct' && ['function', 'class', 'keyword'].includes(concept.type) && (
-        <motion.div
-          initial={{ scale: 0, opacity: 1 }}
-          animate={{
-            scale: [0, 1.5, 0],
-            opacity: [1, 0.8, 0]
-          }}
-          transition={{ duration: 1 }}
-          style={{
-            position: 'absolute',
-            top: '-8px',
-            right: '-8px',
-            width: '8px',
-            height: '8px',
-            background: `radial-gradient(circle, ${blockStyle.borderColor}, ${blockStyle.borderColor}aa)`,
-            borderRadius: '50%',
-            zIndex: 10
-          }}
-        />
-      )}
-      
       {/* Enhanced error indicator */}
       {showError && status === 'incorrect' && (
         <motion.div
@@ -385,52 +364,6 @@ export const EnhancedTypingBlock = memo(({
       )}
 
       {/* Optimized success ripple - only for high combos */}
-      {status === 'correct' && combo > 5 && (
-        <motion.div
-          initial={{ scale: 0, opacity: 0.6 }}
-          animate={{
-            scale: [0, 3.5, 5],
-            opacity: [0.6, 0.3, 0]
-          }}
-          transition={{ duration: 1.8 }}
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: `${(fullScreen ? 50 : 40) + (combo * 2)}px`,
-            height: `${(fullScreen ? 50 : 40) + (combo * 2)}px`,
-            border: `2px solid ${blockStyle.borderColor}`,
-            borderRadius: '50%',
-            pointerEvents: 'none',
-            boxShadow: `0 0 ${20 + combo}px ${blockStyle.borderColor}`
-          }}
-        />
-      )}
-      
-      {/* Additional celebration ring for high performance */}
-      {status === 'correct' && (combo > 15 || speed === 'perfect') && (
-        <motion.div
-          initial={{ scale: 0, opacity: 0.8 }}
-          animate={{
-            scale: [0, 4, 6],
-            opacity: [0.8, 0.4, 0]
-          }}
-          transition={{ duration: 2.2, delay: 0.3 }}
-          style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: `${(fullScreen ? 70 : 60) + (combo * 3)}px`,
-            height: `${(fullScreen ? 70 : 60) + (combo * 3)}px`,
-            border: `3px solid ${blockStyle.borderColor}`,
-            borderRadius: '50%',
-            pointerEvents: 'none',
-            boxShadow: `0 0 ${30 + combo * 2}px ${blockStyle.borderColor}`
-          }}
-        />
-      )}
     </motion.div>
   );
 });

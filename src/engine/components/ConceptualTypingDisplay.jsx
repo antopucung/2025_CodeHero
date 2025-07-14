@@ -473,17 +473,6 @@ export const ConceptualTypingDisplay = memo(({
           />
         )}
         
-        {/* Old cursor for comparison
-        <AnticipationCursor
-          isVisible={engine.state?.isActive && !engine.state?.isComplete}
-          position={cursorPosition}
-          typingSpeed={engine.state?.typingSpeed || 'lame'}
-          anticipationLevel={(engine.state?.anticipationLevel || 1) * effectScale}
-          combo={engine.state?.combo || 1}
-          reduced={performanceMode === 'low'}
-        />
-        */
-        
         {/* Code Lines with Enhanced Layout */}
         <Box
           style={{

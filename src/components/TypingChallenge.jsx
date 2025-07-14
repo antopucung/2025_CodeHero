@@ -6,6 +6,7 @@ import confetti from 'canvas-confetti';
 import { TypingEngine } from "../engine/core/TypingEngine";
 import { EffectSystem } from "../engine/systems/EffectSystem";
 import { ConceptualTypingDisplay } from "../engine/components/ConceptualTypingDisplay";
+import { MegaLevelUpCelebration, MegaAchievementUnlock } from "../engine/effects/CelebrationSystem";
 import { GameStats } from "../engine/components/GameStats";
 import { TerminalPanel } from "../design/components/TerminalPanel";
 import { PatternBonusDisplay } from "../design/components/PatternBonusDisplay";
@@ -22,6 +23,8 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   const [isStarted, setIsStarted] = useState(false);
   const [engineState, setEngineState] = useState(engine.state);
   const [activePatterns, setActivePatterns] = useState([]);
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [showAchievement, setShowAchievement] = useState(null);
 
   // Initialize engine
   useEffect(() => {
@@ -68,9 +71,15 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       
       // Clear new level after showing
       if (newState.newLevel) {
+        setShowLevelUp(newState.newLevel);
         setTimeout(() => {
           engine.state.newLevel = null;
         }, 100);
+      }
+      
+      // Show new achievements
+      if (newState.newAchievements && newState.newAchievements.length > 0) {
+        setShowAchievement(newState.newAchievements[0]);
       }
     };
 
@@ -215,6 +224,22 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           setActivePatterns(prev => prev.filter(p => p.id !== patternId));
         }}
       />
+      
+      {/* Level Up Celebration */}
+      {showLevelUp && (
+        <MegaLevelUpCelebration
+          newLevel={showLevelUp}
+          onComplete={() => setShowLevelUp(false)}
+        />
+      )}
+      
+      {/* Achievement Unlock */}
+      {showAchievement && (
+        <MegaAchievementUnlock
+          achievement={showAchievement}
+          onComplete={() => setShowAchievement(null)}
+        />
+      )}
       
       {/* Progress Bar */}
       <Box

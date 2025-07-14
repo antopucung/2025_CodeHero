@@ -2,6 +2,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { colors } from '../../design/tokens/colors';
+import { JuicyCharacterExplosion } from '../effects/RewardSystem';
 
 export const EnhancedTypingBlock = memo(({
   char,
@@ -384,24 +385,49 @@ export const EnhancedTypingBlock = memo(({
       )}
 
       {/* Optimized success ripple - only for high combos */}
-      {status === 'correct' && combo > 10 && (
+      {status === 'correct' && combo > 5 && (
         <motion.div
           initial={{ scale: 0, opacity: 0.6 }}
           animate={{
-            scale: [0, 2.5, 3.5],
+            scale: [0, 3.5, 5],
             opacity: [0.6, 0.3, 0]
           }}
-          transition={{ duration: 1.2 }}
+          transition={{ duration: 1.8 }}
           style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: `${fullScreen ? 40 : 30}px`,
-            height: `${fullScreen ? 40 : 30}px`,
-            border: `1px solid ${blockStyle.borderColor}`,
+            width: `${(fullScreen ? 50 : 40) + (combo * 2)}px`,
+            height: `${(fullScreen ? 50 : 40) + (combo * 2)}px`,
+            border: `2px solid ${blockStyle.borderColor}`,
             borderRadius: '50%',
-            pointerEvents: 'none'
+            pointerEvents: 'none',
+            boxShadow: `0 0 ${20 + combo}px ${blockStyle.borderColor}`
+          }}
+        />
+      )}
+      
+      {/* Additional celebration ring for high performance */}
+      {status === 'correct' && (combo > 15 || speed === 'perfect') && (
+        <motion.div
+          initial={{ scale: 0, opacity: 0.8 }}
+          animate={{
+            scale: [0, 4, 6],
+            opacity: [0.8, 0.4, 0]
+          }}
+          transition={{ duration: 2.2, delay: 0.3 }}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: `${(fullScreen ? 70 : 60) + (combo * 3)}px`,
+            height: `${(fullScreen ? 70 : 60) + (combo * 3)}px`,
+            border: `3px solid ${blockStyle.borderColor}`,
+            borderRadius: '50%',
+            pointerEvents: 'none',
+            boxShadow: `0 0 ${30 + combo * 2}px ${blockStyle.borderColor}`
           }}
         />
       )}

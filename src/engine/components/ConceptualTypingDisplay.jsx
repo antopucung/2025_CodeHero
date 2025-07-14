@@ -8,14 +8,15 @@ import { CodeFormatter } from '../utils/CodeFormatter';
 import { TerminalPanel } from '../../design/components/TerminalPanel';
 import { codeSpacing } from '../../design/tokens/codeTypography';
 import { 
-  FloatingScore, 
-  CharacterExplosion, 
-  ComboBurstEffect, 
+  JuicyFloatingScore, 
+  JuicyCharacterExplosion, 
+  JuicyComboBurst, 
   AnticipationCursor,
   BackgroundWaveEffect,
   ScreenFlashEffect,
   PatternCelebration
-} from '../effects';
+} from '../effects/RewardSystem';
+import { MegaLevelUpCelebration, MegaAchievementUnlock } from '../effects/CelebrationSystem';
 import { colors, colorPsychology } from '../../design/tokens/colors';
 
 export const ConceptualTypingDisplay = memo(({
@@ -491,7 +492,7 @@ export const ConceptualTypingDisplay = memo(({
         {/* Visual Effects */}
         <AnimatePresence>
           {activeEffects.floatingScores.slice(0, performanceMode === 'low' ? 3 : 8).map((score) => (
-            <FloatingScore
+            <JuicyFloatingScore
               key={score.id}
               score={score.score}
               x={score.x}
@@ -501,14 +502,13 @@ export const ConceptualTypingDisplay = memo(({
               speed={score.speed}
               patterns={score.patterns}
               onComplete={() => removeEffect('floatingScores', score.id)}
-              reduced={performanceMode === 'low'}
             />
           ))}
         </AnimatePresence>
 
         <AnimatePresence>
           {activeEffects.explosions.slice(0, performanceMode === 'low' ? 2 : 6).map((explosion) => (
-            <CharacterExplosion
+            <JuicyCharacterExplosion
               key={explosion.id}
               char={explosion.char}
               x={explosion.x}
@@ -518,7 +518,20 @@ export const ConceptualTypingDisplay = memo(({
               speed={explosion.speed}
               patterns={explosion.patterns}
               onComplete={() => removeEffect('explosions', explosion.id)}
-              reduced={performanceMode === 'low'}
+            />
+          ))}
+        </AnimatePresence>
+
+        {/* Enhanced Combo Bursts */}
+        <AnimatePresence>
+          {activeEffects.comboBursts.slice(0, performanceMode === 'low' ? 1 : 4).map((burst) => (
+            <JuicyComboBurst
+              key={burst.id}
+              isActive={true}
+              combo={burst.combo}
+              x={burst.x}
+              y={burst.y}
+              patterns={burst.patterns}
             />
           ))}
         </AnimatePresence>
@@ -530,11 +543,12 @@ export const ConceptualTypingDisplay = memo(({
               key={completion.id}
               initial={{ scale: 0, opacity: 0, y: 0 }}
               animate={{ 
-                scale: [0, 2, 1.5, 0],
+                scale: [0, 3, 2, 0],
                 opacity: [0, 1, 1, 0],
-                y: [0, -60, -80, -120]
+                y: [0, -80, -100, -150],
+                rotate: [0, 360, 180, 0]
               }}
-              transition={{ duration: 2 }}
+              transition={{ duration: 2.5 }}
               onAnimationComplete={() => removeEffect('conceptCompletions', completion.id)}
               style={{
                 position: 'absolute',
@@ -544,11 +558,11 @@ export const ConceptualTypingDisplay = memo(({
                 pointerEvents: 'none',
                 color: getConceptColor(completion.concept.type),
                 fontWeight: 'bold',
-                fontSize: fullScreen ? '16px' : '14px',
-                textShadow: `0 0 10px ${getConceptColor(completion.concept.type)}`
+                fontSize: fullScreen ? '20px' : '16px',
+                textShadow: `0 0 20px ${getConceptColor(completion.concept.type)}`
               }}
             >
-              {completion.concept.type.toUpperCase()} +{completion.score}
+              🎯 {completion.concept.type.toUpperCase()} +{completion.score}
             </motion.div>
           ))}
         </AnimatePresence>

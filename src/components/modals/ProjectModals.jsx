@@ -335,6 +335,7 @@ export const CollaborationModal = ({ isOpen, onClose, project }) => {
                     </Button>
                   ))}
                 </Grid>
+              </Box>
               </VStack>
             </VStack>
 

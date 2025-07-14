@@ -18,35 +18,39 @@ export const StreakMultiplierEffect = ({ streak, multiplier, isActive }) => {
   const intensity = Math.min(streak / 20, 3);
 
   return (
-    // Non-blocking streak display
     <motion.div
       initial={{ scale: 0, y: -20 }}
       animate={{ 
-        scale: [1, 1.1, 1],
+        scale: [1, 1.05, 1],
         y: 0,
         textShadow: [
           `0 0 10px ${color}`,
-          `0 0 20px ${color}`,
+          `0 0 15px ${color}`,
           `0 0 10px ${color}`
         ]
       }}
       exit={{ scale: 0, y: -20 }}
       transition={{ 
-        scale: { repeat: Infinity, duration: 1.5 },
-        textShadow: { repeat: Infinity, duration: 2 }
+        scale: { repeat: Infinity, duration: 2 },
+        textShadow: { repeat: Infinity, duration: 2.5 }
       }}
       style={{
         position: 'fixed',
-        top: '10%', // Moved higher to avoid blocking
-        right: '20px',
-        zIndex: 100, // Much lower z-index
+        top: '80px',
+        right: '10px',
+        zIndex: 1100,
         color: color,
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
-        fontSize: '20px', // Smaller
+        fontSize: '12px',
         textAlign: 'center',
-        pointerEvents: 'none', // Ensure it doesn't block clicks
-        opacity: 0.9 // Slightly transparent
+        pointerEvents: 'none',
+        opacity: 0.9,
+        background: 'rgba(0, 0, 0, 0.8)',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        border: `1px solid ${color}`,
+        maxWidth: '120px'
       }}
     >
       🔥 {streak}
@@ -77,35 +81,39 @@ export const ComboMultiplier = ({ multiplier, isActive, anticipationLevel = 1, t
   const intensity = Math.min(multiplier / 2, 3) * anticipationLevel;
 
   return (
-    // Non-blocking combo display
     <motion.div
       initial={{ scale: 0, y: -20 }}
       animate={{ 
-        scale: [1, 1.15, 1],
+        scale: [1, 1.05, 1],
         y: 0,
         textShadow: [
           `0 0 10px ${color}`,
-          `0 0 20px ${color}`,
+          `0 0 15px ${color}`,
           `0 0 10px ${color}`
         ]
       }}
       exit={{ scale: 0, y: -20 }}
       transition={{ 
-        scale: { repeat: Infinity, duration: 1.2 },
-        textShadow: { repeat: Infinity, duration: 1.8 }
+        scale: { repeat: Infinity, duration: 2 },
+        textShadow: { repeat: Infinity, duration: 2.5 }
       }}
       style={{
         position: 'fixed',
-        top: '10%', // Moved higher
-        left: '20px',
-        zIndex: 100, // Much lower z-index
+        top: '80px',
+        left: '10px',
+        zIndex: 1100,
         color: color,
         fontFamily: "'Courier New', monospace",
         fontWeight: 'bold',
-        fontSize: '18px', // Smaller
+        fontSize: '12px',
         textAlign: 'center',
-        pointerEvents: 'none', // Ensure it doesn't block clicks
-        opacity: 0.9 // Slightly transparent
+        pointerEvents: 'none',
+        opacity: 0.9,
+        background: 'rgba(0, 0, 0, 0.8)',
+        padding: '4px 8px',
+        borderRadius: '4px',
+        border: `1px solid ${color}`,
+        maxWidth: '100px'
       }}
     >
       x{multiplier}
@@ -118,52 +126,30 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
   const [phase, setPhase] = React.useState('buildup');
 
   React.useEffect(() => {
-    // Much faster progression to avoid blocking
     const autoComplete = setTimeout(() => {
       onComplete && onComplete();
-    }, 3000); // Auto-complete after 3 seconds
+    }, 2000);
     
-    // Phase progression
-    const timer1 = setTimeout(() => setPhase('explosion'), 600);
-    const timer2 = setTimeout(() => setPhase('celebration'), 1500);
-    const timer3 = setTimeout(() => setPhase('complete'), 2800);
+    const timer1 = setTimeout(() => setPhase('celebration'), 400);
+    const timer2 = setTimeout(() => setPhase('complete'), 1800);
     
     return () => {
       clearTimeout(autoComplete);
       clearTimeout(timer1);
       clearTimeout(timer2);
-      clearTimeout(timer3);
     };
   }, []);
 
   React.useEffect(() => {
-    if (phase === 'explosion') {
-      // Massive confetti explosion
+    if (phase === 'celebration' && newLevel % 5 === 0) {
       const colors = ['#ff6b6b', '#ffd93d', '#4ecdc4', '#9c27b0', '#00e5ff'];
       
-      // Central explosion
       window.confetti({
-        particleCount: 300,
-        spread: 120,
+        particleCount: 60,
+        spread: 60,
         origin: { y: 0.5 },
         colors
       });
-      
-      // Side explosions
-      setTimeout(() => {
-        window.confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.6, x: 0.1 },
-          colors
-        });
-        window.confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.6, x: 0.9 },
-          colors
-        });
-      }, 200);
     }
   }, [phase]);
 
@@ -176,14 +162,14 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
     <motion.div
       style={{
         position: 'fixed',
-        top: '60px',
+        top: '120px',
         right: '10px',
         zIndex: 150,
-        maxWidth: '250px',
+        maxWidth: '150px',
         background: 'linear-gradient(135deg, #000, #111)',
-        border: '2px solid #ffd93d',
-        borderRadius: '8px',
-        padding: '12px',
+        border: '1px solid #ffd93d',
+        borderRadius: '4px',
+        padding: '6px 8px',
         cursor: 'pointer'
       }}
       onClick={() => onComplete && onComplete()} // Click to dismiss
@@ -192,128 +178,59 @@ export const LevelUpTransformation = ({ newLevel, onComplete }) => {
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ 
-            scale: [0, 1],
-            opacity: [0, 0.5, 1, 1]
+            scale: 1,
+            opacity: 1
           }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.3 }}
           style={{
             textAlign: 'center',
             color: '#ffd93d'
           }}
         >
-          <motion.div
-            animate={{
-              textShadow: [
-                '0 0 20px #ffd93d',
-                '0 0 40px #ffd93d',
-                '0 0 20px #ffd93d'
-              ]
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            style={{
-              fontSize: '16px',
-              fontWeight: 'bold',
-              marginBottom: '8px'
-            }}
-          >
+          <div style={{
+            fontSize: '10px',
+            fontWeight: 'bold',
+            marginBottom: '4px'
+          }}>
             LEVEL UP!
-          </motion.div>
+          </div>
           
-          <motion.div
-            style={{
-              fontSize: '20px',
-              color: '#4ecdc4'
-            }}
-          >
+          <div style={{
+            fontSize: '12px',
+            color: '#4ecdc4'
+          }}>
             ⚡
-          </motion.div>
-        </motion.div>
-      )}
-      
-      {phase === 'explosion' && (
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ 
-            scale: [0, 1.2, 1]
-          }}
-          transition={{ duration: 0.8 }}
-          style={{
-            textAlign: 'center'
-          }}
-        >
-          <motion.div
-            animate={{
-              textShadow: [
-                '0 0 30px #ff6b6b',
-                '0 0 60px #ff6b6b',
-                '0 0 30px #ff6b6b'
-              ]
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            style={{
-              fontSize: '18px',
-              fontWeight: 'bold',
-              color: '#ff6b6b',
-              marginBottom: '8px'
-            }}
-          >
-            LEVEL UP!
-          </motion.div>
-          
-          <motion.div
-            animate={{
-              color: ['#ffd93d', '#ff6b6b', '#4ecdc4', '#ffd93d']
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              fontSize: '28px',
-              fontWeight: 'bold'
-            }}
-          >
-            {newLevel}
-          </motion.div>
+          </div>
         </motion.div>
       )}
       
       {phase === 'celebration' && (
         <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          initial={{ scale: 0 }}
+          animate={{ 
+            scale: 1
+          }}
+          transition={{ duration: 0.3 }}
           style={{
-            textAlign: 'center',
-            color: '#4ecdc4'
+            textAlign: 'center'
           }}
         >
-          <motion.div
-            animate={{
-              textShadow: [
-                '0 0 25px #4ecdc4',
-                '0 0 50px #4ecdc4',
-                '0 0 25px #4ecdc4'
-              ]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-            style={{
-              fontSize: '14px',
-              fontWeight: 'bold',
-              marginBottom: '6px'
-            }}
-          >
-            🚀 PROGRESS! 🚀
-          </motion.div>
+          <div style={{
+            fontSize: '10px',
+            fontWeight: 'bold',
+            color: '#ff6b6b',
+            marginBottom: '4px'
+          }}>
+            LEVEL UP!
+          </div>
           
-          <ChakraText fontSize="18px" color="#ffd93d">
-            Level {newLevel}!
-          </ChakraText>
-          
-          <motion.div
-            style={{
-              fontSize: '16px',
-              marginTop: '6px'
-            }}
-          >
-            🎉
-          </motion.div>
+          <div style={{
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: '#ffd93d'
+          }}>
+            {newLevel}
+          </div>
         </motion.div>
       )}
     </motion.div>

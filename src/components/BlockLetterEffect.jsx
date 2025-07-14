@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Box } from '@chakra-ui/react';
 
 // Juicy block letter typing effect with wave springs and gradients
-export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCharacterClick }) => {
+export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCharacterClick, combo = 1 }) => {
   const [waveOffset, setWaveOffset] = useState(0);
   const [comboLevel, setComboLevel] = useState(1);
 

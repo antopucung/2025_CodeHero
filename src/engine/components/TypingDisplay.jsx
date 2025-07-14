@@ -11,7 +11,7 @@ import {
   BackgroundWaveEffect,
   ScreenFlashEffect,
   PatternCelebration
-} from './TypingEffects';
+} from '../effects';
 import { colors } from '../../design/tokens/colors';
 import { spacing } from '../../design/tokens/spacing';
 

@@ -6,6 +6,7 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import MarketplacePage from './pages/MarketplacePage';
 import CommunityPage from './pages/CommunityPage';
+import CommissionDetailPage from './pages/CommissionDetailPage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
 import LessonPage from './pages/LessonPage';
 
@@ -46,9 +47,12 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/community" element={<CommunityPage />} />
+            <Route path="/commission/:id" element={<CommissionDetailPage />} />
             <Route path="/modules/:id" element={<ModuleDetailPage />} />
             <Route path="/learn/:courseId/:lessonId" element={<LessonPage />} />
             <Route path="/submit-project" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Project Submission - Coming Soon!</div>} />
+            <Route path="/post-commission" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Post Commission - Coming Soon!</div>} />
+            <Route path="/creator-profile" element={<div style={{color: '#00ff00', padding: '50px', textAlign: 'center'}}>Creator Profile - Coming Soon!</div>} />
           </Routes>
         </MotionBox>
       </Box>

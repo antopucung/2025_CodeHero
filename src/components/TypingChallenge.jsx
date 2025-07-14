@@ -7,6 +7,7 @@ import { EffectSystem } from "../engine/systems/EffectSystem";
 import { TypingDisplay } from "../engine/components/TypingDisplay";
 import { GameStats } from "../engine/components/GameStats";
 import { TerminalPanel } from "../design/components/TerminalPanel";
+import { PatternBonusDisplay } from "../design/components/PatternBonusDisplay";
 import { colors } from "../design/tokens/colors";
 import { typography } from "../design/tokens/typography";
 import { spacing } from "../design/tokens/spacing";
@@ -19,6 +20,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   const [effectSystem] = useState(() => new EffectSystem());
   const [isStarted, setIsStarted] = useState(false);
   const [engineState, setEngineState] = useState(engine.state);
+  const [activePatterns, setActivePatterns] = useState([]);
 
   // Initialize engine
   useEffect(() => {
@@ -44,6 +46,17 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   useEffect(() => {
     const handleStateChange = (newState) => {
       setEngineState({ ...newState });
+      
+      // Show new pattern bonuses
+      if (newState.patternMatches && newState.patternMatches.length > 0) {
+        const newPatterns = newState.patternMatches.filter(
+          pattern => !activePatterns.some(active => active.id === pattern.id)
+        );
+        
+        if (newPatterns.length > 0) {
+          setActivePatterns(prev => [...prev, ...newPatterns]);
+        }
+      }
     };
 
     engine.on('stateChange', handleStateChange);
@@ -51,27 +64,33 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
     return () => {
       engine.off('stateChange', handleStateChange);
     };
-  }, [engine]);
+  }, [engine, activePatterns]);
 
   // Handle keyboard input
   useEffect(() => {
-    if (!isActive || !isStarted || engineState.isComplete) return;
+    if (!isActive || !isStarted || engineState?.isComplete) return;
 
     const handleKeyDown = (e) => {
-      e.preventDefault();
+      // Only prevent default for typing characters
+      if (e.key.length === 1 || e.key === 'Backspace') {
+        e.preventDefault();
+      }
       
+      // Ignore backspace for now (can be added later)
       if (e.key === 'Backspace') {
         return;
       }
       
+      // Process only printable characters immediately
       if (e.key.length === 1) {
         engine.processKeyPress(e.key);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    // Use keydown for immediate response
+    window.addEventListener('keydown', handleKeyDown, { passive: false });
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isActive, isStarted, engine, engineState.isComplete]);
+  }, [isActive, isStarted, engine, engineState?.isComplete]);
 
   // Cleanup effects
   useEffect(() => {
@@ -150,6 +169,14 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
 
   return (
     <VStack spacing={spacing[4]} align="stretch">
+      {/* Pattern Bonus Display */}
+      <PatternBonusDisplay
+        patterns={activePatterns}
+        onPatternComplete={(patternId) => {
+          setActivePatterns(prev => prev.filter(p => p.id !== patternId));
+        }}
+      />
+      
       {/* Game Stats */}
       <GameStats engine={engine} />
       

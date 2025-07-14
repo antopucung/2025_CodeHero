@@ -135,6 +135,7 @@ export class TypingEngine extends CustomEventEmitter {
   
   // Process key press
   processKeyPress(char) {
+    // Immediate response - no delays
     if (!this.state.isActive && !this.state.startTime) {
       this.state.startTime = Date.now();
       this.state.isActive = true;
@@ -154,6 +155,7 @@ export class TypingEngine extends CustomEventEmitter {
     }
     
     this.updateStats();
+    // Emit state change immediately for responsive UI
     this.emit('stateChange', this.state);
   }
   
@@ -317,10 +319,11 @@ export class TypingEngine extends CustomEventEmitter {
   checkPatterns(newTypedText, currentCombo) {
     const patterns = [];
     
-    // Check for consecutive perfect characters
+    // Enhanced pattern detection for bonus combos
     const recentChars = this.state.recentlyTyped.slice(-5);
     const perfectCount = recentChars.filter(char => char.speed === 'perfect').length;
     
+    // Perfect streak pattern
     if (perfectCount >= 3) {
       patterns.push({
         type: 'perfect_streak',
@@ -331,6 +334,50 @@ export class TypingEngine extends CustomEventEmitter {
       });
     }
     
+    // Function/method pattern detection
+    const recentText = newTypedText.slice(-10);
+    if (recentText.includes('function') || recentText.includes('const ') || recentText.includes('let ')) {
+      patterns.push({
+        type: 'function_declaration',
+        bonus: 100,
+        color: '#4ecdc4',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Bracket/parentheses matching pattern
+    const brackets = recentText.match(/[\(\)\[\]\{\}]/g);
+    if (brackets && brackets.length >= 2) {
+      patterns.push({
+        type: 'bracket_combo',
+        bonus: 75,
+        color: '#ffd93d',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Speed consistency pattern
+    const speeds = recentChars.map(char => char.speed);
+    const uniqueSpeeds = [...new Set(speeds)];
+    if (uniqueSpeeds.length === 1 && speeds.length >= 4 && uniqueSpeeds[0] !== 'lame') {
+      patterns.push({
+        type: 'speed_consistency',
+        speed: uniqueSpeeds[0],
+        bonus: 120,
+        color: '#6bcf7f',
+        id: Date.now() + Math.random()
+      });
+    }
+    
+    // Line completion pattern
+    if (recentText.includes('\n') || recentText.includes(';')) {
+      patterns.push({
+        type: 'line_completion',
+        bonus: 80,
+        color: '#45b7d1',
+        id: Date.now() + Math.random()
+      });
+    }
     // Check for combo milestones
     if (currentCombo > 0 && currentCombo % 10 === 0) {
       patterns.push({

@@ -1,12 +1,11 @@
-// Typing Block Component - Clean, reusable character block
-import React from 'react';
+// Enhanced Typing Block Component - Optimized for performance and responsiveness
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { colors, getPerformanceColor } from '../../design/tokens/colors';
 import { spacing } from '../../design/tokens/spacing';
 import { typography } from '../../design/tokens/typography';
-import { createPulseAnimation, createGlowAnimation } from '../../design/tokens/animations';
 
-export const TypingBlock = ({
+export const TypingBlock = memo(({
   char,
   status = 'pending',
   speed = 'lame',
@@ -14,7 +13,8 @@ export const TypingBlock = ({
   combo = 1,
   anticipationLevel = 1,
   onClick,
-  style = {}
+  style = {},
+  showError = false
 }) => {
   const getBlockStyle = () => {
     const performanceColors = getPerformanceColor(speed);
@@ -24,25 +24,31 @@ export const TypingBlock = ({
         return {
           background: colors.performance.error.gradient,
           borderColor: colors.performance.error.primary,
-          boxShadow: colors.performance.error.shadow,
+          boxShadow: `0 0 15px ${colors.performance.error.primary}`,
           color: '#fff'
         };
         
       case 'current':
         return {
-          background: performanceColors.gradient,
-          borderColor: performanceColors.glow,
-          boxShadow: performanceColors.shadow,
-          color: speed === 'perfect' || speed === 'best' ? '#000' : '#fff'
+          background: 'transparent',
+          borderColor: colors.primary[500],
+          boxShadow: `0 0 8px ${colors.primary[500]}`,
+          color: colors.primary[500]
         };
         
       case 'correct':
-        const upgradeMultiplier = 1 + (upgrade.level * 0.3);
+        // Stable colors based on combo level - no random blinking
+        const comboColor = combo >= 50 ? colors.performance.perfect.primary :
+                          combo >= 30 ? colors.performance.best.primary :
+                          combo >= 20 ? colors.performance.good.primary :
+                          combo >= 10 ? colors.combo.triple :
+                          colors.combo.basic;
+        
         return {
-          background: performanceColors.gradient,
-          borderColor: performanceColors.glow,
-          boxShadow: performanceColors.shadow,
-          color: speed === 'perfect' || speed === 'best' ? '#fff' : '#000'
+          background: `linear-gradient(135deg, ${comboColor}22, ${comboColor}11)`,
+          borderColor: comboColor,
+          boxShadow: `0 0 ${5 + Math.min(combo / 10, 10)}px ${comboColor}`,
+          color: comboColor
         };
         
       default:
@@ -55,148 +61,124 @@ export const TypingBlock = ({
   };
   
   const getAnimationProps = () => {
-    const baseProps = {
-      scale: status === 'current' ? 1.2 + (anticipationLevel * 0.1) : 
-             status === 'correct' ? 1.1 + (upgrade.level * 0.05) : 1,
-      opacity: status === 'pending' ? 0.4 : 1
-    };
-    
+    // Minimal animations for performance
     if (status === 'current') {
       return {
-        ...baseProps,
-        ...createPulseAnimation(anticipationLevel, anticipationLevel),
-        ...createGlowAnimation(getPerformanceColor(speed).glow, anticipationLevel, anticipationLevel)
+        scale: 1,
+        opacity: 1,
+        transition: { duration: 0.1 }
       };
     }
     
     if (status === 'correct') {
-      const intensity = 1 + (upgrade.level * 0.2);
       return {
-        ...baseProps,
-        scale: [1, 1.2 + (intensity * 0.1), 1.1 + (intensity * 0.05)],
-        rotate: [0, 3 * intensity, 0]
+        scale: 1,
+        opacity: 1,
+        transition: { duration: 0.15 }
       };
     }
     
     if (status === 'incorrect') {
       return {
-        ...baseProps,
-        scale: [1, 1.2, 0.9, 1.1, 1],
-        rotate: [0, -3, 3, -2, 0],
-        x: [0, -2, 2, -1, 0]
+        scale: [1, 1.1, 1],
+        x: [0, -2, 2, 0],
+        transition: { duration: 0.2 }
       };
     }
     
-    return baseProps;
+    return {
+      scale: 1,
+      opacity: status === 'pending' ? 0.4 : 1,
+      transition: { duration: 0.1 }
+    };
   };
   
   const blockStyle = getBlockStyle();
   
+  // Fixed dimensions for consistent spacing
+  const isSpace = char === ' ';
+  const width = isSpace ? '8px' : '16px';
+  const height = '20px';
+  
   return (
     <motion.div
-      initial={{ scale: 0.8, opacity: 0.6 }}
       animate={getAnimationProps()}
-      whileHover={{ scale: 1.05, y: -2 }}
       onClick={onClick}
       style={{
         display: 'inline-block',
-        width: char === ' ' ? '12px' : spacing.component.blockChar.width,
-        height: spacing.component.blockChar.height,
-        margin: spacing.component.blockChar.margin,
-        border: `2px solid ${blockStyle.borderColor}`,
-        borderRadius: '6px',
+        width,
+        height,
+        margin: '1px',
+        border: `1px solid ${blockStyle.borderColor}`,
+        borderRadius: '2px',
         textAlign: 'center',
-        lineHeight: '24px',
+        lineHeight: '18px',
         fontFamily: typography.fonts.mono,
-        fontSize: typography.sizes.base,
+        fontSize: '12px',
         fontWeight: typography.weights.bold,
         cursor: 'pointer',
         position: 'relative',
         userSelect: 'none',
+        verticalAlign: 'top',
         ...blockStyle,
         ...style
       }}
     >
-      {char === ' ' ? '' : char === '\n' ? '↵' : char}
+      {isSpace ? '' : char === '\n' ? '↵' : char}
       
-      {/* Upgrade indicator */}
-      {status === 'correct' && upgrade.level > 0 && (
+      {/* Error X indicator - only show when explicitly set */}
+      {showError && status === 'incorrect' && (
         <motion.div
-          initial={{ scale: 0, opacity: 1 }}
-          animate={{
-            scale: [0, 1.5, 0],
-            opacity: [1, 0.8, 0],
-            rotate: [0, 180, 360]
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ 
+            scale: [0, 1.5, 1],
+            opacity: [0, 1, 0.8],
+            rotate: [0, 180, 0]
           }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.3 }}
           style={{
             position: 'absolute',
             top: '-8px',
             right: '-8px',
-            width: `${8 + (upgrade.level * 2)}px`,
-            height: `${8 + (upgrade.level * 2)}px`,
-            background: blockStyle.borderColor,
-            borderRadius: '50%',
-            boxShadow: `0 0 ${10 + (upgrade.level * 5)}px ${blockStyle.borderColor}`,
-            zIndex: 10
-          }}
-        />
-      )}
-      
-      {/* Speed indicator for current character */}
-      {status === 'current' && speed !== 'lame' && (
-        <motion.div
-          animate={{
-            opacity: [0.3, 0.8, 0.3],
-            scale: [1, 1.2, 1]
-          }}
-          transition={{
-            duration: 0.8,
-            repeat: Infinity
-          }}
-          style={{
-            position: 'absolute',
-            top: '-12px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            fontSize: typography.sizes.xs,
-            color: blockStyle.borderColor,
-            fontWeight: typography.weights.bold,
-            textShadow: `0 0 5px ${blockStyle.borderColor}`,
-            zIndex: 10
-          }}
-        >
-          {speed.toUpperCase()}
-        </motion.div>
-      )}
-      
-      {/* Error indicator */}
-      {status === 'incorrect' && (
-        <motion.div
-          initial={{ scale: 0, rotate: -90 }}
-          animate={{ 
-            scale: [1, 1.5, 1.2],
-            rotate: [0, 10, -10, 0],
-            opacity: [1, 0.7, 1]
-          }}
-          transition={{ 
-            duration: 0.6,
-            opacity: { repeat: 2, duration: 0.2 }
-          }}
-          style={{
-            position: 'absolute',
-            top: '-12px',
-            right: '-12px',
             color: colors.performance.error.primary,
-            fontSize: '18px',
+            fontSize: '14px',
             fontWeight: typography.weights.bold,
-            textShadow: `0 0 10px ${colors.performance.error.primary}`,
-            zIndex: 10
+            textShadow: `0 0 5px ${colors.performance.error.primary}`,
+            zIndex: 10,
+            pointerEvents: 'none'
           }}
         >
           ✗
         </motion.div>
       )}
+      
+      {/* Combo bonus indicator */}
+      {status === 'correct' && combo >= 20 && (
+        <motion.div
+          initial={{ scale: 0, y: 0 }}
+          animate={{ 
+            scale: [0, 1.2, 1],
+            y: [0, -15, -12]
+          }}
+          transition={{ duration: 0.4 }}
+          style={{
+            position: 'absolute',
+            top: '-12px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: '8px',
+            color: colors.combo.perfect,
+            fontWeight: typography.weights.bold,
+            textShadow: `0 0 3px ${colors.combo.perfect}`,
+            zIndex: 10,
+            pointerEvents: 'none'
+          }}
+        >
+          ⭐
+        </motion.div>
+      )}
     </motion.div>
   );
-};
+});
+
+TypingBlock.displayName = 'TypingBlock';

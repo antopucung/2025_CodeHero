@@ -211,7 +211,7 @@ const MarketplacePage = () => {
                   borderRadius="8px"
                   overflow="hidden"
                   cursor="pointer"
-                  onClick={() => handleCourseClick(course.id)}
+                  onClick={() => handleCourseClick(course.slug)}
                   _hover={{
                     borderColor: "#00ff00"
                   }}
@@ -313,7 +313,7 @@ const MarketplacePage = () => {
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleCourseClick(course.id);
+                        handleCourseClick(course.slug);
                       }}
                     >
                       🚀 VIEW COURSE

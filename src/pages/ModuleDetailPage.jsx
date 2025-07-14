@@ -8,7 +8,7 @@ import { useUserEnrollment } from '../hooks/useUserEnrollment';
 const MotionBox = motion(Box);
 
 const ModuleDetailPage = () => {
-  const { id } = useParams();
+  const { id: slug } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
@@ -16,12 +16,12 @@ const ModuleDetailPage = () => {
   const [error, setError] = useState(null);
   
   const { isEnrolled, enrollInCourse, getCourseProgress } = useUserEnrollment();
-  const enrolled = isEnrolled(id);
-  const progress = getCourseProgress(id);
+  const enrolled = course ? isEnrolled(course.id) : false;
+  const progress = course ? getCourseProgress(course.id) : { completedLessons: [], currentLesson: null };
 
   useEffect(() => {
     fetchCourseData();
-  }, [id]);
+  }, [slug]);
 
   const fetchCourseData = async () => {
     try {
@@ -31,7 +31,7 @@ const ModuleDetailPage = () => {
       const { data: courseData, error: courseError } = await supabase
         .from('courses')
         .select('*')
-        .eq('id', id)
+        .eq('slug', slug)
         .single();
       
       if (courseError) throw courseError;
@@ -40,7 +40,7 @@ const ModuleDetailPage = () => {
       const { data: lessonsData, error: lessonsError } = await supabase
         .from('lessons')
         .select('*')
-        .eq('course_id', id)
+        .eq('course_id', courseData.id)
         .order('order_index');
       
       if (lessonsError) throw lessonsError;
@@ -56,14 +56,16 @@ const ModuleDetailPage = () => {
   };
 
   const handleEnroll = async () => {
-    await enrollInCourse(id);
+    if (course) {
+      await enrollInCourse(course.id);
+    }
   };
 
   const handleStartLearning = () => {
     if (lessons.length > 0) {
       // Navigate to first lesson or current lesson
       const currentLessonId = progress.currentLesson || lessons[0].id;
-      navigate(`/learn/${id}/${currentLessonId}`);
+      navigate(`/learn/${course.id}/${currentLessonId}`);
     }
   };
 
@@ -280,7 +282,7 @@ const ModuleDetailPage = () => {
                     opacity={isLocked ? 0.5 : 1}
                     onClick={() => {
                       if (!isLocked) {
-                        navigate(`/learn/${id}/${lesson.id}`);
+                        navigate(`/learn/${course.id}/${lesson.id}`);
                       }
                     }}
                     _hover={!isLocked ? {

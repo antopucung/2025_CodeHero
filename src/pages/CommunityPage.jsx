@@ -11,6 +11,7 @@ import {
   CommissionCard, 
   CollaborationCard, 
   CreatorCard, 
+  EnhancedProjectCard,
   FeaturedCreatorsSidebar,
   TipsCard 
 } from '../design/components/CommunityComponents';

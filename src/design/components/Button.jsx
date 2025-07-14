@@ -1,6 +1,6 @@
 // Standardized Button Component
 import React from 'react';
-import { Button as ChakraButton } from '@chakra-ui/react';
+import { Button as ChakraButton, Box } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { designSystem, createVariant } from '../system/DesignSystem';
 

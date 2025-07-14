@@ -18,6 +18,8 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
   const [explosions, setExplosions] = useState([]);
   const [floatingScores, setFloatingScores] = useState([]);
   const [totalScore, setTotalScore] = useState(0);
+  const [comboLevel, setComboLevel] = useState(1);
+  const [recentlyTyped, setRecentlyTyped] = useState([]);
   
   const intervalRef = useRef(null);
 
@@ -80,28 +82,36 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
       const newStreak = streak + 1;
       setStreak(newStreak);
       
+      // Enhanced combo system with timing
       const timeDiff = lastCorrectTime ? now - lastCorrectTime : 200;
       let newCombo = combo;
       
-      if (timeDiff < 250) { // Fast typing increases combo
+      if (timeDiff < 200) { // Very fast typing
+        newCombo = Math.min(combo + 2, 100);
+      } else if (timeDiff < 300) { // Fast typing
         newCombo = Math.min(combo + 1, 100);
-      } else if (timeDiff > 500) { // Slow typing decreases combo
+      } else if (timeDiff > 600) { // Slow typing decreases combo
         newCombo = Math.max(1, combo - 1);
       }
       
       setCombo(newCombo);
+      setComboLevel(newCombo);
       setMaxCombo(prev => Math.max(prev, newCombo));
       setLastCorrectTime(now);
       
-      // Simple scoring
-      const baseScore = 10;
-      const speedBonus = timeDiff < 150 ? 15 : timeDiff < 200 ? 10 : 5;
-      const comboBonus = newCombo * 2;
+      // Track recently typed characters for wave effects
+      setRecentlyTyped(prev => [...prev.slice(-10), { char, index: currentIndex, time: now, combo: newCombo }]);
+      
+      // Enhanced scoring system
+      const baseScore = 15;
+      const speedBonus = timeDiff < 150 ? 25 : timeDiff < 200 ? 20 : timeDiff < 250 ? 15 : 10;
+      const comboBonus = newCombo * 3;
+      const streakBonus = newStreak > 10 ? Math.floor(newStreak / 5) * 5 : 0;
       const finalScore = baseScore + speedBonus + comboBonus;
       
       setTotalScore(prev => prev + finalScore);
       
-      // Add floating score
+      // Enhanced floating score with combo colors
       const getScoreColor = (combo) => {
         if (combo >= 50) return '#ff6b6b';
         if (combo >= 30) return '#ffd93d';
@@ -114,6 +124,7 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
       setFloatingScores(prev => [...prev, {
         id: Date.now(),
         score: finalScore,
+        combo: newCombo,
         x: Math.random() * 200,
         y: Math.random() * 50,
         color: getScoreColor(newCombo)
@@ -124,6 +135,7 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
         id: Date.now(),
         char,
         x: currentIndex * 12,
+        combo: newCombo,
         y: 0,
         isCorrect: true,
         combo: newCombo
@@ -175,6 +187,7 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
       setErrors(errors + 1);
       setStreak(0);
       setCombo(1); // Reset combo on error
+      setComboLevel(1);
       
       // Error explosion
       setExplosions(prev => [...prev, {
@@ -182,6 +195,7 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
         char,
         x: currentIndex * 12,
         y: 0,
+        combo: 0,
         isCorrect: false,
         combo: 0
       }]);
@@ -216,6 +230,8 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
     setExplosions([]);
     setFloatingScores([]);
     setTotalScore(0);
+    setComboLevel(1);
+    setRecentlyTyped([]);
   }, []);
 
   const getCharacterStatus = useCallback((index) => {
@@ -239,6 +255,8 @@ export const useTypingGame = (targetText = '', onComplete = null, onCharacterTyp
     combo,
     maxCombo,
     totalScore,
+    comboLevel,
+    recentlyTyped,
     explosions,
     floatingScores,
     handleKeyPress,

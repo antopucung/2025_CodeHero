@@ -2,125 +2,235 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Box } from '@chakra-ui/react';
 
-// Simple but juicy block letter typing effect matching the reference game
+// Juicy block letter typing effect with wave springs and gradients
 export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCharacterClick }) => {
   const [waveOffset, setWaveOffset] = useState(0);
+  const [comboLevel, setComboLevel] = useState(1);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setWaveOffset(prev => (prev + 0.1) % (Math.PI * 2));
+      setWaveOffset(prev => (prev + 0.15) % (Math.PI * 2));
     }, 50);
     return () => clearInterval(interval);
   }, []);
 
-  const getCharacterColors = (status, combo = 1) => {
-    switch (status) {
-      case 'correct':
-        if (combo >= 50) return { bg: '#ff6b6b', text: '#fff', glow: '#ff6b6b' };
-        if (combo >= 30) return { bg: '#ffd93d', text: '#000', glow: '#ffd93d' };
-        if (combo >= 20) return { bg: '#6bcf7f', text: '#000', glow: '#6bcf7f' };
-        if (combo >= 10) return { bg: '#4ecdc4', text: '#000', glow: '#4ecdc4' };
-        if (combo >= 5) return { bg: '#45b7d1', text: '#fff', glow: '#45b7d1' };
-        return { bg: '#00ff00', text: '#000', glow: '#00ff00' };
-      case 'incorrect':
-        return { bg: '#ff1744', text: '#fff', glow: '#ff1744' };
-      case 'current':
-        return { bg: '#ffeb3b', text: '#000', glow: '#ffeb3b' };
-      default:
-        return { bg: 'transparent', text: '#444', glow: 'transparent' };
-    }
+  const getComboColors = (combo) => {
+    if (combo >= 50) return {
+      bg: 'linear-gradient(45deg, #ff6b6b, #ff8e8e, #ff6b6b)',
+      border: '#ff6b6b',
+      glow: '#ff6b6b',
+      shadow: '0 0 25px #ff6b6b, inset 0 0 15px rgba(255, 107, 107, 0.3)'
+    };
+    if (combo >= 30) return {
+      bg: 'linear-gradient(45deg, #ffd93d, #ffed4e, #ffd93d)',
+      border: '#ffd93d',
+      glow: '#ffd93d',
+      shadow: '0 0 25px #ffd93d, inset 0 0 15px rgba(255, 217, 61, 0.3)'
+    };
+    if (combo >= 20) return {
+      bg: 'linear-gradient(45deg, #6bcf7f, #7dd87f, #6bcf7f)',
+      border: '#6bcf7f',
+      glow: '#6bcf7f',
+      shadow: '0 0 25px #6bcf7f, inset 0 0 15px rgba(107, 207, 127, 0.3)'
+    };
+    if (combo >= 10) return {
+      bg: 'linear-gradient(45deg, #4ecdc4, #5ed9d1, #4ecdc4)',
+      border: '#4ecdc4',
+      glow: '#4ecdc4',
+      shadow: '0 0 25px #4ecdc4, inset 0 0 15px rgba(78, 205, 196, 0.3)'
+    };
+    if (combo >= 5) return {
+      bg: 'linear-gradient(45deg, #45b7d1, #5bc3d7, #45b7d1)',
+      border: '#45b7d1',
+      glow: '#45b7d1',
+      shadow: '0 0 25px #45b7d1, inset 0 0 15px rgba(69, 183, 209, 0.3)'
+    };
+    return {
+      bg: 'linear-gradient(45deg, #00ff00, #33ff33, #00ff00)',
+      border: '#00ff00',
+      glow: '#00ff00',
+      shadow: '0 0 20px #00ff00, inset 0 0 10px rgba(0, 255, 0, 0.3)'
+    };
   };
+
+  const getErrorColors = () => ({
+    bg: 'linear-gradient(45deg, #ff1744, #ff4569, #ff1744)',
+    border: '#ff1744',
+    glow: '#ff1744',
+    shadow: '0 0 30px #ff1744, inset 0 0 20px rgba(255, 23, 68, 0.4)'
+  });
+
+  const getCurrentColors = () => ({
+    bg: 'linear-gradient(45deg, #ffeb3b, #fff176, #ffeb3b)',
+    border: '#ffeb3b',
+    glow: '#ffeb3b',
+    shadow: '0 0 25px #ffeb3b, inset 0 0 15px rgba(255, 235, 59, 0.4)'
+  });
 
   const renderCharacter = (char, index) => {
     const status = getCharacterStatus(index);
     const isActive = index === currentIndex;
-    const colors = getCharacterColors(status);
     
-    // Simple wave effect for active character
-    const waveY = isActive ? Math.sin(waveOffset + index * 0.3) * 3 : 0;
+    let colors;
+    if (status === 'incorrect') colors = getErrorColors();
+    else if (status === 'current') colors = getCurrentColors();
+    else if (status === 'correct') colors = getComboColors(comboLevel);
+    else colors = { bg: 'transparent', border: '#333', glow: 'transparent', shadow: 'none' };
     
+    // Wave effect for active character
+    const waveY = isActive ? Math.sin(waveOffset + index * 0.4) * 4 : 0;
+    const waveScale = isActive ? 1 + Math.sin(waveOffset * 2) * 0.1 : 1;
+    
+    // Spring effect for correct characters
+    const springEffect = status === 'correct' ? {
+      scale: [1, 1.3, 1.1, 1.2, 1.1],
+      rotate: [0, 5, -3, 2, 0],
+      y: [0, -8, -4, -6, -2]
+    } : {};
+
     return (
       <motion.div
         key={index}
-        className="simple-block-letter"
         initial={{ scale: 0.8, opacity: 0.6 }}
         animate={{ 
-          scale: status === 'current' ? 1.2 : status === 'correct' ? 1.1 : 1,
-          opacity: 1,
+          scale: status === 'current' ? waveScale * 1.2 : 
+                 status === 'correct' ? 1.1 : 
+                 status === 'incorrect' ? [1, 1.2, 0.9, 1.1, 1] : 1,
+          opacity: status === 'pending' ? 0.4 : 1,
           y: waveY,
-          backgroundColor: colors.bg,
-          color: colors.text,
-          boxShadow: status !== 'pending' ? `0 0 15px ${colors.glow}` : 'none'
+          background: colors.bg,
+          borderColor: colors.border,
+          boxShadow: colors.shadow,
+          ...springEffect
         }}
         transition={{ 
-          duration: 0.3,
+          duration: status === 'correct' ? 0.6 : 0.3,
           type: "spring",
-          stiffness: 300,
-          damping: 20
+          stiffness: status === 'correct' ? 200 : 300,
+          damping: status === 'correct' ? 15 : 20
         }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.05, y: -2 }}
         onClick={() => onCharacterClick && onCharacterClick(index)}
         style={{
           display: 'inline-block',
-          width: char === ' ' ? '12px' : '18px',
-          height: '24px',
-          margin: '2px 1px',
-          border: status !== 'pending' ? `2px solid ${colors.glow}` : '2px solid #333',
-          borderRadius: '4px',
+          width: char === ' ' ? '12px' : '20px',
+          height: '28px',
+          margin: '3px 2px',
+          border: `2px solid ${colors.border}`,
+          borderRadius: '6px',
           textAlign: 'center',
-          lineHeight: '20px',
+          lineHeight: '24px',
           fontFamily: "'Courier New', monospace",
           fontSize: '14px',
           fontWeight: 'bold',
           cursor: 'pointer',
           position: 'relative',
-          userSelect: 'none'
+          userSelect: 'none',
+          color: status === 'pending' ? '#666' : 
+                 status === 'incorrect' ? '#fff' : 
+                 status === 'current' ? '#000' : '#000'
         }}
       >
         {char === ' ' ? '' : char === '\n' ? '↵' : char}
         
-        {/* Simple pulse effect for current character */}
+        {/* Blinking gradient effect for current character */}
         {isActive && (
           <motion.div
             animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.7, 0, 0.7]
+              opacity: [0.3, 0.8, 0.3],
+              scale: [1, 1.1, 1]
             }}
             transition={{
-              duration: 1,
+              duration: 0.8,
               repeat: Infinity,
               ease: "easeInOut"
             }}
             style={{
               position: 'absolute',
-              top: '-3px',
-              left: '-3px',
-              right: '-3px',
-              bottom: '-3px',
-              border: '2px solid #ffeb3b',
-              borderRadius: '6px',
-              pointerEvents: 'none'
+              top: '-4px',
+              left: '-4px',
+              right: '-4px',
+              bottom: '-4px',
+              background: 'linear-gradient(45deg, #ffeb3b, #fff176, #ffeb3b)',
+              borderRadius: '8px',
+              zIndex: -1,
+              filter: 'blur(2px)'
             }}
           />
         )}
         
-        {/* Simple error indicator */}
-        {status === 'incorrect' && (
+        {/* Combo celebration effect */}
+        {status === 'correct' && comboLevel > 1 && (
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 0.4 }}
+            initial={{ scale: 0, opacity: 1 }}
+            animate={{
+              scale: [0, 1.5, 0],
+              opacity: [1, 0.8, 0],
+              rotate: [0, 180, 360]
+            }}
+            transition={{ duration: 0.8 }}
             style={{
               position: 'absolute',
-              top: '-8px',
-              right: '-8px',
+              top: '-10px',
+              right: '-10px',
+              width: '16px',
+              height: '16px',
+              background: colors.glow,
+              borderRadius: '50%',
+              boxShadow: `0 0 15px ${colors.glow}`
+            }}
+          />
+        )}
+        
+        {/* Error X indicator with pulse */}
+        {status === 'incorrect' && (
+          <motion.div
+            initial={{ scale: 0, rotate: -90 }}
+            animate={{ 
+              scale: [1, 1.3, 1],
+              rotate: 0,
+              opacity: [1, 0.7, 1]
+            }}
+            transition={{ 
+              duration: 0.5,
+              opacity: { repeat: 3, duration: 0.2 }
+            }}
+            style={{
+              position: 'absolute',
+              top: '-12px',
+              right: '-12px',
               color: '#ff1744',
-              fontSize: '12px',
-              fontWeight: 'bold'
+              fontSize: '16px',
+              fontWeight: 'bold',
+              textShadow: '0 0 10px #ff1744',
+              zIndex: 10
             }}
           >
             ✗
           </motion.div>
+        )}
+
+        {/* Wave ripple effect for correct typing */}
+        {status === 'correct' && (
+          <motion.div
+            initial={{ scale: 0, opacity: 0.8 }}
+            animate={{
+              scale: [0, 2, 3],
+              opacity: [0.8, 0.4, 0]
+            }}
+            transition={{ duration: 1 }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '40px',
+              height: '40px',
+              border: `2px solid ${colors.glow}`,
+              borderRadius: '50%',
+              pointerEvents: 'none'
+            }}
+          />
         )}
       </motion.div>
     );
@@ -128,9 +238,8 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
 
   return (
     <Box
-      className="simple-block-letter-container"
       style={{
-        lineHeight: '32px',
+        lineHeight: '36px',
         wordWrap: 'break-word',
         whiteSpace: 'pre-wrap'
       }}
@@ -140,7 +249,7 @@ export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, onCh
   );
 };
 
-// Simple gradient background effect
+// Enhanced gradient wave background with combo effects
 export const GradientWaveBackground = ({ isActive, intensity = 1, combo = 1 }) => {
   const [time, setTime] = useState(0);
 
@@ -148,7 +257,7 @@ export const GradientWaveBackground = ({ isActive, intensity = 1, combo = 1 }) =
     if (!isActive) return;
     
     const interval = setInterval(() => {
-      setTime(prev => prev + 0.05);
+      setTime(prev => prev + 0.08);
     }, 50);
     
     return () => clearInterval(interval);
@@ -157,19 +266,66 @@ export const GradientWaveBackground = ({ isActive, intensity = 1, combo = 1 }) =
   if (!isActive) return null;
 
   const getGradient = (combo, time) => {
-    const baseOpacity = 0.1 * intensity;
+    const baseOpacity = 0.15 * intensity;
+    const pulseOpacity = baseOpacity + Math.sin(time * 3) * 0.05;
     
     if (combo >= 50) {
-      return `linear-gradient(${time * 30}deg, rgba(255, 107, 107, ${baseOpacity}) 0%, rgba(255, 20, 147, ${baseOpacity * 0.7}) 50%, rgba(255, 107, 107, ${baseOpacity}) 100%)`;
+      return `
+        radial-gradient(circle at ${50 + Math.sin(time) * 20}% ${50 + Math.cos(time * 1.3) * 20}%, 
+          rgba(255, 107, 107, ${pulseOpacity * 1.2}) 0%, 
+          rgba(255, 20, 147, ${pulseOpacity * 0.8}) 30%, 
+          rgba(255, 107, 107, ${pulseOpacity * 0.6}) 60%,
+          transparent 100%),
+        linear-gradient(${time * 45}deg, 
+          rgba(255, 107, 107, ${pulseOpacity * 0.3}) 0%, 
+          rgba(255, 20, 147, ${pulseOpacity * 0.2}) 50%, 
+          rgba(255, 107, 107, ${pulseOpacity * 0.3}) 100%)
+      `;
     } else if (combo >= 30) {
-      return `linear-gradient(${time * 25}deg, rgba(255, 217, 61, ${baseOpacity}) 0%, rgba(255, 193, 7, ${baseOpacity * 0.7}) 50%, rgba(255, 217, 61, ${baseOpacity}) 100%)`;
+      return `
+        radial-gradient(circle at ${50 + Math.sin(time * 1.2) * 15}% ${50 + Math.cos(time) * 15}%, 
+          rgba(255, 217, 61, ${pulseOpacity}) 0%, 
+          rgba(255, 193, 7, ${pulseOpacity * 0.7}) 40%, 
+          transparent 80%),
+        linear-gradient(${time * 35}deg, 
+          rgba(255, 217, 61, ${pulseOpacity * 0.4}) 0%, 
+          rgba(255, 193, 7, ${pulseOpacity * 0.2}) 50%, 
+          rgba(255, 217, 61, ${pulseOpacity * 0.4}) 100%)
+      `;
     } else if (combo >= 20) {
-      return `linear-gradient(${time * 20}deg, rgba(107, 207, 127, ${baseOpacity}) 0%, rgba(76, 175, 80, ${baseOpacity * 0.7}) 50%, rgba(107, 207, 127, ${baseOpacity}) 100%)`;
+      return `
+        radial-gradient(circle at ${50 + Math.sin(time * 0.8) * 12}% ${50 + Math.cos(time * 1.1) * 12}%, 
+          rgba(107, 207, 127, ${pulseOpacity}) 0%, 
+          rgba(76, 175, 80, ${pulseOpacity * 0.6}) 50%, 
+          transparent 100%),
+        linear-gradient(${time * 25}deg, 
+          rgba(107, 207, 127, ${pulseOpacity * 0.3}) 0%, 
+          rgba(76, 175, 80, ${pulseOpacity * 0.2}) 50%, 
+          rgba(107, 207, 127, ${pulseOpacity * 0.3}) 100%)
+      `;
     } else if (combo >= 10) {
-      return `linear-gradient(${time * 15}deg, rgba(78, 205, 196, ${baseOpacity}) 0%, rgba(0, 188, 212, ${baseOpacity * 0.7}) 50%, rgba(78, 205, 196, ${baseOpacity}) 100%)`;
+      return `
+        radial-gradient(circle at ${50 + Math.sin(time * 0.6) * 10}% ${50 + Math.cos(time * 0.9) * 10}%, 
+          rgba(78, 205, 196, ${pulseOpacity}) 0%, 
+          rgba(0, 188, 212, ${pulseOpacity * 0.6}) 60%, 
+          transparent 100%),
+        linear-gradient(${time * 20}deg, 
+          rgba(78, 205, 196, ${pulseOpacity * 0.2}) 0%, 
+          rgba(0, 188, 212, ${pulseOpacity * 0.15}) 50%, 
+          rgba(78, 205, 196, ${pulseOpacity * 0.2}) 100%)
+      `;
     }
     
-    return `linear-gradient(${time * 10}deg, rgba(0, 255, 0, ${baseOpacity}) 0%, rgba(0, 255, 255, ${baseOpacity * 0.7}) 50%, rgba(0, 255, 0, ${baseOpacity}) 100%)`;
+    return `
+      radial-gradient(circle at ${50 + Math.sin(time * 0.5) * 8}% ${50 + Math.cos(time * 0.7) * 8}%, 
+        rgba(0, 255, 0, ${pulseOpacity}) 0%, 
+        rgba(0, 255, 255, ${pulseOpacity * 0.5}) 70%, 
+        transparent 100%),
+      linear-gradient(${time * 15}deg, 
+        rgba(0, 255, 0, ${pulseOpacity * 0.2}) 0%, 
+        rgba(0, 255, 255, ${pulseOpacity * 0.1}) 50%, 
+        rgba(0, 255, 0, ${pulseOpacity * 0.2}) 100%)
+    `;
   };
 
   return (
@@ -191,7 +347,7 @@ export const GradientWaveBackground = ({ isActive, intensity = 1, combo = 1 }) =
   );
 };
 
-// Simple pulse animation
+// Enhanced pulse animation with combo effects
 export const PulseAnimation = ({ children, isActive, color = '#00ff00', intensity = 1, combo = 1 }) => {
   const getComboColor = (combo) => {
     if (combo >= 50) return '#ff6b6b';
@@ -203,19 +359,20 @@ export const PulseAnimation = ({ children, isActive, color = '#00ff00', intensit
   };
 
   const pulseColor = getComboColor(combo);
+  const pulseIntensity = Math.min(1 + (combo / 20), 2);
 
   return (
     <motion.div
       animate={isActive ? {
-        scale: [1, 1 + (0.1 * intensity), 1],
+        scale: [1, 1 + (0.08 * intensity * pulseIntensity), 1],
         textShadow: [
           `0 0 5px ${pulseColor}`,
-          `0 0 ${15 * intensity}px ${pulseColor}`,
+          `0 0 ${20 * intensity * pulseIntensity}px ${pulseColor}, 0 0 ${10 * intensity}px ${pulseColor}`,
           `0 0 5px ${pulseColor}`
         ]
       } : {}}
       transition={{
-        duration: 0.8,
+        duration: 0.6,
         repeat: isActive ? Infinity : 0,
         ease: "easeInOut"
       }}
@@ -225,7 +382,7 @@ export const PulseAnimation = ({ children, isActive, color = '#00ff00', intensit
   );
 };
 
-// Simple typing cursor
+// Enhanced typing cursor with combo effects
 export const AdvancedTypingCursor = ({ isVisible, x, y, combo = 1 }) => {
   const getComboColor = (combo) => {
     if (combo >= 50) return '#ff6b6b';
@@ -237,6 +394,7 @@ export const AdvancedTypingCursor = ({ isVisible, x, y, combo = 1 }) => {
   };
 
   const cursorColor = getComboColor(combo);
+  const cursorIntensity = Math.min(1 + (combo / 25), 2);
 
   return (
     <AnimatePresence>
@@ -246,23 +404,30 @@ export const AdvancedTypingCursor = ({ isVisible, x, y, combo = 1 }) => {
           animate={{ 
             opacity: [1, 0.3, 1],
             x: x,
-            y: y
+            y: y,
+            scaleY: [1, 1.1, 1],
+            boxShadow: [
+              `0 0 8px ${cursorColor}`,
+              `0 0 ${15 * cursorIntensity}px ${cursorColor}`,
+              `0 0 8px ${cursorColor}`
+            ]
           }}
           exit={{ opacity: 0 }}
           transition={{
-            opacity: { duration: 0.8, repeat: Infinity },
+            opacity: { duration: 0.6, repeat: Infinity },
+            scaleY: { duration: 0.6, repeat: Infinity },
+            boxShadow: { duration: 0.6, repeat: Infinity },
             x: { duration: 0.1 },
             y: { duration: 0.1 }
           }}
           style={{
             position: 'absolute',
-            width: '2px',
-            height: '20px',
-            background: cursorColor,
-            borderRadius: '1px',
+            width: '3px',
+            height: '24px',
+            background: `linear-gradient(180deg, ${cursorColor}, ${cursorColor}aa)`,
+            borderRadius: '2px',
             zIndex: 1000,
-            pointerEvents: 'none',
-            boxShadow: `0 0 8px ${cursorColor}`
+            pointerEvents: 'none'
           }}
         />
       )}
@@ -270,7 +435,7 @@ export const AdvancedTypingCursor = ({ isVisible, x, y, combo = 1 }) => {
   );
 };
 
-// Simple combo burst effect
+// Enhanced combo burst effect
 export const ComboBurstEffect = ({ isActive, combo, x, y }) => {
   if (!isActive || combo <= 5) return null;
 
@@ -283,7 +448,8 @@ export const ComboBurstEffect = ({ isActive, combo, x, y }) => {
   };
 
   const burstColor = getComboColor(combo);
-  const particleCount = Math.min(combo / 5, 8);
+  const particleCount = Math.min(Math.floor(combo / 3), 12);
+  const burstSize = Math.min(combo * 2, 40);
 
   return (
     <motion.div
@@ -300,27 +466,50 @@ export const ComboBurstEffect = ({ isActive, combo, x, y }) => {
           key={i}
           initial={{ scale: 0, opacity: 1 }}
           animate={{
-            scale: [0, 1, 0],
-            x: Math.cos((i * (360 / particleCount)) * Math.PI / 180) * 20,
-            y: Math.sin((i * (360 / particleCount)) * Math.PI / 180) * 20,
+            scale: [0, 1.5, 0],
+            x: Math.cos((i * (360 / particleCount)) * Math.PI / 180) * burstSize,
+            y: Math.sin((i * (360 / particleCount)) * Math.PI / 180) * burstSize,
             opacity: [1, 0.8, 0]
           }}
           transition={{
-            duration: 0.8,
-            delay: i * 0.05,
+            duration: 1.2,
+            delay: i * 0.03,
             repeat: Infinity,
-            repeatDelay: 0.5
+            repeatDelay: 0.8
           }}
           style={{
             position: 'absolute',
-            width: '4px',
-            height: '4px',
-            background: burstColor,
+            width: '6px',
+            height: '6px',
+            background: `radial-gradient(circle, ${burstColor}, ${burstColor}88)`,
             borderRadius: '50%',
-            boxShadow: `0 0 6px ${burstColor}`
+            boxShadow: `0 0 10px ${burstColor}`
           }}
         />
       ))}
+      
+      {/* Central burst effect */}
+      <motion.div
+        animate={{
+          scale: [1, 1.5, 1],
+          opacity: [0.8, 0.4, 0.8],
+          rotate: [0, 180, 360]
+        }}
+        transition={{
+          duration: 1,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        style={{
+          position: 'absolute',
+          width: '12px',
+          height: '12px',
+          background: `radial-gradient(circle, ${burstColor}, transparent)`,
+          borderRadius: '50%',
+          transform: 'translate(-50%, -50%)',
+          boxShadow: `0 0 20px ${burstColor}`
+        }}
+      />
     </motion.div>
   );
 };

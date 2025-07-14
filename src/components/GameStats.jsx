@@ -48,7 +48,9 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
               opacity: 1, 
               y: 0, 
               scale: 1,
-              borderColor: ["#333", "#00ff00", "#333"]
+              borderColor: currentStats.combo >= 10 ? 
+                ["#333", "#4ecdc4", "#333"] : 
+                ["#333", "#00ff00", "#333"]
             }}
             transition={{ 
               duration: 0.5,
@@ -57,7 +59,7 @@ const GameStats = ({ progress, currentStats = null, streak = 0 }) => {
             border="1px solid #333"
             borderRadius="4px"
             p={2}
-            bg="#000"
+            bg={currentStats.combo >= 20 ? "#001100" : "#000"}
           >
             <HStack justify="space-between">
               <VStack spacing={0} align="start">

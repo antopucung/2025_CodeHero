@@ -38,6 +38,8 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
     combo,
     maxCombo,
     totalScore,
+    comboLevel,
+    recentlyTyped,
     explosions,
     floatingScores,
     handleKeyPress,
@@ -205,6 +207,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         <FloatingScore
           key={score.id}
           score={score.score}
+          combo={score.combo || 1}
           x={score.x}
           y={score.y}
           color={score.color}
@@ -326,6 +329,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
           text={challenge.code}
           currentIndex={currentIndex}
           getCharacterStatus={getCharacterStatus}
+          combo={comboLevel}
           combo={combo}
           onCharacterClick={(index) => {
             console.log('Clicked character at index:', index);

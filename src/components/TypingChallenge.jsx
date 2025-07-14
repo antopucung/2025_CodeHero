@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import confetti from 'canvas-confetti';
 import { TypingEngine } from "../engine/core/TypingEngine";
 import { EffectSystem } from "../engine/systems/EffectSystem";
-import { CodeTypingDisplay } from "../engine/components/CodeTypingDisplay";
+import { ConceptualTypingDisplay } from "../engine/components/ConceptualTypingDisplay";
 import { GameStats } from "../engine/components/GameStats";
 import { TerminalPanel } from "../design/components/TerminalPanel";
 import { PatternBonusDisplay } from "../design/components/PatternBonusDisplay";
@@ -258,7 +258,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       
       {/* Typing Display */}
       <Box flex={1} overflow="hidden">
-        <CodeTypingDisplay
+        <ConceptualTypingDisplay
           text={challenge.code}
           engine={engine}
           onCharacterClick={(index) => {

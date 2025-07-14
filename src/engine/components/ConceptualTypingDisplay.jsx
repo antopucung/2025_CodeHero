@@ -1,10 +1,12 @@
-// Code-aware Typing Display with proper IDE-like formatting
+// Conceptual Typing Display with enhanced spacing and concept awareness
 import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
 import { Box, Text as ChakraText } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TypingBlock } from './TypingBlock';
+import { EnhancedTypingBlock } from './EnhancedTypingBlock';
+import { CodeConceptDetector } from '../utils/CodeConceptDetector';
 import { CodeFormatter } from '../utils/CodeFormatter';
 import { TerminalPanel } from '../../design/components/TerminalPanel';
+import { codeSpacing } from '../../design/tokens/codeTypography';
 import { 
   FloatingScore, 
   CharacterExplosion, 
@@ -16,7 +18,7 @@ import {
 } from '../effects';
 import { colors, colorPsychology } from '../../design/tokens/colors';
 
-export const CodeTypingDisplay = memo(({
+export const ConceptualTypingDisplay = memo(({
   text,
   engine,
   onCharacterClick,
@@ -24,7 +26,10 @@ export const CodeTypingDisplay = memo(({
 }) => {
   const containerRef = useRef(null);
   const [codeFormatter] = useState(() => new CodeFormatter());
+  const [conceptDetector] = useState(() => new CodeConceptDetector());
   const [structuredCode, setStructuredCode] = useState([]);
+  const [detectedConcepts, setDetectedConcepts] = useState([]);
+  const [conceptMap, setConceptMap] = useState(new Map());
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [errorPositions, setErrorPositions] = useState(new Set());
   const [screenFlash, setScreenFlash] = useState({ active: false, type: 'success', intensity: 1 });
@@ -32,35 +37,91 @@ export const CodeTypingDisplay = memo(({
   const [activeEffects, setActiveEffects] = useState({
     floatingScores: [],
     explosions: [],
-    comboBursts: []
+    comboBursts: [],
+    conceptCompletions: []
   });
   const [performanceMode, setPerformanceMode] = useState('high');
   const [effectScale, setEffectScale] = useState(1);
   
-  // Parse code structure when text changes
+  // Parse code structure and detect concepts
   useEffect(() => {
     if (text) {
+      // Parse code structure
       const parsed = codeFormatter.parseCodeStructure(text);
       const formatted = codeFormatter.formatForDisplay(parsed);
       setStructuredCode(formatted);
+      
+      // Detect programming concepts
+      const concepts = conceptDetector.detectConcepts(text);
+      const designPatterns = conceptDetector.detectDesignPatterns(concepts);
+      const allConcepts = [...concepts, ...designPatterns];
+      setDetectedConcepts(allConcepts);
+      
+      // Create concept map for quick lookup
+      const map = new Map();
+      allConcepts.forEach(concept => {
+        for (let i = concept.start; i < concept.end; i++) {
+          map.set(i, concept);
+        }
+      });
+      setConceptMap(map);
     }
-  }, [text, codeFormatter]);
+  }, [text, codeFormatter, conceptDetector]);
   
-  // Update cursor position with code-aware layout
+  // Enhanced cursor position with concept-aware spacing
   const updateCursorPosition = useCallback(() => {
     if (!containerRef.current || !engine.state || !structuredCode.length) return;
     
     const currentIndex = engine.state.currentIndex;
     const containerWidth = containerRef.current.offsetWidth;
-    const layoutInfo = codeFormatter.getLayoutInfo(structuredCode, containerWidth);
     
-    if (layoutInfo[currentIndex]) {
-      setCursorPosition({
-        x: layoutInfo[currentIndex].x,
-        y: layoutInfo[currentIndex].y
-      });
+    // Calculate position with concept-aware spacing
+    let x = 0;
+    let y = 0;
+    let currentLine = 0;
+    
+    for (let i = 0; i < Math.min(currentIndex, structuredCode.length); i++) {
+      const item = structuredCode[i];
+      const concept = conceptMap.get(i);
+      
+      if (item.isNewline) {
+        currentLine++;
+        x = item.indentLevel * (fullScreen ? 16 : 12);
+        y = currentLine * (fullScreen ? 32 : 28);
+      } else {
+        // Concept-aware character width
+        let charWidth = fullScreen ? 22 : 18;
+        
+        if (concept) {
+          switch (concept.type) {
+            case 'bracket':
+            case 'operator':
+              charWidth = fullScreen ? 24 : 20;
+              break;
+            case 'keyword':
+            case 'function':
+              charWidth = fullScreen ? 23 : 19;
+              break;
+          }
+        }
+        
+        // Add spacing
+        const spacing = concept?.type === 'operator' ? 
+          (fullScreen ? 4 : 3) : (fullScreen ? 2 : 1.5);
+        
+        x += charWidth + spacing;
+        
+        // Handle line wrapping
+        if (x > containerWidth - 50) {
+          currentLine++;
+          x = item.indentLevel * (fullScreen ? 16 : 12);
+          y = currentLine * (fullScreen ? 32 : 28);
+        }
+      }
     }
-  }, [engine.state?.currentIndex, structuredCode, codeFormatter]);
+    
+    setCursorPosition({ x, y });
+  }, [engine.state?.currentIndex, structuredCode, conceptMap, fullScreen]);
   
   // Update cursor position when index changes
   useEffect(() => {
@@ -95,6 +156,76 @@ export const CodeTypingDisplay = memo(({
     }
   }, [engine.state?.errors, engine.state?.currentIndex]);
 
+  // Handle concept completion celebrations
+  useEffect(() => {
+    if (!engine.state) return;
+    
+    const currentIndex = engine.state.currentIndex;
+    const concept = conceptMap.get(currentIndex - 1);
+    
+    if (concept && engine.getCharacterStatus(currentIndex - 1) === 'correct') {
+      // Check if concept is completed
+      const conceptEnd = concept.end;
+      let conceptCompleted = true;
+      
+      for (let i = concept.start; i < conceptEnd; i++) {
+        if (engine.getCharacterStatus(i) !== 'correct') {
+          conceptCompleted = false;
+          break;
+        }
+      }
+      
+      if (conceptCompleted) {
+        // Add concept completion effect
+        const completionEffect = {
+          id: Date.now() + Math.random(),
+          concept,
+          x: cursorPosition.x,
+          y: cursorPosition.y,
+          score: concept.score,
+          createdAt: Date.now()
+        };
+        
+        setActiveEffects(prev => ({
+          ...prev,
+          conceptCompletions: [...prev.conceptCompletions, completionEffect]
+        }));
+        
+        // Add pattern celebration if it's a significant concept
+        if (concept.score >= 25) {
+          const celebration = {
+            id: Date.now() + Math.random(),
+            type: concept.type,
+            name: concept.name,
+            bonus: concept.score,
+            color: getConceptColor(concept.type),
+            description: concept.description
+          };
+          
+          setPatternCelebrations(prev => [...prev, celebration]);
+        }
+      }
+    }
+  }, [engine.state?.currentIndex, conceptMap, cursorPosition]);
+
+  // Get concept color
+  const getConceptColor = (conceptType) => {
+    const colors = {
+      function: '#805AD5',
+      class: '#D69E2E',
+      keyword: '#E53E3E',
+      string: '#38A169',
+      number: '#DD6B20',
+      operator: '#319795',
+      bracket: '#718096',
+      variable: '#4299E1',
+      method: '#9F7AEA',
+      controlStructure: '#F56565',
+      designPattern: '#FF6B6B'
+    };
+    return colors[conceptType] || '#4299E1';
+  };
+
   // Handle visual effects
   useEffect(() => {
     if (!engine.state) return;
@@ -109,17 +240,6 @@ export const CodeTypingDisplay = memo(({
     if (engine.state.combo >= 50 && engine.state.combo % 10 === 0 && effectScale > 0.5) {
       setScreenFlash({ active: true, type: 'combo', intensity: Math.min(engine.state.combo / 50, 2) });
       setTimeout(() => setScreenFlash({ active: false, type: 'success', intensity: 1 }), 300);
-    }
-
-    // Handle pattern celebrations
-    if (engine.state.patternMatches && engine.state.patternMatches.length > 0) {
-      const newPatterns = engine.state.patternMatches.filter(
-        pattern => !patternCelebrations.some(active => active.id === pattern.id)
-      );
-      
-      if (newPatterns.length > 0) {
-        setPatternCelebrations(prev => [...prev, ...newPatterns]);
-      }
     }
 
     // Add floating scores
@@ -151,7 +271,7 @@ export const CodeTypingDisplay = memo(({
         }));
       }
     }
-  }, [engine.state, activeEffects, patternCelebrations, effectScale, performanceMode]);
+  }, [engine.state, activeEffects, effectScale, performanceMode]);
 
   // Cleanup expired effects
   useEffect(() => {
@@ -160,7 +280,8 @@ export const CodeTypingDisplay = memo(({
       setActiveEffects(prev => ({
         floatingScores: prev.floatingScores.filter(effect => now - effect.id < 3000),
         explosions: prev.explosions.filter(effect => now - effect.id < 2000),
-        comboBursts: prev.comboBursts.filter(effect => now - effect.id < 2000)
+        comboBursts: prev.comboBursts.filter(effect => now - effect.id < 2000),
+        conceptCompletions: prev.conceptCompletions.filter(effect => now - effect.createdAt < 2500)
       }));
       
       setPatternCelebrations(prev => prev.filter(pattern => now - pattern.id < 4000));
@@ -180,6 +301,7 @@ export const CodeTypingDisplay = memo(({
     setPatternCelebrations(prev => prev.filter(pattern => pattern.id !== patternId));
   }, []);
   
+  // Render code line with enhanced spacing
   const renderCodeLine = useCallback((lineItems, lineIndex) => {
     return (
       <div
@@ -188,11 +310,29 @@ export const CodeTypingDisplay = memo(({
           display: 'flex',
           flexWrap: 'nowrap',
           alignItems: 'baseline',
-          minHeight: fullScreen ? '28px' : '24px',
-          marginBottom: '2px',
-          paddingLeft: `${lineItems[0]?.indentLevel * (fullScreen ? 16 : 12)}px`
+          minHeight: fullScreen ? '32px' : '28px',
+          marginBottom: codeSpacing.line.normal,
+          paddingLeft: `${lineItems[0]?.indentLevel * (fullScreen ? 16 : 12)}px`,
+          position: 'relative'
         }}
       >
+        {/* Line number indicator */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '-40px',
+            top: '0',
+            width: '30px',
+            fontSize: fullScreen ? '10px' : '9px',
+            color: colors.terminal.textMuted,
+            textAlign: 'right',
+            opacity: 0.5,
+            fontFamily: "'Fira Code', monospace"
+          }}
+        >
+          {lineIndex + 1}
+        </div>
+        
         {lineItems.map((item, itemIndex) => {
           const globalIndex = structuredCode.findIndex(code => 
             code.lineIndex === lineIndex && code.charIndex === item.charIndex
@@ -204,27 +344,28 @@ export const CodeTypingDisplay = memo(({
           const speed = engine.getCharacterSpeed(globalIndex);
           const upgrade = engine.getCharacterUpgrade(globalIndex);
           const showError = errorPositions.has(globalIndex);
+          const concept = conceptMap.get(globalIndex);
           
           return (
-            <TypingBlock
+            <EnhancedTypingBlock
               key={`${lineIndex}-${itemIndex}`}
               char={item.char}
               status={status}
               speed={speed}
+              concept={concept}
               upgrade={upgrade}
               combo={engine.state?.combo || 1}
               anticipationLevel={engine.state?.anticipationLevel || 1}
               showError={showError}
               onClick={() => onCharacterClick && onCharacterClick(globalIndex)}
               fullScreen={fullScreen}
-              syntaxType={item.type}
-              indentLevel={item.indentLevel}
+              spacing={concept?.type === 'operator' ? 'wide' : 'normal'}
             />
           );
         })}
       </div>
     );
-  }, [structuredCode, engine, errorPositions, onCharacterClick, fullScreen]);
+  }, [structuredCode, engine, errorPositions, conceptMap, onCharacterClick, fullScreen]);
   
   // Group structured code by lines
   const codeLines = structuredCode.reduce((lines, item) => {
@@ -248,7 +389,7 @@ export const CodeTypingDisplay = memo(({
       overflow="hidden"
     >
       <ChakraText fontSize="xs" color={colors.terminal.textSecondary} p={2} borderBottom="1px solid #333">
-        │ CODE TYPING INTERFACE
+        │ CONCEPTUAL CODE TYPING INTERFACE
       </ChakraText>
       
       <Box
@@ -256,9 +397,10 @@ export const CodeTypingDisplay = memo(({
         bg={colorPsychology.environment.background}
         flex={1}
         overflow="auto"
-        p={3}
+        p={4}
+        pl={12} // Extra padding for line numbers
         position="relative"
-        fontFamily="monospace"
+        fontFamily="'Fira Code', 'Consolas', 'Monaco', monospace"
         fontSize="14px"
         style={{
           background: `linear-gradient(135deg, ${colorPsychology.environment.background} 0%, ${colorPsychology.environment.surface} 100%)`,
@@ -281,23 +423,24 @@ export const CodeTypingDisplay = memo(({
           type={screenFlash.type}
         />
 
-        {/* Dynamic Cursor */}
+        {/* Enhanced Cursor */}
         <AnticipationCursor
           isVisible={engine.state?.isActive && !engine.state?.isComplete}
           position={cursorPosition}
           typingSpeed={engine.state?.typingSpeed || 'lame'}
           anticipationLevel={(engine.state?.anticipationLevel || 1) * effectScale}
           combo={engine.state?.combo || 1}
-          fullScreen={fullScreen}
+          reduced={performanceMode === 'low'}
         />
         
-        {/* Code Lines with Proper Layout */}
+        {/* Code Lines with Enhanced Layout */}
         <Box
           style={{
             fontFamily: "'Fira Code', 'Consolas', 'Monaco', monospace",
-            fontSize: fullScreen ? '14px' : '12px',
-            lineHeight: fullScreen ? '28px' : '24px',
-            whiteSpace: 'pre'
+            fontSize: fullScreen ? '14px' : '13px',
+            lineHeight: fullScreen ? '32px' : '28px',
+            whiteSpace: 'pre',
+            position: 'relative'
           }}
         >
           {Object.entries(codeLines).map(([lineIndex, lineItems]) => 
@@ -339,6 +482,36 @@ export const CodeTypingDisplay = memo(({
             />
           ))}
         </AnimatePresence>
+
+        {/* Concept Completion Effects */}
+        <AnimatePresence>
+          {activeEffects.conceptCompletions.map((completion) => (
+            <motion.div
+              key={completion.id}
+              initial={{ scale: 0, opacity: 0, y: 0 }}
+              animate={{ 
+                scale: [0, 2, 1.5, 0],
+                opacity: [0, 1, 1, 0],
+                y: [0, -60, -80, -120]
+              }}
+              transition={{ duration: 2 }}
+              onAnimationComplete={() => removeEffect('conceptCompletions', completion.id)}
+              style={{
+                position: 'absolute',
+                left: completion.x,
+                top: completion.y,
+                zIndex: 1002,
+                pointerEvents: 'none',
+                color: getConceptColor(completion.concept.type),
+                fontWeight: 'bold',
+                fontSize: fullScreen ? '16px' : '14px',
+                textShadow: `0 0 10px ${getConceptColor(completion.concept.type)}`
+              }}
+            >
+              {completion.concept.type.toUpperCase()} +{completion.score}
+            </motion.div>
+          ))}
+        </AnimatePresence>
         
         <AnimatePresence>
           {patternCelebrations.slice(0, performanceMode === 'low' ? 1 : 3).map((pattern) => (
@@ -354,4 +527,4 @@ export const CodeTypingDisplay = memo(({
   );
 });
 
-CodeTypingDisplay.displayName = 'CodeTypingDisplay';
+ConceptualTypingDisplay.displayName = 'ConceptualTypingDisplay';

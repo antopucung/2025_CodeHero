@@ -22,6 +22,10 @@ export class CustomEventEmitter {
     if (!this.events[event]) return;
     this.events[event].forEach(listener => listener(...args));
   }
+
+  removeAllListeners() {
+    this.events = {};
+  }
 }
 
 export class TypingEngine extends CustomEventEmitter {

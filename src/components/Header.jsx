@@ -66,8 +66,7 @@ const Header = () => {
               label={item.label}
               isActive={location.pathname === item.path}
               onClick={() => navigate(item.path)}
-            >
-            </NavigationButton>
+            />
           </Box>
         ))}
       </HStack>

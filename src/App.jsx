@@ -9,6 +9,7 @@ import CommunityPage from './pages/CommunityPage';
 import CommissionDetailPage from './pages/CommissionDetailPage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
 import LessonPage from './pages/LessonPage';
+import ProfilePage from './pages/ProfilePage';
 
 const MotionBox = motion(Box);
 
@@ -37,6 +38,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/community" element={<CommunityPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/commission/:id" element={<CommissionDetailPage />} />
             <Route path="/modules/:id" element={<ModuleDetailPage />} />
             <Route path="/learn/:courseId/:lessonId" element={<LessonPage />} />

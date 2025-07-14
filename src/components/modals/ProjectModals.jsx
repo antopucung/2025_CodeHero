@@ -336,6 +336,7 @@ export const CollaborationModal = ({ isOpen, onClose, project }) => {
                   ))}
                 </Grid>
               </Box>
+            </VStack>
 
             {/* Portfolio */}
             <VStack spacing={3} align="stretch">
@@ -385,6 +386,7 @@ export const CollaborationModal = ({ isOpen, onClose, project }) => {
                 <Text>✓ Potential for future paid opportunities</Text>
               </VStack>
             </Box>
+          </VStack>
         </ModalBody>
 
         <ModalFooter borderTop={`1px solid ${designSystem.colors.borders.default}`}>

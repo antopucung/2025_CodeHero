@@ -203,37 +203,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-          <MotionBox
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            w="100%"
-            flex={1}
-          >
-              {features.map((feature, index) => (
-                <GridItem key={feature.id}>
-                  <MotionBox
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.3 + (index * 0.1) }}
-                    whileHover={{ 
-                      scale: 1.02,
-                      boxShadow: `0 0 20px ${feature.color}33`
-                    }}
-                    whileTap={{ scale: 0.98 }}
-                    h="100%"
-                  >
-                    <Box
-                      bg="#111"
-                      border={`2px solid ${feature.color}`}
-                      borderRadius="8px"
-                      p={{ base: 4, md: 5 }}
-                      h="100%"
-                      cursor="pointer"
-                      onClick={() => navigate(feature.path)}
-                      position="relative"
-  );
-};
-
-export default HomePage;

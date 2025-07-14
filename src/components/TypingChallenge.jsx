@@ -26,6 +26,14 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [showAchievement, setShowAchievement] = useState(null);
 
+  // Performance optimization - limit concurrent effects
+  const [effectLimiter, setEffectLimiter] = useState({
+    maxFloatingScores: 5,
+    maxExplosions: 3,
+    maxPatterns: 2,
+    lastCleanup: Date.now()
+  });
+
   // Initialize engine
   useEffect(() => {
     if (challenge && isStarted) {
@@ -55,7 +63,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       if (newState.patternMatches && newState.patternMatches.length > 0) {
         const newPatterns = newState.patternMatches.filter(
           pattern => !activePatterns.some(active => active.id === pattern.id)
-        );
+        ).slice(0, effectLimiter.maxPatterns); // Limit concurrent patterns
         
         if (newPatterns.length > 0) {
           setActivePatterns(prev => [...prev, ...newPatterns]);
@@ -123,10 +131,17 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   useEffect(() => {
     const cleanup = setInterval(() => {
       engine.cleanupEffects();
-    }, 500);
+      
+      // Aggressive cleanup for performance
+      const now = Date.now();
+      if (now - effectLimiter.lastCleanup > 1000) {
+        setActivePatterns(prev => prev.slice(0, effectLimiter.maxPatterns));
+        setEffectLimiter(prev => ({ ...prev, lastCleanup: now }));
+      }
+    }, 250); // More frequent cleanup
     
     return () => clearInterval(cleanup);
-  }, [engine]);
+  }, [engine, effectLimiter]);
 
   // Cleanup on unmount
   useEffect(() => {

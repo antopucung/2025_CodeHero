@@ -223,7 +223,7 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
           scale: isCorrect ? [1, 3 + (patterns * 0.3), 0] : [1, 2.5, 0],
           opacity: [1, 0.9, 0],
         }}
-        transition={{ duration: 0.8 + (patterns * 0.1) }}
+        transition={{ duration: 0.6 }}
         style={{
           color: explosionColor,
           fontFamily: "'Courier New', monospace",
@@ -268,15 +268,14 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
       {/* Pattern bonus indicator */}
       {patterns > 0 && (
         <motion.div
-          initial={{ scale: 0, rotate: -180 }}
+          initial={{ scale: 0 }}
           animate={{ 
             scale: [1, 1.5, 1.2],
-            rotate: [0, 180, 90],
             opacity: [1, 1, 0]
           }}
           transition={{ 
-            duration: 1.3,
-            opacity: { delay: 0.9, duration: 0.4 }
+            duration: 1.0,
+            opacity: { delay: 0.6, duration: 0.4 }
           }}
           style={{
             position: 'absolute',
@@ -286,7 +285,7 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
             color: '#ff6b6b',
             fontSize: '12px',
             fontWeight: 'bold',
-            textShadow: '0 0 12px #ff6b6b'
+            textShadow: '0 0 8px #ff6b6b'
           }}
         >
           ⭐ BONUS!
@@ -302,7 +301,7 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
               scale: [0, 2.5 + patterns, 4 + patterns],
               opacity: [1, 0.7, 0]
             }}
-            transition={{ duration: 1.8 }}
+            transition={{ duration: 1.2 }}
             style={{
               position: 'absolute',
               top: '50%',
@@ -310,9 +309,9 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
               transform: 'translate(-50%, -50%)',
               width: '70px',
               height: '70px',
-              border: `4px solid ${explosionColor}`,
+              border: `2px solid ${explosionColor}`,
               borderRadius: '50%',
-              boxShadow: `0 0 25px ${explosionColor}`
+              boxShadow: `0 0 15px ${explosionColor}`
             }}
           />
           
@@ -323,7 +322,7 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
                 scale: [0, 3 + patterns, 5 + patterns],
                 opacity: [0.8, 0.5, 0]
               }}
-              transition={{ duration: 2.2, delay: 0.3 }}
+              transition={{ duration: 1.5, delay: 0.2 }}
               style={{
                 position: 'absolute',
                 top: '50%',
@@ -331,9 +330,9 @@ export const JuicyCharacterExplosion = ({ char, x, y, isCorrect, combo = 1, spee
                 transform: 'translate(-50%, -50%)',
                 width: '90px',
                 height: '90px',
-                border: `5px solid ${explosionColor}`,
+                border: `2px solid ${explosionColor}`,
                 borderRadius: '50%',
-                boxShadow: `0 0 35px ${explosionColor}`
+                boxShadow: `0 0 20px ${explosionColor}`
               }}
             />
           )}
@@ -380,10 +379,10 @@ export const JuicyComboBurst = ({ isActive, combo, x, y, patterns = [] }) => {
             opacity: [1, 0.8, 0]
           }}
           transition={{
-            duration: 1.2 + (patterns.length * 0.2),
+            duration: 0.8,
             delay: i * 0.05,
-            repeat: Infinity,
-            repeatDelay: 0.8
+            repeat: 1,
+            repeatDelay: 0.5
           }}
           style={{
             position: 'absolute',
@@ -401,11 +400,10 @@ export const JuicyComboBurst = ({ isActive, combo, x, y, patterns = [] }) => {
         animate={{
           scale: [1, 1.5 + (patterns.length * 0.2), 1],
           opacity: [0.8, 0.4, 0.8],
-          rotate: [0, 180 + (patterns.length * 30), 360 + (patterns.length * 60)]
         }}
         transition={{
-          duration: 1 + (patterns.length * 0.2),
-          repeat: Infinity,
+          duration: 0.8,
+          repeat: 2,
           ease: "easeInOut"
         }}
         style={{
@@ -415,7 +413,7 @@ export const JuicyComboBurst = ({ isActive, combo, x, y, patterns = [] }) => {
           background: `radial-gradient(circle, ${burstColor}, transparent)`,
           borderRadius: '50%',
           transform: 'translate(-50%, -50%)',
-          boxShadow: `0 0 ${20 + patterns.length * 5}px ${burstColor}`
+          boxShadow: `0 0 ${15 + patterns.length * 3}px ${burstColor}`
         }}
       />
     </motion.div>

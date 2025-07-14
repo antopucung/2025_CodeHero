@@ -1,7 +1,30 @@
 // Typing Gamification Engine - Core Engine
-import { EventEmitter } from 'events';
 
-export class TypingEngine extends EventEmitter {
+// Browser-compatible EventEmitter implementation
+class CustomEventEmitter {
+  constructor() {
+    this.events = {};
+  }
+
+  on(event, listener) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(listener);
+  }
+
+  off(event, listenerToRemove) {
+    if (!this.events[event]) return;
+    this.events[event] = this.events[event].filter(listener => listener !== listenerToRemove);
+  }
+
+  emit(event, ...args) {
+    if (!this.events[event]) return;
+    this.events[event].forEach(listener => listener(...args));
+  }
+}
+
+export class TypingEngine extends CustomEventEmitter {
   constructor(config = {}) {
     super();
     

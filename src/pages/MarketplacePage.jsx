@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, VStack, HStack } from "@chakra-ui/react";
+import { Box, VStack, HStack, Badge } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
@@ -149,6 +149,25 @@ const MarketplacePage = () => {
                   onView={() => handleCourseClick(course.slug)}
                   isEnrolled={enrolledCourses.some(enrolled => enrolled.id === course.id)}
                 />
+                
+                {/* Gamification Badge for the course */}
+                {course.slug === 'unity-csharp-101' && (
+                  <Badge 
+                    position="absolute" 
+                    top={designSystem.spacing[4]} 
+                    left={designSystem.spacing[4]}
+                    zIndex={10}
+                    bg="#ff6b6b"
+                    color="#fff"
+                    borderRadius="full"
+                    px={3}
+                    py={1}
+                    fontSize="sm"
+                    boxShadow="0 0 15px rgba(255, 107, 107, 0.6)"
+                  >
+                    🎮 NEW QUEST!
+                  </Badge>
+                )}
               </MotionBox>
             ))}
           </GridLayout>

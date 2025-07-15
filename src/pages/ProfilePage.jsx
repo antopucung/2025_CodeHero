@@ -15,14 +15,19 @@ import { designSystem } from '../design/system/DesignSystem';
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { progress } = useGameProgress();
-  const { getEnrolledCourses } = useUserEnrollment();
+  const { getEnrolledCourses, getAllAchievements } = useUserEnrollment();
   const [enrolledCourses, setEnrolledCourses] = React.useState([]);
+  const [courseAchievements, setCourseAchievements] = React.useState([]);
 
   React.useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
         const courses = await getEnrolledCourses();
         setEnrolledCourses(courses);
+        
+        // Get achievements from courses
+        const achievements = getAllAchievements();
+        setCourseAchievements(achievements);
       } catch (error) {
         console.error('Error fetching enrolled courses:', error);
       }
@@ -47,7 +52,7 @@ const ProfilePage = () => {
     { value: progress.level, label: 'LEVEL' },
     { value: progress.bestWpm, label: 'BEST WPM' },
     { value: progress.totalChallengesCompleted, label: 'CHALLENGES' },
-    { value: progress.achievements.length, label: 'ACHIEVEMENTS' }
+    { value: progress.achievements.length + courseAchievements.length, label: 'ACHIEVEMENTS' }
   ];
 
   const handleNavigateToMarketplace = () => navigate('/marketplace');
@@ -70,7 +75,12 @@ const ProfilePage = () => {
           {/* Left Column - Profile Info */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
             <ProfileCard userData={userData} progress={progress} />
-            <AchievementsSection achievements={progress.achievements} />
+            <AchievementsSection 
+              achievements={[
+                ...progress.achievements, 
+                ...courseAchievements.map(a => a.replace('_', ' '))
+              ]} 
+            />
           </div>
 
           {/* Right Column - Progress & Courses */}

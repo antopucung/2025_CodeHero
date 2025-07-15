@@ -22,6 +22,14 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
   const [isStarted, setIsStarted] = useState(false);
   const [engineState, setEngineState] = useState(engine.state);
 
+  // Add game state tracking
+  const [gameStats, setGameStats] = useState({
+    streakLevel: 0,
+    perfectKeystrokes: 0,
+    powerLevel: 1,
+    bonusPoints: 0
+  });
+
   // Initialize engine
   useEffect(() => {
     if (challenge && isStarted) {
@@ -54,6 +62,35 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       engine.off('stateChange', handleStateChange);
     };
   }, [engine]);
+
+  // Track game stats
+  useEffect(() => {
+    if (engineState && engineState.streak > 0) {
+      // Update streak level
+      let streakLevel = 0;
+      if (engineState.streak >= 50) streakLevel = 5;
+      else if (engineState.streak >= 30) streakLevel = 4;
+      else if (engineState.streak >= 20) streakLevel = 3;
+      else if (engineState.streak >= 10) streakLevel = 2;
+      else if (engineState.streak >= 5) streakLevel = 1;
+      
+      // Count perfect keystrokes
+      const perfectCount = engineState.recentlyTyped?.filter(char => char.speed === 'perfect').length || 0;
+      
+      // Calculate power level based on combo and perfect keystrokes
+      const powerLevel = Math.min(10, Math.floor((engineState.combo / 10) + (perfectCount / 5)));
+      
+      // Bonus points based on streak and power
+      const bonusPoints = engineState.streak * powerLevel * 5;
+      
+      setGameStats({
+        streakLevel,
+        perfectKeystrokes: perfectCount,
+        powerLevel,
+        bonusPoints
+      });
+    }
+  }, [engineState]);
 
   // Handle keyboard input
   useEffect(() => {
@@ -107,6 +144,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
       <MotionBox
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
         position="relative"
         overflow="hidden"
         h={fullScreen ? "100%" : "auto"}
@@ -140,6 +178,40 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             >
               LANGUAGE: {challenge.language.toUpperCase()} | 
               DIFFICULTY: {challenge.difficulty.toUpperCase()}
+            </Text>
+            
+            {/* Gamification Elements */}
+            <MotionBox
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              bg="#001100"
+              border="1px solid #003300"
+              borderRadius="4px"
+              p={3}
+              mt={4}
+              maxW="450px"
+              mx="auto"
+            >
+              <Text color="#00ff00" fontSize="sm" mb={2} fontWeight="bold" textAlign="center">
+                🎮 CODING QUEST OBJECTIVES
+              </Text>
+              <VStack spacing={2} align="start" fontSize="xs" color="#00cc00">
+                <Box>
+                  <Text>✅ Type code accurately to gain XP</Text>
+                </Box>
+                <Box>
+                  <Text>✅ Build combos for multiplier bonuses</Text>
+                </Box>
+                <Box>
+                  <Text>✅ Achieve 100% accuracy for achievements</Text>
+                </Box>
+                <Box>
+                  <Text>✅ Maintain streaks to unlock special powers</Text>
+                </Box>
+              </VStack>
+            </MotionBox>
+            
             </Box>
             
             <MotionBox
@@ -159,9 +231,10 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
                   boxShadow: `0 0 15px ${colors.primary[500]}`
                 }}
                 onClick={startChallenge}
+                _active={{ transform: "scale(0.98)" }}
                 size={fullScreen ? "xl" : "lg"}
               >
-                🚀 START TYPING CHALLENGE 🚀
+                🚀 BEGIN QUEST 🚀
               </Button>
             </MotionBox>
           </VStack>
@@ -185,9 +258,21 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         p={2}
         flexShrink={0}
       >
-        <Text fontSize="xs" color={colors.terminal.textSecondary} mb={2}>
-          │ PROGRESS
-        </Text>
+        <HStack justify="space-between" mb={2}>
+          <Text fontSize="xs" color={colors.terminal.textSecondary}>
+            │ QUEST PROGRESS
+          </Text>
+          
+          {gameStats.streakLevel > 0 && (
+            <HStack spacing={1}>
+              <Text fontSize="xs" color="#ffd93d">STREAK LEVEL:</Text>
+              <Text fontSize="xs" color="#ffaa00" fontWeight="bold">
+                {Array(gameStats.streakLevel).fill('✦').join('')}
+              </Text>
+            </HStack>
+          )}
+        </HStack>
+        
         <Box 
           bg={colors.terminal.bg}
           border={`1px solid ${colors.terminal.border}`}
@@ -198,24 +283,41 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         >
           <motion.div
             initial={{ width: 0 }}
-            animate={{ width: `${engine.getProgress()}%` }}
+            animate={{ 
+              width: `${engine.getProgress()}%`,
+              background: gameStats.streakLevel >= 3 
+                ? `linear-gradient(90deg, #00ff00, #ffff00, #00ff00)` 
+                : `linear-gradient(90deg, ${colors.primary[500]}, ${colors.primary[400]})`
+            }}
             transition={{ duration: 0.3 }}
             style={{
               height: '100%',
-              background: `linear-gradient(90deg, ${colors.primary[500]}, ${colors.primary[400]})`,
               boxShadow: `0 0 10px ${colors.primary[500]}`
             }}
           />
         </Box>
         
-        <Text 
-          fontSize="xs"
-          color={colors.terminal.textSecondary}
-          textAlign="center" 
-          mt={1}
-        >
-          {Math.round(engine.getProgress())}% Complete
+        <HStack justify="space-between" mt={1}>
+          <Text 
+            fontSize="xs"
+            color={colors.terminal.textSecondary}
+          >
+            {Math.round(engine.getProgress())}% Complete
+          </Text>
+          
+          {gameStats.bonusPoints > 0 && (
+            <Text fontSize="xs" color="#ffaa00" fontWeight="bold">
+              Bonus: +{gameStats.bonusPoints} pts
+            </Text>
+          )}
+          
+          {gameStats.powerLevel > 1 && (
+            <Text fontSize="xs" color="#ff6b6b" fontWeight="bold">
+              POWER LVL {gameStats.powerLevel}
+            </Text>
+          )}
         </Text>
+        </HStack>
       </Box>
       
       {/* Typing Display */}

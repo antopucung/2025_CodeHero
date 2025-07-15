@@ -4,6 +4,7 @@ import { Box, Text, VStack, HStack, Button, Grid, GridItem, Badge, Image, Divide
 import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
+import confetti from 'canvas-confetti';
 
 const MotionBox = motion(Box);
 
@@ -14,8 +15,9 @@ const ModuleDetailPage = () => {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showEnrollSuccess, setShowEnrollSuccess] = useState(false);
   
-  const { isEnrolled, enrollInCourse, getCourseProgress } = useUserEnrollment();
+  const { isEnrolled, enrollInCourse, getCourseProgress, getCompletionPercentage } = useUserEnrollment();
   const enrolled = course ? isEnrolled(course.id) : false;
   const progress = course ? getCourseProgress(course.id) : { completedLessons: [], currentLesson: null };
 
@@ -58,6 +60,21 @@ const ModuleDetailPage = () => {
   const handleEnroll = async () => {
     if (course) {
       await enrollInCourse(course.id);
+      
+      // Show enrollment success animation
+      setShowEnrollSuccess(true);
+      
+      // Trigger confetti celebration
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      
+      // Hide the success message after a few seconds
+      setTimeout(() => {
+        setShowEnrollSuccess(false);
+      }, 5000);
     }
   };
 
@@ -215,11 +232,11 @@ const ModuleDetailPage = () => {
                   {progress.completedLessons.length > 0 && (
                     <VStack spacing={1}>
                       <Text fontSize="sm" color="#ffd93d">
-                        {calculateProgress()}% Complete
+                        {getCompletionPercentage(course.id).toFixed(0)}% Complete
                       </Text>
                       <Box w="200px" h="4px" bg="#333" borderRadius="2px">
                         <Box 
-                          w={`${calculateProgress()}%`} 
+                          w={`${getCompletionPercentage(course.id).toFixed(0)}%`} 
                           h="100%" 
                           bg="#ffd93d" 
                           borderRadius="2px"
@@ -238,9 +255,33 @@ const ModuleDetailPage = () => {
                   fontWeight="bold"
                   onClick={handleEnroll}
                   _hover={{ bg: "#ff8e8e" }}
+                  isDisabled={showEnrollSuccess}
                 >
                   💳 Enroll Now
                 </Button>
+              )}
+              
+              {/* Enrollment Success Message */}
+              {showEnrollSuccess && (
+                <MotionBox
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  bg="#111"
+                  border="1px solid #00ff00"
+                  borderRadius="md"
+                  p={3}
+                  mt={4}
+                  textAlign="center"
+                  boxShadow="0 0 15px #00ff0066"
+                >
+                  <Text color="#00ff00" fontSize="sm" fontWeight="bold">
+                    🎮 Quest Started! Your adventure begins now.
+                  </Text>
+                  <Text color="#ccc" fontSize="xs" mt={1}>
+                    Click 'Start Learning' to begin your journey
+                  </Text>
+                </MotionBox>
               )}
             </VStack>
           </HStack>

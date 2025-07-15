@@ -92,10 +92,10 @@ export const QuizFeedback = ({
             ]
           }}
           transition={{ 
-            duration: 0.5 * effects.speed,
+            duration: 0.5 * effects?.speed || 1,
             backgroundColor: { 
               repeat: Infinity, 
-              duration: 1.5 * effects.speed 
+              duration: 1.5 * effects?.speed || 1
             }
           }}
           position="fixed"
@@ -119,7 +119,7 @@ export const QuizFeedback = ({
       )}
       
       {/* Floating points animation */}
-      {effects.speed !== 'low' && gameEffects.pointsText && (
+      {effects?.speed !== 'low' && gameEffects.pointsText && (
         <AnimatePresence>
           <MotionBox
             key={`points-${Date.now()}`}
@@ -130,7 +130,7 @@ export const QuizFeedback = ({
               scale: [0.5, 1.2, 1]
             }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.5 * effects.speed }}
+            transition={{ duration: 1.5 * effects?.speed || 1 }}
             position="fixed"
             top="50%"
             right="10%"
@@ -147,20 +147,20 @@ export const QuizFeedback = ({
       )}
       
       {/* Combo text animation */}
-      {effects.speed !== 'low' && gameEffects.comboText && (
+      {effects?.speed !== 'low' && gameEffects.comboText && (
         <AnimatePresence>
           <MotionBox
             key={`combo-${Date.now()}`}
             initial={{ opacity: 0, scale: 0.7 }}
             animate={{ 
               opacity: [0, 1, 0],
-              scale: [0.7, 1.3 * effects.scale, 0.9],
+              scale: [0.7, 1.3 * (effects?.scale || 1), 0.9],
               rotate: [-5, 5, 0]
             }}
             exit={{ opacity: 0 }}
             transition={{ 
-              duration: 1.2 * effects.speed,
-              scale: { type: "spring", stiffness: 300 * effects.speed }
+              duration: 1.2 * effects?.speed || 1,
+              scale: { type: "spring", stiffness: 300 * effects?.speed || 300 }
             }}
             position="fixed"
             top="30%"
@@ -216,3 +216,5 @@ export const QuizFeedback = ({
     </>
   );
 };
+
+export default QuizFeedback;

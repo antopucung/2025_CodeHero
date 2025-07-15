@@ -34,7 +34,7 @@ export const QuizHeader = ({
         <VStack spacing={1} align="end">
           <HStack>
             <Text color={quizState.timeRemaining < 10 ? "#ff6b6b" : "#ccc"} fontSize="sm">
-              Time: {formatTime(quizState.timeRemaining)}
+              Time: {formatTime ? formatTime(quizState.timeRemaining) : quizState.timeRemaining}
             </Text>
             <Text color="#ffd93d" fontSize="sm">
               Score: {quizState.score}
@@ -51,7 +51,7 @@ export const QuizHeader = ({
               h="100%"
               bg="#00ff00"
               animate={{ 
-                width: `${(quizState.timeRemaining / timeLimit) * 100}%`,
+                width: `${(quizState.timeRemaining / (timeLimit || 120)) * 100}%`,
                 backgroundColor: quizState.timeRemaining < 10 ? "#ff6b6b" : "#00ff00"
               }}
               transition={{ duration: 0.3 }}
@@ -62,3 +62,5 @@ export const QuizHeader = ({
     </HStack>
   );
 };
+
+export default QuizHeader;

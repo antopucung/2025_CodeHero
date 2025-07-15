@@ -12,7 +12,8 @@ export const SolutionArea = ({
   activeDragBlock,
   gameEffects,
   language,
-  quizState
+  quizState,
+  onDrop
 }) => {
   return (
     <Box 
@@ -35,17 +36,18 @@ export const SolutionArea = ({
       >
         <VStack align="start" spacing={1} overflow="visible">
           {/* Render drop zones for every possible insertion point */}
-          {Array.from({ length: userSolution.length + 1 }).map((_, index) => (
+          {Array.from({ length: (userSolution?.length || 0) + 1 }).map((_, index) => (
             <Box key={`dropzone-wrapper-${index}`} w="100%" overflow="visible" position="relative">
               <DropZone 
                 key={`dropzone-${index}`}
                 index={index}
-                ref={el => dropZoneRefs.current[index] = el}
+                ref={el => dropZoneRefs && dropZoneRefs[index] ? dropZoneRefs[index] = el : null}
                 isActive={!!activeDragBlock}
-                highlightColor={gameEffects.streak >= 3 ? "#ffd93d" : "#4ecdc4"}
+                highlightColor={gameEffects?.streak >= 3 ? "#ffd93d" : "#4ecdc4"}
+                onDrop={onDrop ? () => onDrop(index) : undefined}
               >
                 {/* If there's a block at this index in the solution, render it */}
-                {index < userSolution.length && (
+                {index < (userSolution?.length || 0) && userSolution && (
                   <DraggableCodeBlock
                     key={`solution-${userSolution[index].id}`}
                     block={userSolution[index]}
@@ -56,7 +58,7 @@ export const SolutionArea = ({
                 )}
                 
                 {/* If this is an empty drop zone, show a placeholder when active */}
-                {index >= userSolution.length && index === 0 && userSolution.length === 0 && (
+                {index >= (userSolution?.length || 0) && index === 0 && (userSolution?.length || 0) === 0 && (
                   <Text color="#666" fontSize="sm">Drop first block here</Text>
                 )}
               </DropZone>
@@ -67,3 +69,5 @@ export const SolutionArea = ({
     </Box>
   );
 };
+
+export default SolutionArea;

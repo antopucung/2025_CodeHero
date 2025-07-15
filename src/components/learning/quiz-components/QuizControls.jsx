@@ -74,3 +74,5 @@ export const QuizControls = ({
     </HStack>
   );
 };
+
+export default QuizControls;

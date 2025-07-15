@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CodeQuizEngine, createCodeBlocksFromString } from '../CodeQuizEngine';
 
 /**
@@ -51,11 +50,8 @@ export const useCodeQuizEngine = ({
     if (!code) return;
     
     try {
-      console.log("Initializing quiz with code:", code);
-      
       // Create code blocks
       const codeBlocks = createCodeBlocksFromString(code, splitType);
-      console.log("Created code blocks:", codeBlocks);
       
       // Create quiz engine
       const quizEngine = new CodeQuizEngine({
@@ -66,12 +62,10 @@ export const useCodeQuizEngine = ({
       
       // Set up quiz with code blocks
       quizEngine.setup(codeBlocks, [...codeBlocks]);
-      console.log("Quiz engine setup complete");
       
       // Register event handlers
       quizEngine
         .on('start', (state) => {
-          console.log("Quiz started:", state);
           setQuizState({...state});
           setGameEffects({
             combo: 1,
@@ -89,7 +83,6 @@ export const useCodeQuizEngine = ({
           });
         })
         .on('complete', (result) => {
-          console.log("Quiz completed:", result);
           if (onComplete) {
             onComplete({
               score: result.score,
@@ -103,7 +96,6 @@ export const useCodeQuizEngine = ({
           }
         })
         .on('correct', (data) => {
-          console.log("Correct placement:", data);
           setGameEffects(prev => {
             const newStreak = prev.streak + 1;
             
@@ -158,7 +150,6 @@ export const useCodeQuizEngine = ({
           });
         })
         .on('incorrect', (data) => {
-          console.log("Incorrect placement:", data);
           // Flash screen on error
           setScreenFlash({ 
             active: true, 
@@ -192,7 +183,6 @@ export const useCodeQuizEngine = ({
           }));
         })
         .on('timeout', (result) => {
-          console.log("Quiz timeout:", result);
           setGameEffects(prev => ({
             ...prev,
             lastAction: 'timeout',
@@ -233,11 +223,10 @@ export const useCodeQuizEngine = ({
       if (quizEngine.state.solution) {
         // Create a ref for each potential drop position (solution length + 1)
         const numDropZones = quizEngine.state.solution.length + 1;
-        console.log("Creating", numDropZones, "drop zone refs");
         dropZoneRefs.current = Array(numDropZones).fill().map(() => React.createRef());
       }
     } catch (error) {
-      console.error("Error initializing quiz engine:", error);
+      console.error('Error initializing quiz engine:', error);
     }
     
     return () => {
@@ -251,7 +240,6 @@ export const useCodeQuizEngine = ({
   // Start the quiz
   const handleStart = () => {
     if (quizEngineRef.current) {
-      console.log("Starting quiz");
       setIsPaused(false);
       quizEngineRef.current.start();
     }
@@ -260,7 +248,6 @@ export const useCodeQuizEngine = ({
   // Reset the quiz
   const handleReset = () => {
     if (quizEngineRef.current) {
-      console.log("Resetting quiz");
       quizEngineRef.current.reset();
       setQuizState(quizEngineRef.current.getState());
       setGameEffects({
@@ -277,7 +264,6 @@ export const useCodeQuizEngine = ({
   // Pause the quiz
   const handlePause = () => {
     if (quizEngineRef.current && quizState.status === 'active') {
-      console.log("Pausing quiz");
       quizEngineRef.current.pause();
       setQuizState({ ...quizEngineRef.current.getState() });
       setIsPaused(true);
@@ -287,7 +273,6 @@ export const useCodeQuizEngine = ({
   // Resume the quiz
   const handleResume = () => {
     if (quizEngineRef.current && quizState.status === 'paused') {
-      console.log("Resuming quiz");
       quizEngineRef.current.resume();
       setQuizState({ ...quizEngineRef.current.getState() });
       setIsPaused(false);
@@ -296,7 +281,6 @@ export const useCodeQuizEngine = ({
 
   // Close/Abort the quiz
   const handleAbort = () => {
-    console.log("Aborting quiz");
     // If onClose prop exists (from parent QuizPopup), call it
     if (onComplete) {
       // Call onComplete with a failed result
@@ -312,27 +296,22 @@ export const useCodeQuizEngine = ({
 
   // Handle drag start
   const handleBlockDragStart = (block) => {
-    console.log("Block drag started:", block.id);
     setActiveDragBlock(block);
     setIsDraggingBlock(true);
   };
 
-  // New: Handle drag end for a block
+  // Handle drag end for a block
   const handleBlockDragEnd = () => {
-    console.log("Block drag ended.");
     setActiveDragBlock(null);
     setIsDraggingBlock(false);
   };
 
-  // New: Handle drop on a specific drop zone
+  // Handle drop on a specific drop zone
   const handleDropOnZone = (dropZoneIndex) => {
     if (!activeDragBlock || !quizEngineRef.current) {
-      console.log("No active drag block or quiz engine for drop.");
       return;
     }
-    console.log(`Dropped block ${activeDragBlock.id} on zone ${dropZoneIndex}`);
     const result = quizEngineRef.current.placeBlock(activeDragBlock.id, dropZoneIndex);
-    console.log("Place block result:", result);
     setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
 
     // Trigger a small screen flash for feedback

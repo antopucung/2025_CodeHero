@@ -102,3 +102,5 @@ export const QuizResults = ({ type = "complete", quizState, handleReset }) => {
     </MotionBox>
   );
 };
+
+export default QuizResults;

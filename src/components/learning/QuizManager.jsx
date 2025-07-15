@@ -6,7 +6,6 @@ import CodeCompletionQuiz from './CodeCompletionQuiz';
 import DebugChallengeQuiz from './DebugChallengeQuiz';
 
 // Quiz Manager Component - Renders the appropriate quiz based on type
-// Quiz Manager Component - Renders the appropriate quiz based on type
 const QuizManager = ({ quizData, onComplete, juiciness = 'high' }) => {
   if (!quizData || !quizData.type) {
     return (
@@ -30,7 +29,6 @@ const QuizManager = ({ quizData, onComplete, juiciness = 'high' }) => {
           difficulty={quizData.difficulty || "medium"}
           onComplete={onComplete}
           juiciness={juiciness}
-          totalBlocks={quizData.totalBlocks}
           totalBlocks={quizData.totalBlocks}
         />
       );

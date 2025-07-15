@@ -90,21 +90,13 @@ export class CodeQuizEngine {
   
   // Add a block to the user solution
   placeBlock(blockId, insertIndex = -1) {
-    console.log(`Attempting to place block ${blockId} at index ${insertIndex}`);
     if (this.state.status !== 'active') {
-      console.log("Quiz not active, can't place block");
       return false;
     }
-
-    console.log("Current blocks:", this.state.blocks);
-    console.log("User solution before placement:", this.state.userSolution);
-
-    console.log("Insert at index:", insertIndex);
 
     // Find block in available blocks
     const blockIndex = this.state.blocks.findIndex(b => b.id === blockId);
     if (blockIndex === -1) {
-      console.log("Block not found in available blocks");
       return false;
     }
     
@@ -113,7 +105,6 @@ export class CodeQuizEngine {
     const newBlocks = [...this.state.blocks];
     newBlocks.splice(blockIndex, 1);
     this.state.blocks = newBlocks;
-    console.log("Available blocks after removal:", this.state.blocks);
     
     // Add to user solution at specified index or append to end if not specified
     const newUserSolution = [...this.state.userSolution];
@@ -125,14 +116,9 @@ export class CodeQuizEngine {
       newUserSolution.push(block);
     }
     this.state.userSolution = newUserSolution;
-    console.log("User solution after placement:", this.state.userSolution);
     
     // Check if placement is correct
-    // After placing, check if the block at the inserted position matches the solution
-    const isCorrect = this.state.userSolution[insertIndex].id === this.state.solution[insertIndex].id;
-    console.log(`Checking placement for block ${block.id} at index ${insertIndex}. Is it correct? ${isCorrect}`);
-    console.log(`Expected solution block at this index:`, this.state.solution[insertIndex]);
-    console.log("Placement correct?", isCorrect);
+    const isCorrect = this.checkPlacement(block, insertIndex);
     
     if (isCorrect) {
       // Increase combo
@@ -187,23 +173,24 @@ export class CodeQuizEngine {
       }
     }
     
+    // Check if quiz should be completed
+    if (this.areAllPlacementsCorrect()) {
+      this.complete();
+    }
+    
     return isCorrect;
   }
   
-  // Check if all current placements are correct
+  // Check if all blocks are placed correctly
   areAllPlacementsCorrect() {
-    // Only check if the user has placed the same number of blocks as in the solution
-    if (this.state.userSolution.length !== this.state.solution.length) { 
+    if (this.state.userSolution.length !== this.state.solution.length) {
       return false;
     }
     
     for (let i = 0; i < this.state.userSolution.length; i++) {
-      // Use strict equality (===) for comparison [2, 3, 4, 5, 6]
-      if (this.state.userSolution[i].id !== this.state.solution[i].id) { 
-        console.log(`Mismatch at index ${i}: User has ${this.state.userSolution[i].id}, Solution has ${this.state.solution[i].id}`);
+      if (this.state.userSolution[i].id !== this.state.solution[i].id) {
         return false;
       }
-      console.log(`Block ${this.state.userSolution[i].id} at index ${i} is correct.`);
     }
     
     return true;
@@ -222,7 +209,6 @@ export class CodeQuizEngine {
     this.state.status = 'completed';
     this.state.isComplete = true;
     this.state.endTime = Date.now();
-    console.log("Quiz state set to completed.");
     
     // Stop timer
     this.stopTimer();

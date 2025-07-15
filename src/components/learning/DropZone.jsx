@@ -1,12 +1,14 @@
+import React from 'react';
+import { Box, Text } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+
 // Drop Zone for placing code blocks
-const DropZone = React.forwardRef((props, ref) => {
-  const { index, children, isActive, highlightColor = "#4ecdc4" } = props;
-  
+const DropZone = React.forwardRef(({ index, children, isActive, highlightColor = "#4ecdc4" }, ref) => {
   return (
     <Box
       ref={ref}
-      bg={isActive ? `${highlightColor}22` : "transparent"}
-      border="1px dashed"
+      bg={isActive ? `${highlightColor}11` : "transparent"}
+      border="2px dashed"
       borderColor={isActive ? highlightColor : "#333"}
       borderWidth="2px"
       borderRadius="md"
@@ -15,9 +17,12 @@ const DropZone = React.forwardRef((props, ref) => {
       mb={2}
       position="relative"
       transition="all 0.2s ease"
+      zIndex={isActive ? 0 : 1} // Lower z-index when active to allow dragged items to appear above
       _hover={{
         borderColor: isActive ? highlightColor : "#666"
       }}
+      data-dropzone-index={index}
+      className="drop-zone"
     >
       {children}
       {isActive && !children && (
@@ -27,13 +32,14 @@ const DropZone = React.forwardRef((props, ref) => {
           left={0}
           right={0}
           bottom={0}
-           bg={`${highlightColor}11`}
-           borderRadius="md"
-           border={`1px dashed ${highlightColor}`}
-           display="flex"
-           alignItems="center"
-           justifyContent="center"
+          bg={`${highlightColor}11`}
+          borderRadius="md"
+          border={`1px dashed ${highlightColor}`}
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
           pointerEvents="none"
+          zIndex={0} // Behind draggable elements but visible
         >
           <Text fontSize="xs" color={highlightColor} fontWeight="bold">
             DROP HERE

@@ -129,7 +129,7 @@ const DropZone = React.forwardRef(({ index, children, isActive, highlightColor =
           bottom="0"
           bg={`${highlightColor}11`}
           borderRadius="md"
-          zIndex={-1}
+          overflow="visible" 
         />
       )}
     </MotionBox>
@@ -441,7 +441,11 @@ const CodeStackingQuiz = ({
   // Handle drag end
   const handleDragEnd = (block, info) => {
     console.log("Drag ended:", block.id, info);
-    if (!activeDragBlock || !quizEngineRef.current || !info) return;
+    if (!activeDragBlock || !quizEngineRef.current || !info) {
+      console.log("Missing required data for drag end");
+      setActiveDragBlock(null);
+      return;
+    }
     
     // Get the drop point coordinates
     const dropPoint = info?.point ? { x: info.point.x, y: info.point.y } : null;
@@ -450,6 +454,13 @@ const CodeStackingQuiz = ({
       console.log("Drop point:", dropPoint);
       // Check each dropzone to see if the point is within its bounds
       let droppedInZone = false;
+
+      console.log("Checking", dropZoneRefs.current.length, "dropzones");
+      // Add visual feedback when dropped
+      setScreenFlash({ active: true, type: 'info', intensity: 0.3 });
+      setTimeout(() => {
+        setScreenFlash({ active: false, type: 'info', intensity: 0 });
+      }, 200);
       
       dropZoneRefs.current.forEach((ref, index) => {
         if (!ref || !ref.current) {
@@ -475,9 +486,31 @@ const CodeStackingQuiz = ({
           droppedInZone = true;
         }
       });
-      
+
       if (!droppedInZone) {
         console.log("Not dropped in any zone");
+        setGameEffects(prev => ({
+          ...prev,
+          feedbackMessages: [
+            ...prev.feedbackMessages,
+            {
+              id: Date.now(),
+              text: "Block not placed in a drop zone",
+              type: "warning"
+            }
+          ].slice(-5)
+        }));
+      } else {
+        // Trigger a small screen flash for feedback
+        setScreenFlash({ 
+          active: true, 
+          type: 'info', 
+          intensity: 0.3 
+        });
+        
+        setTimeout(() => {
+          setScreenFlash({ active: false, type: 'info', intensity: 0 });
+        }, 300);
       }
     }
     
@@ -533,8 +566,8 @@ const CodeStackingQuiz = ({
       {screenFlash.active && (
         <MotionBox
           initial={{ opacity: 0 }}
-          animate={{ 
-            opacity: [0, screenFlash.intensity, 0] 
+          animate={{
+            opacity: [0, screenFlash.intensity, 0]
           }}
           transition={{ duration: 0.3 }}
           position="fixed"
@@ -542,7 +575,11 @@ const CodeStackingQuiz = ({
           left={0}
           right={0}
           bottom={0}
-          bg={screenFlash.type === 'success' ? "rgba(0, 255, 0, 0.2)" : "rgba(255, 0, 0, 0.2)"}
+          bg={
+            screenFlash.type === 'success' ? "rgba(0, 255, 0, 0.2)" : 
+            screenFlash.type === 'error' ? "rgba(255, 0, 0, 0.2)" :
+            "rgba(78, 205, 196, 0.2)" // info - teal color for neutral actions
+          }
           zIndex={999}
           pointerEvents="none"
         />
@@ -696,8 +733,8 @@ const CodeStackingQuiz = ({
         </HStack>
       </HStack>
       
-      {/* Quiz content */}
-      <Box p={4} position="relative">
+      {/* Quiz content - Setting overflow to visible for dragging outside containers */}
+      <Box p={4} position="relative" overflow="visible">
         {quizState.status === 'waiting' && (
           <Box>
             <VStack spacing={6} align="center" justify="center" bg="#111" borderRadius="md" p={8} textAlign="center">
@@ -722,9 +759,17 @@ const CodeStackingQuiz = ({
           </Box>
         )}
 
-        <HStack align="start" spacing={6} h="calc(100vh - 300px)" maxH="500px">
+        <HStack align="start" spacing={6} h="calc(100vh - 300px)" maxH="500px" overflow="visible" position="relative">
           {/* Available blocks */}
-          <Box w="45%" position="relative" h="100%" display="flex" flexDirection="column">
+          <Box 
+            w="45%" 
+            position="relative" 
+            h="100%" 
+            display="flex" 
+            flexDirection="column" 
+            zIndex={1}
+            bg="#111"
+          >
             <Text color="#666" fontSize="sm" mb={2}>Available Blocks:</Text>
             <Box flex={1} overflowY="auto" ml="30px">
               {quizState.blocks.length > 0 ? (
@@ -749,9 +794,23 @@ const CodeStackingQuiz = ({
           </Box>
           
           {/* Solution area */}
-          <Box w="55%" position="relative" h="100%" display="flex" flexDirection="column">
+          <Box 
+            w="55%" 
+            position="relative" 
+            h="100%" 
+            display="flex" 
+            flexDirection="column" 
+            zIndex={1}
+            bg="#111"
+          >
             <Text color="#666" fontSize="sm" mb={2}>Arrange Here:</Text>
-            <Box flex={1} overflowY="auto" ml="30px">
+            <Box 
+              flex={1} 
+              overflowY="auto" 
+              ml="30px" 
+              position="relative"
+              className="drop-container"
+            >
               <VStack align="start" spacing={1}>
                 {/* Render drop zones for every possible insertion point */}
                 {Array.from({ length: quizState.userSolution.length + 1 }).map((_, index) => (

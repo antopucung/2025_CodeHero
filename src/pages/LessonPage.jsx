@@ -179,7 +179,7 @@ const LessonPage = () => {
               </Text>
 
               {contentData.code_example && (
-                (course?.language === "csharp" && contentData.execution_environment === "unity") ? (
+                (course?.language === "csharp" && (contentData.execution_environment === "unity" || contentData.code_title?.includes("Unity"))) ? (
                   <UnityCodeEditor
                     initialCode={contentData.code_example}
                     title={contentData.code_title || "Unity C# Example"}

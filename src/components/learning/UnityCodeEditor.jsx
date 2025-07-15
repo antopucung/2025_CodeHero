@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Box, HStack, VStack, Text, Button, Badge, useDisclosure, Tooltip } from "@chakra-ui/react";
+import { Box, HStack, VStack, Text, Button, Badge, Tooltip, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Editor } from "@monaco-editor/react";
 import { executeCode } from "../../api";
@@ -17,10 +17,9 @@ const MotionBox = motion(Box);
 const UnityCodeEditor = ({ 
   initialCode, 
   annotations = [],
-  defaultLanguage = "csharp",
-  title = "Unity C# Code Example",
+  title = "Unity C# Example",
   readOnly = false,
-  onExecutionComplete
+  onExecutionComplete = null
 }) => {
   const [code, setCode] = useState(initialCode);
   const [output, setOutput] = useState(null);
@@ -37,7 +36,7 @@ const UnityCodeEditor = ({
       if (!readOnly && annotations.length > 0) {
         addAnnotationMarkers(editor, annotations);
       }
-    }, 100);
+    }, 500);
   };
   
   // Add interactive markers for code annotations
@@ -58,12 +57,18 @@ const UnityCodeEditor = ({
         if (!wordAtPosition) return null;
         
         const word = wordAtPosition.word;
+        const lineContent = model.getLineContent(line);
         
         // Find matching annotation
-        const matchingAnnotation = annotations.find(a => 
-          a.text.includes(word) && 
-          a.line === line - 1
-        );
+        const matchingAnnotation = annotations.find(a => {
+          // Check for exact text match
+          if (a.text === word) return true;
+          
+          // Check if text is in the line
+          if (a.line === line - 1 && lineContent.includes(a.text)) return true;
+          
+          return false;
+        });
         
         if (matchingAnnotation) {
           return {
@@ -84,103 +89,199 @@ const UnityCodeEditor = ({
     if (!editorRef.current) return;
     
     setIsExecuting(true);
+    setOutput(null); // Clear previous output
+    
     try {
       const sourceCode = editorRef.current.getValue();
       
-      // For Unity C#, we add some wrapper code to make it runnable in isolation
-      // since Unity components rely on MonoBehaviour
-      const wrappedCode = `using System;
+      // Wrap the user code in a simulation environment that mimics Unity
+      const wrappedCode = `
+using System;
 using System.Collections.Generic;
 
-namespace UnitySimulation {
-  // Unity simulation environment
-  public static class UnityEngine {
-    public static class Debug {
-      public static void Log(string message) {
-        Console.WriteLine("[Unity Debug]: " + message);
-      }
+// Unity simulation environment
+namespace UnityEngine
+{
+    public static class Debug
+    {
+        public static void Log(object message)
+        {
+            Console.WriteLine($"[Unity Debug]: {message}");
+        }
     }
-    
-    public class Vector3 {
-      public float x, y, z;
-      public static Vector3 up = new Vector3(0, 1, 0);
-      public static Vector3 right = new Vector3(1, 0, 0);
-      
-      public Vector3(float x = 0, float y = 0, float z = 0) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-      }
-    }
-    
-    public class MonoBehaviour {}
-    
-    public static class Time {
-      public static float deltaTime = 0.016f; // ~60fps
-    }
-  }
-  
-  // User code starts here
-  ${sourceCode}
-  
-  // Test execution code
-  public class Program {
-    public static void Main() {
-      Console.WriteLine("[Unity Simulation Started]");
-      // Instantiate player controller
-      try {
-        var player = new PlayerController();
+
+    public class Vector3
+    {
+        public float x, y, z;
         
-        // Simulate Start method call
-        try {
-          player.Start();
-        } catch (Exception e) {
-          Console.WriteLine("Error in Start(): " + e.Message);
+        public Vector3(float x = 0, float y = 0, float z = 0)
+        {
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
         
-        // Simulate a few Update calls
-        Console.WriteLine("[Running Update frames...]");
-        for (int i = 0; i < 3; i++) {
-          try {
-            Console.WriteLine("Frame " + (i+1));
-            player.Update();
-          } catch (Exception e) {
-            Console.WriteLine("Error in Update(): " + e.Message);
-          }
+        public static Vector3 up => new Vector3(0, 1, 0);
+        public static Vector3 right => new Vector3(1, 0, 0);
+        public static Vector3 forward => new Vector3(0, 0, 1);
+        
+        public override string ToString()
+        {
+            return $"({x}, {y}, {z})";
         }
-        Console.WriteLine("[Unity Simulation Completed]");
-      }
-      catch (Exception e) {
-        Console.WriteLine("Error: " + e.Message);
-      }
     }
-  }
+    
+    public class Transform
+    {
+        private Vector3 _position = new Vector3();
+        private Vector3 _rotation = new Vector3();
+        private Vector3 _scale = new Vector3(1, 1, 1);
+        
+        public Vector3 position
+        {
+            get { return _position; }
+            set { _position = value; Console.WriteLine($"[Unity Transform]: Position set to {value}"); }
+        }
+        
+        public void Translate(Vector3 translation)
+        {
+            _position.x += translation.x;
+            _position.y += translation.y;
+            _position.z += translation.z;
+            Console.WriteLine($"[Unity Transform]: Translated to {_position}");
+        }
+    }
+    
+    public class GameObject
+    {
+        public string name;
+        public Transform transform = new Transform();
+        
+        public GameObject(string name = "GameObject")
+        {
+            this.name = name;
+            Console.WriteLine($"[Unity]: Created GameObject '{name}'");
+        }
+        
+        public T GetComponent<T>() where T : new()
+        {
+            Console.WriteLine($"[Unity]: Getting component of type {typeof(T).Name}");
+            return new T();
+        }
+    }
+    
+    public class MonoBehaviour
+    {
+        public GameObject gameObject = new GameObject();
+        public Transform transform => gameObject.transform;
+    }
+    
+    public static class Time
+    {
+        public static float deltaTime = 0.016f; // ~60fps
+    }
+    
+    public static class Input
+    {
+        public static bool GetKeyDown(KeyCode key)
+        {
+            Console.WriteLine($"[Unity Input]: Simulating key press: {key}");
+            return true;
+        }
+    }
+    
+    public enum KeyCode
+    {
+        Space,
+        W,
+        A,
+        S,
+        D
+    }
+}
+
+// User code
+${sourceCode}
+
+// Test execution
+public class UnitySimulation
+{
+    public static void Main()
+    {
+        Console.WriteLine("[Unity Simulation Started]");
+        
+        try
+        {
+            // Create an instance of the player controller
+            PlayerController player = null;
+            try {
+                player = new PlayerController();
+                Console.WriteLine("[Unity]: PlayerController instance created successfully");
+            }
+            catch (Exception e) {
+                Console.WriteLine($"[Unity Error]: Failed to create PlayerController: {e.Message}");
+                return;
+            }
+            
+            // Call Start() to initialize
+            try {
+                Console.WriteLine("[Unity]: Calling Start() method...");
+                player.Start();
+            }
+            catch (Exception e) {
+                Console.WriteLine($"[Unity Error]: Exception in Start() method: {e.Message}");
+            }
+            
+            // Simulate a few frames of Update()
+            Console.WriteLine("[Unity]: Simulating frames...");
+            for (int frame = 1; frame <= 3; frame++) {
+                Console.WriteLine($"[Unity]: Frame {frame}");
+                try {
+                    player.Update();
+                }
+                catch (Exception e) {
+                    Console.WriteLine($"[Unity Error]: Exception in Update() method: {e.Message}");
+                }
+            }
+            
+            Console.WriteLine("[Unity Simulation Completed]");
+        }
+        catch (Exception e) {
+            Console.WriteLine($"[Unity Error]: {e.Message}\\n{e.StackTrace}");
+        }
+    }
 }`;
       
       // Execute the wrapped code
       const { run: result } = await executeCode("csharp", wrappedCode);
       
-      // Parse and format the output
-      let formattedOutput = result.output;
-      const hasError = result.stderr ? true : false;
+      // Check if there was a compilation error
+      const hasCompilationError = result.stderr || 
+                                result.output.includes("error CS") ||
+                                result.output.includes("error BC");
       
-      // Format Unity debug logs for better visibility
-      if (!hasError) {
+      // Check if there was any Unity-specific output
+      const hasUnityOutput = result.output.includes("[Unity Debug]") || 
+                            result.output.includes("[Unity Simulation");
+      
+      // Format the output for better readability
+      let formattedOutput = result.output;
+      
+      // If there's an error but the execution claims success, we need to fix that
+      const isActuallySuccessful = !hasCompilationError && hasUnityOutput;
+      
+      // Format the output
+      if (!hasCompilationError) {
         try {
-          formattedOutput = formattedOutput.replace(/\[Unity Debug\]:/g, '🎮 ');
-          formattedOutput = formattedOutput.replace(/\[Unity Simulation Started\]/g, '🚀 Unity Simulation Started\n');
-          formattedOutput = formattedOutput.replace(/\[Running Update frames\.\.\.\]/g, '\n⏱️ Running Update Frames...\n');
-          formattedOutput = formattedOutput.replace(/\[Unity Simulation Completed\]/g, '\n✅ Unity Simulation Completed');
-          
-          // Check if we actually got any Unity debug output
-          const hasUnityOutput = formattedOutput.includes('Unity Debug') || 
-                                formattedOutput.includes('Unity Simulation Started');
-          
-          if (!hasUnityOutput && !result.stderr) {
-            // No Unity-specific output and no errors means the code probably doesn't follow expected structure
-            formattedOutput += '\n\n⚠️ Note: Your code compiled but didn\'t produce any Unity debug output. ' +
-                              'Make sure your class is named "PlayerController" and inherits from MonoBehaviour.';
-          }
+          // Add colors and formatting to Unity-specific outputs
+          formattedOutput = formattedOutput
+            .replace(/\[Unity Debug\]:/g, '🟢 [Unity Debug]:')
+            .replace(/\[Unity Simulation Started\]/g, '🚀 [Unity Simulation Started]')
+            .replace(/\[Unity Simulation Completed\]/g, '✅ [Unity Simulation Completed]')
+            .replace(/\[Unity\]:/g, '🔵 [Unity]:')
+            .replace(/\[Unity Transform\]:/g, '🟣 [Unity Transform]:')
+            .replace(/\[Unity Input\]:/g, '🟠 [Unity Input]:')
+            .replace(/\[Unity Error\]:/g, '🔴 [Unity Error]:');
         } catch (e) {
           console.error("Error formatting output:", e);
         }
@@ -188,14 +289,14 @@ namespace UnitySimulation {
       
       setOutput({
         text: formattedOutput,
-        hasError: hasError,
-        stderr: result.stderr
+        hasError: hasCompilationError,
+        isSuccessful: isActuallySuccessful
       });
       
-      // Callback if provided
-      if (onExecutionComplete) {
+      // Call the completion handler if provided
+      if (onExecutionComplete && isActuallySuccessful) {
         onExecutionComplete({
-          success: !hasError,
+          success: isActuallySuccessful,
           output: formattedOutput,
           code: sourceCode
         });
@@ -204,7 +305,7 @@ namespace UnitySimulation {
       setOutput({
         text: `Error executing code: ${error.message}`,
         hasError: true,
-        stderr: error.message
+        isSuccessful: false
       });
     } finally {
       setIsExecuting(false);
@@ -219,7 +320,7 @@ namespace UnitySimulation {
     setOutput(null);
   };
   
-  // Handle annotation click - show explanation
+  // Handle annotation click
   const handleAnnotationClick = (annotation) => {
     setActiveAnnotation(annotation);
   };
@@ -238,29 +339,27 @@ namespace UnitySimulation {
         borderBottom="1px solid #333"
         justify="space-between"
       >
-        <HStack>
-          <Text color="#00ff00" fontWeight="bold" fontSize="sm" whiteSpace="nowrap">
+        <HStack spacing={2}>
+          <Text color="#00ff00" fontWeight="bold" fontSize="sm">
             {title}
           </Text>
-          <Badge colorScheme="green" fontSize="xs">C#</Badge>
-          <Badge colorScheme="purple" fontSize="xs">Unity</Badge>
+          <Badge bg="#222" color="#4ecdc4">C#</Badge>
+          <Badge bg="#222" color="#ff6b6b">UNITY</Badge>
         </HStack>
         
-        <HStack>
+        <HStack spacing={2}>
           <Button
-            size="xs"
+            size="sm"
             variant="outline"
             colorScheme="gray"
-            whiteSpace="nowrap"
             onClick={resetCode}
             isDisabled={isExecuting}
           >
             Reset
           </Button>
           <Button
-            size="xs"
+            size="sm"
             colorScheme="green"
-            whiteSpace="nowrap"
             onClick={runCode}
             isLoading={isExecuting}
             loadingText="Running..."
@@ -272,17 +371,16 @@ namespace UnitySimulation {
       </HStack>
       
       {/* Main Content: Editor + Preview Split */}
-      <HStack spacing={0} align="stretch">
+      <Flex direction={{ base: "column", md: "row" }} h="100%">
         {/* Code Editor Panel */}
         <Box
-          width="50%" 
-          borderRight="1px solid #333"
-          position="relative"
+          width={{ base: "100%", md: "50%" }}
+          borderRight={{ md: "1px solid #333" }}
         >
           <Box height="400px">
             <Editor
               height="100%"
-              defaultLanguage={defaultLanguage}
+              defaultLanguage="csharp"
               defaultValue={initialCode}
               theme="vs-dark"
               onChange={(value) => setCode(value)}
@@ -292,10 +390,9 @@ namespace UnitySimulation {
                 minimap: { enabled: false },
                 scrollBeyondLastLine: false,
                 fontSize: 14,
-                tabSize: 2,
+                tabSize: 4,
                 automaticLayout: true,
-                wordWrap: 'on',
-                padding: { top: 10 }
+                wordWrap: 'on'
               }}
             />
           </Box>
@@ -307,8 +404,8 @@ namespace UnitySimulation {
               borderTop="1px solid #333"
               p={2}
             >
-              <Text fontSize="xs" color="#666" mb={2}>Hover on code segments for explanations:</Text>
-              <HStack flexWrap="wrap" spacing={1}>
+              <Text fontSize="xs" color="#666" mb={2}>Hover on code or click keywords:</Text>
+              <Flex flexWrap="wrap" gap={2}>
                 {annotations.map((annotation, idx) => (
                   <Tooltip
                     key={idx}
@@ -318,26 +415,24 @@ namespace UnitySimulation {
                     hasArrow
                   >
                     <Badge 
-                      colorScheme="green" 
-                      variant="outline" 
+                      bg="#222"
+                      color="#4ecdc4"
                       cursor="help"
-                      m={1}
                       onClick={() => handleAnnotationClick(annotation)}
+                      _hover={{ bg: "#333" }}
                     >
                       {annotation.title}
                     </Badge>
                   </Tooltip>
                 ))}
-              </HStack>
+              </Flex>
             </Box>
           )}
         </Box>
         
         {/* Preview Panel */}
-        <VStack
-          width="50%" 
-          spacing={0} 
-          align="stretch"
+        <Box
+          width={{ base: "100%", md: "50%" }}
         >
           {/* Preview Header */}
           <Box
@@ -345,18 +440,21 @@ namespace UnitySimulation {
             bg="#111"
             borderBottom="1px solid #333"
           >
-            <Text fontSize="xs" color="#666">Unity Game Preview</Text>
+            <Text fontSize="xs" color="#666">Unity C# Output:</Text>
           </Box>
           
           {/* Output/Preview Area */}
           <Box 
             p={4} 
             bg="#000"
-            height="100%"
-            overflow="auto"
+            minHeight="400px"
+            overflowX="auto"
+            overflowY="auto"
+            whiteSpace="pre"
+            fontFamily="monospace"
           >
             {!output ? (
-              <VStack spacing={4} justify="center" height="100%">
+              <VStack spacing={4} justify="center" height="100%" py={10}>
                 <MotionBox
                   animate={{ y: [0, -10, 0] }}
                   transition={{ repeat: Infinity, duration: 1.5 }}
@@ -370,44 +468,32 @@ namespace UnitySimulation {
                 </Text>
               </VStack>
             ) : (
-              <VStack align="stretch" spacing={2}>
-                <Text 
-                  fontSize="xs" 
-                  color="#666"
-                  fontFamily="monospace"
-                  mb={2}
-                >
-                  Unity C# Output:
-                </Text>
+              <Box
+                fontSize="sm"
+                color={output.hasError ? "#ff4444" : "#00ff00"}
+              >
+                {output.text}
                 
-                <Box
-                  p={3}
-                  bg="#111"
-                  border={`1px solid ${output.hasError ? '#ff4444' : '#00ff00'}`}
-                  borderRadius="md"
-                  fontFamily="monospace"
-                  fontSize="sm"
-                  color={output.hasError ? "#ff4444" : "#00ff00"}
-                  whiteSpace="pre-wrap"
-                  overflowY="auto"
-                  maxHeight="320px"
-                >
-                  {output.text}
-                </Box>
-                
-                {/* Only show "Success" badge when there was no error and execution was successful */}
-                {!output.hasError && !output.text.includes("error CS") && (
-                  <HStack justify="flex-end">
-                    <Badge colorScheme="green">
+                {/* Show execution status at the bottom */}
+                {!output.hasError && output.isSuccessful && (
+                  <Box mt={4} textAlign="right">
+                    <Badge bg="#043300" color="#00ff00" fontSize="xs" p={1}>
                       Execution Successful
                     </Badge>
-                  </HStack>
+                  </Box>
                 )}
-              </VStack>
+                
+                {/* Show error note if compilation failed */}
+                {output.hasError && (
+                  <Box mt={4} color="#ff6b6b" fontSize="sm">
+                    Compilation failed. Please fix the errors above.
+                  </Box>
+                )}
+              </Box>
             )}
           </Box>
-        </VStack>
-      </HStack>
+        </Box>
+      </Flex>
       
       {/* Active Annotation Highlight */}
       {activeAnnotation && (

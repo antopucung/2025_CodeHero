@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGameProgress } from '../hooks/useGameProgress';
 import { useDonationSystem } from '../hooks/useDonationSystem';
 import { useCommissionSystem } from '../hooks/useCommissionSystem';
+import { CollaborationModal } from '../components/modals/CollaborationModal';
 import { useCollaborationSystem } from '../hooks/useCollaborationSystem';
 import { PageLayout, SectionLayout, GridLayout } from '../design/layouts/PageLayout';
 import { CustomText } from '../design/components/Typography';

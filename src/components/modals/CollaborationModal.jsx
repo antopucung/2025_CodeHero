@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
    Modal,
    ModalOverlay,
@@ -18,9 +19,12 @@ import {
    Badge
 } from '@chakra-ui/react';
 import { designSystem } from '../../design/system/DesignSystem';
+import { motion } from 'framer-motion';
 
 import { useCollaborationSystem } from '../../hooks/useCollaborationSystem';
 import { CollaborationProfileForm } from '../../design/components/collaboration/CollaborationProfileForm';
+
+const MotionBox = motion(Box);
 
 export const CollaborationModal = ({ 
   isOpen, 
@@ -55,6 +59,17 @@ export const CollaborationModal = ({
 
   const experienceLevels = ['Beginner', 'Intermediate', 'Advanced', 'Expert'];
   const availabilityOptions = ['Part-time (5-10 hrs/week)', 'Part-time (10-20 hrs/week)', 'Full-time availability', 'Flexible schedule'];
+
+  const allSkills = [
+    'JavaScript', 'TypeScript', 'React', 'Vue', 'Angular', 'Node.js',
+    'Python', 'Django', 'Flask', 'Java', 'Spring', 'C#', '.NET',
+    'PHP', 'Laravel', 'Ruby', 'Rails', 'Go', 'Rust', 'Swift',
+    'HTML', 'CSS', 'Sass', 'Tailwind', 'Bootstrap', 'Material-UI',
+    'MongoDB', 'PostgreSQL', 'MySQL', 'Redis', 'GraphQL', 'REST APIs',
+    'AWS', 'Azure', 'GCP', 'Docker', 'Kubernetes', 'CI/CD',
+    'Git', 'Testing', 'Agile', 'Scrum', 'UI/UX', 'Figma',
+    'Photoshop', 'Illustrator', 'Mobile Development', 'Game Development'
+  ];
 
   const handleProfileSubmit = async (profileData) => {
     try {

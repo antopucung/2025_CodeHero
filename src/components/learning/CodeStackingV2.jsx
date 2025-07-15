@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
 
-// Simplified DraggableBlock component
+// DraggableBlock component
 const DraggableBlock = ({ block, isPlaced = false }) => {
   const handleDragStart = (e) => {
     e.dataTransfer.setData("text/plain", block.id);
@@ -19,7 +19,7 @@ const DraggableBlock = ({ block, isPlaced = false }) => {
       border={`1px solid ${isPlaced ? "#00ff00" : "#444"}`}
       borderRadius="md"
       p={2}
-      mb={2}
+      mb={1}
       cursor={isPlaced ? "default" : "grab"}
       whileHover={!isPlaced ? { scale: 1.02 } : {}}
       _hover={!isPlaced ? { borderColor: "#4ecdc4" } : {}}
@@ -37,52 +37,18 @@ const DraggableBlock = ({ block, isPlaced = false }) => {
   );
 };
 
-// Simplified DropZone component
-const DropZone = ({ onDrop, isActive = false, children, index }) => {
-  const handleDragOver = (e) => {
-    if (isActive) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  };
-
-  const handleDrop = (e) => {
-    if (isActive) {
-      e.preventDefault();
-      e.stopPropagation();
-      const blockId = e.dataTransfer.getData("text/plain");
-      onDrop(blockId, index);
-    }
-  };
-
-  return (
-    <Box
-      minH={children ? "auto" : "40px"}
-      bg={isActive ? "rgba(78, 205, 196, 0.1)" : "transparent"}
-      borderRadius="md"
-      border={isActive ? "2px dashed rgba(78, 205, 196, 0.5)" : "2px dashed transparent"}
-      mb={2}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-    >
-      {children || (isActive && <Text color="#666" fontSize="xs">Drop here</Text>)}
-    </Box>
-  );
-};
-
-// Main CodeStackingV2 component - simplified for functionality
+// Main Code Stacking component
 const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }) => {
   const [availableBlocks, setAvailableBlocks] = useState([]);
   const [solutionBlocks, setSolutionBlocks] = useState([]);
   const [timeRemaining, setTimeRemaining] = useState(120);
   const [score, setScore] = useState(0);
   const [status, setStatus] = useState("waiting"); // waiting, active, completed, failed
+  const [isDragging, setIsDragging] = useState(false);
+  const solutionAreaRef = useRef(null);
   const toast = useToast();
 
-  // Initialize code blocks - simple function to split by lines
+  // Initialize code blocks
   useEffect(() => {
     if (code && status === "waiting") {
       const lines = code.split("\n").filter((line) => line.trim() !== "");
@@ -126,6 +92,27 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
     };
   }, [status]);
 
+  // Setup drag events for the document
+  useEffect(() => {
+    const handleDragOver = (e) => {
+      if (status === "active") {
+        setIsDragging(true);
+      }
+    };
+
+    const handleDragEnd = () => {
+      setIsDragging(false);
+    };
+
+    document.addEventListener("dragover", handleDragOver);
+    document.addEventListener("dragend", handleDragEnd);
+
+    return () => {
+      document.removeEventListener("dragover", handleDragOver);
+      document.removeEventListener("dragend", handleDragEnd);
+    };
+  }, [status]);
+
   // Start the quiz
   const handleStart = () => {
     setStatus("active");
@@ -157,26 +144,72 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
     }
   };
 
-  // Handle dropping a block at a specific position
-  const handleDrop = (blockId, dropIndex) => {
-    // Find the block in available blocks
+  // Handle dropping a block in the solution area
+  const handleSolutionAreaDrop = (e) => {
+    e.preventDefault();
+    
+    if (status !== "active") return;
+    
+    const blockId = e.dataTransfer.getData("text/plain");
+    if (!blockId) return;
+    
+    // Find block in available blocks
     const blockIndex = availableBlocks.findIndex((b) => b.id === blockId);
     if (blockIndex === -1) return;
-
+    
     // Get the block and remove from available blocks
     const block = availableBlocks[blockIndex];
     const newAvailableBlocks = [...availableBlocks];
     newAvailableBlocks.splice(blockIndex, 1);
     setAvailableBlocks(newAvailableBlocks);
-
-    // Add to solution at the specified position
+    
+    // Calculate the insert position based on mouse position
+    let insertIndex = 0;
+    
+    if (solutionBlocks.length > 0 && solutionAreaRef.current) {
+      const solutionRect = solutionAreaRef.current.getBoundingClientRect();
+      const blockElements = solutionAreaRef.current.querySelectorAll('.solution-block');
+      
+      // Default to the end if no closer position is found
+      insertIndex = solutionBlocks.length;
+      
+      // Find the closest block based on Y position
+      let closestDistance = Infinity;
+      let closestIndex = -1;
+      
+      blockElements.forEach((blockEl, idx) => {
+        const rect = blockEl.getBoundingClientRect();
+        const blockMiddleY = rect.top + rect.height / 2;
+        const distance = Math.abs(blockMiddleY - e.clientY);
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = idx;
+        }
+      });
+      
+      // If mouse is above the closest block, insert before it
+      // If below, insert after it
+      if (closestIndex !== -1) {
+        const closestRect = blockElements[closestIndex].getBoundingClientRect();
+        const closestMiddleY = closestRect.top + closestRect.height / 2;
+        
+        if (e.clientY < closestMiddleY) {
+          insertIndex = closestIndex;
+        } else {
+          insertIndex = closestIndex + 1;
+        }
+      }
+    }
+    
+    // Add to solution at the calculated position
     const newSolution = [...solutionBlocks];
-    newSolution.splice(dropIndex, 0, block);
+    newSolution.splice(insertIndex, 0, block);
     setSolutionBlocks(newSolution);
-
+    
     // Add points
     setScore((prev) => prev + 50);
-
+    
     toast({
       title: "Block placed!",
       status: "success",
@@ -184,16 +217,16 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
       position: "top-right",
       isClosable: true,
     });
-
+    
     // Check if all blocks are placed
     if (newAvailableBlocks.length === 0) {
       // Quiz completed
       setStatus("completed");
-
+      
       // Add time bonus
       const timeBonus = timeRemaining * 5;
       setScore((prev) => prev + timeBonus);
-
+      
       toast({
         title: "Challenge completed!",
         description: `Time bonus: +${timeBonus} points`,
@@ -201,7 +234,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
         duration: 5000,
         isClosable: true,
       });
-
+      
       if (onComplete) {
         onComplete({
           score: score + timeBonus,
@@ -209,6 +242,13 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
           success: true,
         });
       }
+    }
+  };
+
+  // Handle dragging over the solution area
+  const handleSolutionAreaDragOver = (e) => {
+    if (status === "active") {
+      e.preventDefault(); // Allow drop
     }
   };
 
@@ -289,7 +329,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
           </VStack>
         </Box>
       ) : (
-        <HStack p={4} spacing={4} align="start" h="calc(100vh - 300px)" minH="400px">
+        <HStack p={4} spacing={4} align="stretch" h="calc(100vh - 300px)" minH="400px">
           {/* Available Blocks */}
           <Box
             flex="1"
@@ -316,40 +356,66 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
             </VStack>
           </Box>
 
-          {/* Solution Area */}
+          {/* Solution Area - Single Drop Target */}
           <Box
+            ref={solutionAreaRef}
             flex="1"
             bg="#000"
             p={4}
             borderRadius="md"
             maxH="100%"
             overflowY="auto"
-            border="1px solid #333"
+            border={`1px solid ${isDragging ? "#4ecdc4" : "#333"}`}
+            onDragOver={handleSolutionAreaDragOver}
+            onDrop={handleSolutionAreaDrop}
+            position="relative"
           >
             <Text color="#666" mb={3} fontWeight="bold">
               Your Solution:
             </Text>
-            <VStack align="stretch" spacing={0}>
-              {/* First drop zone */}
-            <DropZone
-              key="dropzone-0"
-              isActive={status === "active"}
-              onDrop={handleDrop}
-              index={0}
-            />
-
-              {/* Existing blocks and drop zones in between */}
-              {solutionBlocks.map((block, index) => (
-                <React.Fragment key={block.id}>
-                  <DraggableBlock block={block} isPlaced={true} />
-                  <DropZone
-                    key={`dropzone-${index + 1}`}
-                    isActive={status === "active"}
-                    onDrop={handleDrop}
-                    index={index + 1}
-                  />
-                </React.Fragment>
-              ))}
+            
+            {/* Drop indicator overlay */}
+            {isDragging && status === "active" && (
+              <Box
+                position="absolute"
+                top="30px"
+                left="4px"
+                right="4px"
+                bottom="4px"
+                borderRadius="md"
+                border="2px dashed #4ecdc4"
+                bg="rgba(78, 205, 196, 0.1)"
+                pointerEvents="none"
+                zIndex={1}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text color="#4ecdc4" fontSize="sm">
+                  Drop to place block
+                </Text>
+              </Box>
+            )}
+            
+            <VStack align="stretch" spacing={1} zIndex={2} position="relative">
+              {solutionBlocks.length === 0 ? (
+                <Text color="#666" textAlign="center" py={10}>
+                  {isDragging ? "Drop your first block here" : "Drag blocks here to build your solution"}
+                </Text>
+              ) : (
+                solutionBlocks.map((block, index) => (
+                  <Box
+                    key={block.id}
+                    className="solution-block"
+                    data-index={index}
+                  >
+                    <DraggableBlock 
+                      block={block} 
+                      isPlaced={true} 
+                    />
+                  </Box>
+                ))
+              )}
             </VStack>
           </Box>
         </HStack>

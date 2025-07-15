@@ -212,7 +212,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               </VStack>
             </MotionBox>
             
-            </Box>
+            </VStack>
             
             <MotionBox
               whileHover={{ scale: 1.05 }}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Text as ChakraText, VStack, HStack, Button } from "@chakra-ui/react";
+import { Box, Text, VStack, HStack, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import TypingChallenge from "../components/TypingChallenge";
 import GameStats from "../components/GameStats";
@@ -49,12 +49,12 @@ const TypingChallengePage = () => {
       >
         <HStack justify="space-between" align="center" h="100%">
           <VStack align="start" spacing={0}>
-           <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold">
+           <Text fontSize="lg" color="#00ff00" fontWeight="bold">
               🎯 Typing Challenge
-           </ChakraText>
-           <ChakraText fontSize="xs" color="#666">
+           </Text>
+           <Text fontSize="xs" color="#666">
               Gamified typing with combos and achievements
-           </ChakraText>
+           </Text>
           </VStack>
           
           <Box w={{ base: "200px", md: "250px" }} h="100%">
@@ -92,12 +92,12 @@ const TypingChallengePage = () => {
                 transition={{ duration: 2, repeat: Infinity }}
                 textAlign="center"
               >
-                <ChakraText fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="#ffd93d" mb={3}>
+                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="#ffd93d" mb={3}>
                   🎯 Ready to Type?
-                </ChakraText>
-                <ChakraText fontSize={{ base: "sm", md: "md" }} color="#666" mb={6}>
+                </Text>
+                <Text fontSize={{ base: "sm", md: "md" }} color="#666" mb={6}>
                   Choose your challenge settings
-                </ChakraText>
+                </Text>
               </MotionBox>
 
               {/* Language Selection */}

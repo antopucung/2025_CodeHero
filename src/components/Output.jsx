@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Button, Text as ChakraText, useToast } from "@chakra-ui/react";
+import { Box, Button, Text, useToast } from "@chakra-ui/react";
 import { executeCode } from "../api";
 
 const Output = ({ editorRef, language, onExecutionComplete, fullHeight = false }) => {
@@ -48,9 +48,9 @@ const Output = ({ editorRef, language, onExecutionComplete, fullHeight = false }
       display="flex"
       flexDirection="column"
     >
-      <ChakraText fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
+      <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
         │ TERMINAL OUTPUT
-      </ChakraText>
+      </Text>
       <Button
         bg="#000"
         color="#00ff00"
@@ -80,24 +80,24 @@ const Output = ({ editorRef, language, onExecutionComplete, fullHeight = false }
         fontSize="sm"
         overflowY="auto"
       >
-        <ChakraText color="#666" fontSize="xs" mb={2}>
+        <Text color="#666" fontSize="xs" mb={2}>
           arnab@terminal-ide:~$ {language} execution
-        </ChakraText>
+        </Text>
         {output
           ? output.map((line, i) => (
-              <ChakraText key={i} fontFamily="'Courier New', monospace" fontSize="sm">
+              <Text key={i} fontFamily="'Courier New', monospace" fontSize="sm">
                 {line || " "}
-              </ChakraText>
+              </Text>
             ))
           : (
-              <ChakraText color="#666" fontSize="sm">
+              <Text color="#666" fontSize="sm">
                 Waiting for execution... Type your code and run $ ./run
-              </ChakraText>
+              </Text>
             )}
         {output && (
-          <ChakraText color="#666" fontSize="xs" mt={2}>
+          <Text color="#666" fontSize="xs" mt={2}>
             [Process completed - Exit code: {isError ? "1" : "0"}]
-          </ChakraText>
+          </Text>
         )}
       </Box>
     </Box>

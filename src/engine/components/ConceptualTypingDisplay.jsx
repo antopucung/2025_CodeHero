@@ -1,6 +1,6 @@
 // Conceptual Typing Display with enhanced spacing and concept awareness
 import React, { useRef, useEffect, useState, memo, useCallback } from 'react';
-import { Box, Text as ChakraText } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { EnhancedTypingBlock } from './EnhancedTypingBlock';
 import { CodeConceptDetector } from '../utils/CodeConceptDetector';
@@ -269,9 +269,9 @@ export const ConceptualTypingDisplay = memo(({
       flexDirection="column"
       overflow="hidden"
     >
-      <ChakraText fontSize="xs" color={colors.terminal.textSecondary} p={2} borderBottom="1px solid #333">
+      <Text fontSize="xs" color={colors.terminal.textSecondary} p={2} borderBottom="1px solid #333">
         │ CONCEPTUAL CODE TYPING INTERFACE
-      </ChakraText>
+      </Text>
       
       <Box
         ref={containerRef}

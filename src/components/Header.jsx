@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Text as ChakraText, HStack, Button, Spacer } from '@chakra-ui/react';
+import { Box, Flex, Text, HStack, Button, Spacer } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 function Header() {
@@ -15,9 +15,9 @@ function Header() {
   return (
     <Box bg="#000000" borderBottom="1px solid #333" px={4} py={3}>
       <Flex alignItems="center" maxW="container.xl" mx="auto">
-        <ChakraText fontSize="xl" fontWeight="bold" color="#00ff00">
+        <Text fontSize="xl" fontWeight="bold" color="#00ff00">
           Terminal IDE
-        </ChakraText>
+        </Text>
         
         <Spacer />
         

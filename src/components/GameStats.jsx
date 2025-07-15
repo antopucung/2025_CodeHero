@@ -1,4 +1,4 @@
-import { Box, Text as ChakraText, HStack, VStack, Progress } from "@chakra-ui/react";
+import { Box, Text, HStack, VStack, Progress } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { JuicyProgressBar } from "./TypingEffects";
 import { PulseAnimation } from "./BlockLetterEffect";
@@ -31,21 +31,21 @@ const GameStats = ({ progress, currentStats = null, streak = 0, compact = false 
       }}
       transition={{ duration: 0.3 }}
     >
-      <ChakraText fontSize={compact ? "xs" : typography.sizes.xs} color={colors.terminal.textSecondary} mb={compact ? 1 : spacing[2]} fontFamily={typography.fonts.mono}>
+      <Text fontSize={compact ? "xs" : typography.sizes.xs} color={colors.terminal.textSecondary} mb={compact ? 1 : spacing[2]} fontFamily={typography.fonts.mono}>
         │ PLAYER STATS
-      </ChakraText>
+      </Text>
       
       <VStack spacing={compact ? 1 : spacing[2]} align="stretch" h="calc(100% - 20px)" overflow="hidden">
         {/* Level and XP */}
         <HStack justify="space-between" align="center">
           <PulseAnimation isActive={true} color={colors.primary[500]} intensity={1.5}>
-            <ChakraText fontSize={compact ? "xs" : typography.sizes.sm} color={colors.primary[500]} fontFamily={typography.fonts.mono} fontWeight={typography.weights.bold}>
+            <Text fontSize={compact ? "xs" : typography.sizes.sm} color={colors.primary[500]} fontFamily={typography.fonts.mono} fontWeight={typography.weights.bold}>
               LEVEL {progress.level}
-            </ChakraText>
+            </Text>
           </PulseAnimation>
-          <ChakraText fontSize={compact ? "xs" : typography.sizes.xs} color={colors.terminal.textSecondary}>
+          <Text fontSize={compact ? "xs" : typography.sizes.xs} color={colors.terminal.textSecondary}>
             {progress.xp}/{xpForNextLevel} XP
-          </ChakraText>
+          </Text>
         </HStack>
         
         <Box h={compact ? "4px" : "8px"}>

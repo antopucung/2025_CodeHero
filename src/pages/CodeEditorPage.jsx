@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Box, HStack, VStack, Text as ChakraText } from "@chakra-ui/react";
+import { Box, HStack, VStack, Text } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import { motion } from "framer-motion";
 import LanguageSelector from "../components/LanguageSelector";
@@ -52,12 +52,12 @@ const CodeEditorPage = () => {
       >
         <HStack justify="space-between" align="center" h="100%">
           <VStack align="start" spacing={0}>
-           <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold">
+           <Text fontSize="lg" color="#00ff00" fontWeight="bold">
               ⌨️ Code Editor
-           </ChakraText>
-           <ChakraText fontSize="xs" color="#666">
+           </Text>
+           <Text fontSize="xs" color="#666">
               Professional IDE with execution
-           </ChakraText>
+           </Text>
           </VStack>
           
           <Box w={{ base: "200px", md: "250px" }} h="100%">
@@ -92,9 +92,9 @@ const CodeEditorPage = () => {
               bg="linear-gradient(90deg, #111 0%, #222 50%, #111 100%)"
               overflow="hidden"
             >
-              <ChakraText fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
+              <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
                 │ CODE EDITOR
-              </ChakraText>
+              </Text>
               <LanguageSelector language={language} onSelect={onSelect} />
             </Box>
             

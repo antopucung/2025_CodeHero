@@ -5,7 +5,7 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Text as ChakraText,
+  Text,
 } from "@chakra-ui/react";
 import { LANGUAGE_VERSIONS } from "../constants";
 
@@ -48,9 +48,9 @@ const LanguageSelector = ({ language, onSelect }) => {
             >
               {lang.toUpperCase()}
               &nbsp;
-              <ChakraText as="span" color="#666" fontSize="xs">
+              <Text as="span" color="#666" fontSize="xs">
                 ({version})
-              </ChakraText>
+              </Text>
             </MenuItem>
           ))}
         </MenuList>

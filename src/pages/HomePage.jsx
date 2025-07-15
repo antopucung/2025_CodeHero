@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Grid, Text as ChakraText, VStack, HStack, Button, Badge } from '@chakra-ui/react';
+import { Box, Grid, Text, VStack, HStack, Button, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -144,9 +144,9 @@ const HomePage = () => {
       
       {/* Features section */}
       <Box id="features" py={16} px={8}>
-        <ChakraText fontSize="3xl" fontWeight="bold" color="#00ff00" mb={12} textAlign="center">
+        <Text fontSize="3xl" fontWeight="bold" color="#00ff00" mb={12} textAlign="center">
           Interactive Features
-        </ChakraText>
+        </Text>
         
         <Grid
           templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}

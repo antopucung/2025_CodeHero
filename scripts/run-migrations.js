@@ -241,6 +241,7 @@ Migration Summary:
     console.error(error.stack);
   }
     // Don't exit with error code, so the server can still start
+}
 
 // Execute migrations
 runMigrations().catch(err => {

@@ -3,7 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import crypto from 'crypto';
 
 // Load Supabase environment variables
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -17,11 +16,6 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const migrationsDir = path.resolve(process.cwd(), 'supabase/migrations');
-
-// Calculate MD5 hash of file content
-function calculateChecksum(content) {
-  return crypto.createHash('md5').update(content).digest('hex');
-}
 
 // Calculate MD5 hash of file content
 function calculateChecksum(content) {
@@ -245,10 +239,8 @@ Migration Summary:
   } catch (error) {
     console.error('An unexpected error occurred during migrations:', error.message);
     console.error(error.stack);
-    console.error(error.stack);
-    // Don't exit with error code, so the server can still start
   }
-}
+    // Don't exit with error code, so the server can still start
 
 // Execute migrations
 runMigrations().catch(err => {

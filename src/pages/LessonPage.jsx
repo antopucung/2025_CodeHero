@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
 import { InteractiveCodeExample } from '../components/learning/InteractiveCodeExample';
-import UnityCodeEditor from '../components/learning/UnityCodeEditor';
 import { ConceptExplainer } from '../components/learning/CodeConcepts';
 import TypingChallenge from '../components/TypingChallenge';
 import CodeEditorPage from './CodeEditorPage';
@@ -179,54 +178,17 @@ const LessonPage = () => {
               </Text>
 
               {contentData.code_example && (
-                (course?.language === "csharp" && (contentData.execution_environment === "unity" || contentData.code_title?.includes("Unity"))) ? (
-                  <UnityCodeEditor
-                    initialCode={contentData.code_example}
-                    title={contentData.code_title || "Unity C# Example"}
-                    readOnly={!contentData.interactive}
-                    annotations={[
-                      {
-                        text: "void Start()",
-                        title: "Unity Lifecycle Method",
-                        line: contentData.code_example.split('\n').findIndex(line => line.includes("void Start")),
-                        explanation: "The Start method is called once when the script is enabled before any Update methods are called."
-                      },
-                      {
-                        text: "Update",
-                        title: "Frame Update Method",
-                        line: contentData.code_example.split('\n').findIndex(line => line.includes("void Update")),
-                        explanation: "The Update method is called once per frame. This is where most game logic happens."
-                      },
-                      {
-                        text: "Debug.Log",
-                        title: "Debug Output",
-                        line: contentData.code_example.split('\n').findIndex(line => line.includes("Debug.Log")),
-                        explanation: "Prints a message to the Unity Console. Useful for debugging and tracking what's happening in your game."
-                      },
-                      {
-                        text: "MonoBehaviour",
-                        title: "Unity Base Class",
-                        line: contentData.code_example.split('\n').findIndex(line => line.includes("MonoBehaviour")),
-                        explanation: "The base class that all Unity scripts derive from. Provides access to Unity's event functions like Start and Update."
-                      }
-                    ]}
-                    onExecutionComplete={(result) => {
-                      if (result.success) {
-                        // Could award points or mark progress
-                        handleLessonComplete({
-                          score: 50,
-                          accuracy: 100,
-                          wpm: 0,
-                          executionSuccess: true
-                        });
-                      }
-                    }}
-                  />
-                ) : (
                   <InteractiveCodeExample
                     code={contentData.code_example}
                     language={course?.language}
-                    mode={contentData.interactive ? "playground" : "annotated"}
+                    mode={
+                      contentData.interactive && 
+                      !(course?.language === "csharp" && 
+                        (contentData.execution_environment === "unity" || 
+                         contentData.code_title?.includes("Unity"))) 
+                        ? "playground" 
+                        : "annotated"
+                    }
                     title={contentData.code_title || "Code Example"}
                     annotations={[
                       {
@@ -245,8 +207,19 @@ const LessonPage = () => {
                         explanation: "Retrieves the Rigidbody component attached to the same GameObject."
                       }
                     ]}
+                    onExecutionComplete={
+                      contentData.interactive ? (result) => {
+                        if (result && result.success) {
+                          handleLessonComplete({
+                            score: 50,
+                            accuracy: 100,
+                            wpm: 0,
+                            executionSuccess: true
+                          });
+                        }
+                      } : null
+                    }
                   />
-                )
               )}
 
               {contentData.concepts && contentData.concepts.length > 0 && (
@@ -279,8 +252,12 @@ const LessonPage = () => {
             <TypingChallenge
               challenge={{
                 id: `lesson-${lesson.id}`,
-                title: lesson.title,
-                description: "Type the code accurately to complete this lesson",
+                title: contentData.execution_environment === "unity" || course?.language === "csharp" 
+                  ? `Unity C# Challenge: ${lesson.title}` 
+                  : lesson.title,
+                description: contentData.execution_environment === "unity" 
+                  ? "Learn Unity C# syntax through typing practice" 
+                  : "Type the code accurately to complete this lesson",
                 code: contentData.code || `function greet(name) {\n    console.log("Hello, " + name + "!");\n}\n\ngreet("World");`,
                 language: contentData.language || course.language,
                 difficulty: contentData.difficulty || course.difficulty

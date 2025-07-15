@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, HStack, Button, useToast, Text as ChakraText } from "@chakra-ui/react";
 import {
   DndContext,
-  closestCenter,
+  closestCorners,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -45,9 +45,8 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
   // Configure sensors for drag and drop
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5, // Minimum drag distance to activate
-      },
+      // More responsive activation
+      activationConstraint: { delay: 0, tolerance: 5 }
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -200,7 +199,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
       toast({
         title: "Block placed!",
         status: "success",
-        duration: 1000,
+        duration: 800,
         position: "top-right",
         isClosable: true,
       });
@@ -227,7 +226,10 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
         if (onComplete) {
           onComplete({
             score: finalScore,
-            timeRemaining,
+            timeRemaining, 
+            timeElapsed: 120 - timeRemaining,
+            correctPlacements: solutionBlocks.length + 1,
+            totalBlocks: solutionBlocks.length + 1 + newAvailableBlocks.length,
             success: true,
           });
         }
@@ -258,13 +260,14 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
       ) : (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={closestCorners}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
+          measuring={{ draggable: { dragAndDrop: true } }}
         >
-          <Box p={4}>
-            <HStack spacing={4} align="stretch" minH="400px">
+          <Box p={5}>
+            <HStack spacing={5} align="stretch" minH="400px">
               {/* Available Blocks */}
               <BlocksPanel blocks={availableBlocks} />
               
@@ -305,12 +308,9 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
               <DraggableBlock
                 id={activeBlock.id}
                 block={activeBlock}
-                bg="#333"
-                border="1px solid #4ecdc4"
-                borderRadius="md"
-                p={2}
-                boxShadow="0 0 10px rgba(78, 205, 196, 0.5)"
-                maxW="600px"
+                isPlaced={false}
+                isDragging={true} 
+                language={language}
               />
             )}
           </DragOverlay>

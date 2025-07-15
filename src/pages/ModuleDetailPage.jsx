@@ -391,9 +391,9 @@ const ModuleDetailPage = () => {
                       </HStack>
                     </HStack>
                   </Box>
-            <ChakraText color="#00ff00" fontFamily="'Courier New', monospace">
+                </MotionBox>
               );
-            </ChakraText>
+            })}
           </VStack>
 
           {/* Course Info */}

@@ -102,12 +102,6 @@ async function runMigrations() {
     let skippedCount = 0;
     let errorCount = 0;
 
-    console.log(`Found ${migrationFiles.length} migration files`);
-    
-    let appliedCount = 0;
-    let skippedCount = 0;
-    let errorCount = 0;
-
     for (const file of migrationFiles) {
       // Skip the tracking system file if it was just applied
       if (file.includes('migration_tracking_system') && !appliedVersionsMap.has(file)) {

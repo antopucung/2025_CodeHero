@@ -320,7 +320,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
                 >
                   {activeBlock.content}
                 </ChakraText>
-              </Box>
+              </DraggableBlock>
             )}
           </DragOverlay>
         </DndContext>

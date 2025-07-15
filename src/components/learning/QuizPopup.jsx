@@ -1,23 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import { 
-  Modal, 
-  ModalOverlay, 
-  ModalContent,
-  ModalHeader, 
-  ModalBody, 
-  ModalCloseButton,
-  Button,
-  Box,
-  Text,
-  HStack,
-  VStack,
-  Badge,
-  Progress,
-  IconButton
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton,
+  Button, Box, Text, HStack, VStack, Badge, Progress, IconButton
 } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
-import CodeStackingQuiz from './CodeStackingQuiz';
-import confetti from 'canvas-confetti';
+import QuizManager from './QuizManager';
 
 const MotionBox = motion(Box);
 
@@ -207,28 +195,19 @@ const QuizPopup = ({
         
         <ModalBody 
           p={0} 
-          maxH="calc(90vh - 150px)" 
+          maxH="calc(90vh - 120px)"
           overflow="auto"
           bg={quizCompleted && quizResults?.success ? 
             "linear-gradient(180deg, rgba(0,17,0,1) 0%, rgba(0,34,0,1) 100%)" : 
             "linear-gradient(180deg, rgba(17,17,17,1) 0%, rgba(0,0,0,1) 100%)"
           }
         >
-          {quizData?.type === 'code-stacking' && (
-            <CodeStackingQuiz
-              code={quizData.code}
-              language={quizData.language || "csharp"}
-              title={quizData.title}
-              description={quizData.description}
-              timeLimit={quizData.timeLimit}
-              onComplete={handleQuizComplete}
-              splitType={quizData.splitType || "line"}
-              difficulty={quizData.difficulty || "medium"}
-              juiciness={quizData.juiciness || "high"}
-            />
-          )}
-          
-          {/* Other quiz types can be added here */}
+          {/* Use QuizManager to render the appropriate quiz type */}
+          <QuizManager
+            quizData={quizData}
+            onComplete={handleQuizComplete}
+            juiciness={quizData?.juiciness || "high"}
+          />
           
           {/* Results and Continue Button */}
           {quizCompleted && (

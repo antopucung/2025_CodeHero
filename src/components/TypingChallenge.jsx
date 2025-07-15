@@ -236,7 +236,6 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               </Button>
             </MotionBox>
           </VStack>
-          </VStack>
         </TerminalPanel>
       </MotionBox>
     );

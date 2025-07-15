@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Grid, Text, VStack, HStack, Button, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import { Text as ChakraText } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
 const MotionBox = motion(Box);

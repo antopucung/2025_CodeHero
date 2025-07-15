@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, HStack, useToast } from "@chakra-ui/react";
+import { Box, HStack, Button, useToast } from "@chakra-ui/react";
 import {
   DndContext,
   closestCenter,
@@ -9,12 +9,7 @@ import {
   useSensors,
   DragOverlay
 } from "@dnd-kit/core";
-import { 
-  arrayMove, 
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy
-} from "@dnd-kit/sortable";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 // Import component parts
 import BlocksPanel from "./stacking/BlocksPanel";
@@ -22,7 +17,7 @@ import SolutionArea from "./stacking/SolutionArea";
 import GameHeader from "./stacking/GameHeader";
 import GameFooter from "./stacking/GameFooter";
 import StartScreen from "./stacking/StartScreen";
-import DraggableBlock from "./stacking/DraggableBlock";
+import DraggableCodeBlock from "./stacking/DraggableCodeBlock";
 
 // Import utilities
 import { 
@@ -32,13 +27,12 @@ import {
 } from "./stacking/utils/codeStackingUtils";
 
 /**
- * CodeStackingV2 - A drag-and-drop code stacking challenge component with reordering
+ * CodeStackingV2 - A drag-and-drop code stacking challenge component without reordering
  */
 const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }) => {
   // Game state
   const [availableBlocks, setAvailableBlocks] = useState([]);
   const [solutionBlocks, setSolutionBlocks] = useState([]);
-  const [solutionBlockIds, setSolutionBlockIds] = useState([]);
   const [timeRemaining, setTimeRemaining] = useState(120);
   const [score, setScore] = useState(0);
   const [status, setStatus] = useState("waiting"); // waiting, active, completed, failed
@@ -68,11 +62,6 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
       setAvailableBlocks(shuffleArray(blocks));
     }
   }, [code, status]);
-  
-  // Update solution block IDs when solution blocks change
-  useEffect(() => {
-    setSolutionBlockIds(solutionBlocks.map(block => block.id));
-  }, [solutionBlocks]);
   
   // Timer effect
   useEffect(() => {
@@ -123,15 +112,58 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
     }
   };
   
+  // Reset the entire stack
+  const handleResetStack = () => {
+    if (status !== "active" || solutionBlocks.length === 0) return;
+    
+    // Return all solution blocks to available blocks
+    setAvailableBlocks(prevAvailable => [...prevAvailable, ...solutionBlocks]);
+    setSolutionBlocks([]);
+    
+    // Reset score partially (keep some progress)
+    setScore(prev => Math.max(0, Math.floor(prev * 0.7)));
+    
+    toast({
+      title: "Stack reset!",
+      description: "All blocks have been returned to the available pool.",
+      status: "info",
+      duration: 1000,
+      position: "top-right",
+      isClosable: true,
+    });
+  };
+  
+  // Reset only the latest drop
+  const handleResetLatestDrop = () => {
+    if (status !== "active" || solutionBlocks.length === 0) return;
+    
+    // Get the last block and remove it from solution
+    const lastBlock = solutionBlocks[solutionBlocks.length - 1];
+    setSolutionBlocks(prev => prev.slice(0, -1));
+    
+    // Add it back to available blocks
+    setAvailableBlocks(prev => [...prev, lastBlock]);
+    
+    // Deduct a small amount from score
+    setScore(prev => Math.max(0, prev - 20));
+    
+    toast({
+      title: "Last block returned!",
+      description: "The most recent block has been returned to the available pool.",
+      status: "info",
+      duration: 1000,
+      position: "top-right",
+      isClosable: true,
+    });
+  };
+  
   // Handle drag start
   const handleDragStart = (event) => {
     const { active } = event;
     setActiveId(active.id);
 
-    // Find the active block from either available or solution blocks
-    const block = availableBlocks.find(b => b.id === active.id) || 
-                 solutionBlocks.find(b => b.id === active.id);
-    
+    // Find the active block from available blocks
+    const block = availableBlocks.find(b => b.id === active.id);
     setActiveBlock(block);
   };
   
@@ -146,35 +178,21 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
     const activeId = active.id;
     const overId = over.id;
     
-    // Check if we're dragging from available blocks
-    const isFromAvailable = availableBlocks.some(block => block.id === activeId);
-    
-    if (isFromAvailable) {
-      // Remove from available blocks
+    // Only handle dropping from available blocks to solution area
+    if (overId === "solution-area") {
+      // Find block in available blocks
       const blockIndex = availableBlocks.findIndex(b => b.id === activeId);
       if (blockIndex === -1) return;
       
       const block = availableBlocks[blockIndex];
+      
+      // Remove from available blocks
       const newAvailableBlocks = [...availableBlocks];
       newAvailableBlocks.splice(blockIndex, 1);
       setAvailableBlocks(newAvailableBlocks);
       
-      // Add to solution blocks
-      const newSolution = [...solutionBlocks];
-      if (overId === 'solution-area') {
-        // Add to the end if dropped on the general area
-        newSolution.push(block);
-      } else {
-        // Add at specific position if dropped on another block
-        const overIndex = solutionBlocks.findIndex(b => b.id === overId);
-        if (overIndex !== -1) {
-          newSolution.splice(overIndex + 1, 0, block);
-        } else {
-          newSolution.push(block);
-        }
-      }
-      
-      setSolutionBlocks(newSolution);
+      // Add to solution blocks at the end
+      setSolutionBlocks(prev => [...prev, block]);
       
       // Add points
       setScore(prev => prev + 50);
@@ -214,27 +232,6 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
           });
         }
       }
-    } else {
-      // Reordering within solution blocks
-      const activeIndex = solutionBlocks.findIndex(b => b.id === activeId);
-      const overIndex = solutionBlocks.findIndex(b => b.id === overId);
-      
-      // Only proceed if indices are valid and different
-      if (activeIndex !== -1 && overIndex !== -1 && activeIndex !== overIndex) {
-        const newSolutionBlocks = arrayMove(solutionBlocks, activeIndex, overIndex);
-        setSolutionBlocks(newSolutionBlocks);
-        
-        // Small bonus for reordering
-        setScore(prev => prev + 10);
-        
-        toast({
-          title: "Block reordered!",
-          status: "info",
-          duration: 1000,
-          position: "top-right",
-          isClosable: true,
-        });
-      }
     }
   };
   
@@ -266,22 +263,41 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
           onDragEnd={handleDragEnd}
           onDragCancel={handleDragCancel}
         >
-          <HStack p={4} spacing={4} align="stretch" h="calc(100vh - 300px)" minH="400px">
-            {/* Available Blocks */}
-            <BlocksPanel blocks={availableBlocks} />
+          <Box p={4}>
+            <HStack spacing={4} align="stretch" minH="400px">
+              {/* Available Blocks */}
+              <BlocksPanel blocks={availableBlocks} />
+              
+              {/* Solution Area */}
+              <SolutionArea
+                blocks={solutionBlocks}
+                isDragging={!!activeId}
+                id="solution-area"
+              />
+            </HStack>
             
-            {/* Solution Area */}
-            <Box flex="1">
-              <SortableContext items={solutionBlockIds} strategy={verticalListSortingStrategy}>
-                <SolutionArea
-                  blocks={solutionBlocks}
-                  blockIds={solutionBlockIds}
-                  isDragging={!!activeId}
-                  id="solution-area"
-                />
-              </SortableContext>
-            </Box>
-          </HStack>
+            {/* Reset Controls */}
+            <HStack spacing={4} mt={4} justify="center">
+              <Button
+                size="sm"
+                colorScheme="blue"
+                variant="outline"
+                onClick={handleResetLatestDrop}
+                isDisabled={solutionBlocks.length === 0 || status !== "active"}
+              >
+                ↩️ Reset Last Drop
+              </Button>
+              <Button
+                size="sm"
+                colorScheme="red"
+                variant="outline"
+                onClick={handleResetStack}
+                isDisabled={solutionBlocks.length === 0 || status !== "active"}
+              >
+                🔄 Reset Entire Stack
+              </Button>
+            </HStack>
+          </Box>
           
           {/* Drag Overlay */}
           <DragOverlay adjustScale={true}>
@@ -294,7 +310,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
                 boxShadow="0 0 10px rgba(78, 205, 196, 0.5)"
                 maxW="600px"
               >
-                <Text
+                <ChakraText
                   as="div"
                   fontFamily="monospace"
                   fontSize="sm"
@@ -303,7 +319,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
                   whiteSpace="pre"
                 >
                   {activeBlock.content}
-                </Text>
+                </ChakraText>
               </Box>
             )}
           </DragOverlay>

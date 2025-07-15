@@ -1,18 +1,23 @@
 import React from "react";
 import { Box, Text as ChakraText, VStack } from "@chakra-ui/react";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import SortableBlock from "./SortableBlock";
+import { useDroppable } from "@dnd-kit/core";
+import DraggableCodeBlock from "../DraggableCodeBlock";
 
 /**
  * SolutionArea - Area where blocks are dropped and arranged
  */
 const SolutionArea = ({ 
   blocks, 
-  blockIds,
-  isDragging
+  isDragging,
+  id = "solution-area"
 }) => {
+  const { setNodeRef } = useDroppable({
+    id: id
+  });
+  
   return (
     <Box
+      ref={setNodeRef}
       flex="1"
       bg="#000"
       p={4}
@@ -51,33 +56,30 @@ const SolutionArea = ({
         </Box>
       )}
       
-      <SortableContext 
-        items={blockIds}
-        strategy={verticalListSortingStrategy}
+      <VStack 
+        align="stretch" 
+        spacing={1} 
+        zIndex={2} 
+        position="relative"
+        role="list"
+        aria-label="Placed code blocks"
       >
-        <VStack 
-          align="stretch" 
-          spacing={1} 
-          zIndex={2} 
-          position="relative"
-          role="list"
-          aria-label="Placed code blocks"
-        >
-          {blocks.length === 0 ? (
-            <ChakraText color="#666" textAlign="center" py={10}>
-              {isDragging ? "Drop your first block here" : "Drag blocks here to build your solution"}
-            </ChakraText>
-          ) : (
-            blocks.map((block) => (
-              <SortableBlock
-                key={block.id}
-                id={block.id}
-                block={block}
-              />
-            ))
-          )}
-        </VStack>
-      </SortableContext>
+        {blocks.length === 0 ? (
+          <ChakraText color="#666" textAlign="center" py={10}>
+            {isDragging ? "Drop your first block here" : "Drag blocks here to build your solution"}
+          </ChakraText>
+        ) : (
+          blocks.map((block) => (
+            <DraggableCodeBlock
+              key={block.id}
+              block={block}
+              isPlaced={true}
+              isCorrect={true}
+              language="javascript"
+            />
+          ))
+        )}
+      </VStack>
     </Box>
   );
 };

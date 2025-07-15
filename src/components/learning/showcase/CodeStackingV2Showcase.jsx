@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, VStack, Button, HStack, Badge, useToast } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import CodeStackingV2 from '../CodeStackingV2';
+import CodeStackingV2 from '../../learning/CodeStackingV2';
 import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion(Box);

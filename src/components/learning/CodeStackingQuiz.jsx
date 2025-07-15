@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, VStack, HStack, Text, Button, Badge, Progress, Tooltip, useDisclosure } from "@chakra-ui/react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { CodeQuizEngine, createCodeBlocksFromString } from './CodeQuizEngine';
+import confetti from 'canvas-confetti';
 
 const MotionBox = motion(Box);
 
@@ -160,6 +161,17 @@ const CodeStackingQuiz = ({
     feedbackMessages: []
   });
   
+  // Track error positions
+  const [errorPositions, setErrorPositions] = useState(new Set());
+  const [screenFlash, setScreenFlash] = useState({ active: false, type: 'success', intensity: 1 });
+  const [streakStatus, setStreakStatus] = useState({ active: false, count: 0 });
+  const [patternCelebrations, setPatternCelebrations] = useState([]);
+  const [activeEffects, setActiveEffects] = useState({
+    floatingScores: [],
+    comboAnimations: [],
+    particleEffects: []
+  });
+  
   // Configure difficulty settings
   const difficultySettings = {
     easy: { timeLimit: 180, basePoints: 50, penalty: 0.05 },
@@ -217,13 +229,39 @@ const CodeStackingQuiz = ({
       })
       .on('correct', (data) => {
         setGameEffects(prev => {
-          const streak = prev.streak + 1;
+          const newStreak = prev.streak + 1;
+          
+          // Update streak status for visual effects
+          if (newStreak >= 3 && !streakStatus.active) {
+            setStreakStatus({ active: true, count: newStreak });
+            
+            // Clear streak after animation time
+            setTimeout(() => {
+              setStreakStatus({ active: false, count: 0 });
+            }, 3000);
+          } else if (newStreak >= 3) {
+            setStreakStatus(prev => ({ ...prev, count: newStreak }));
+          }
           
           let comboText = "";
           if (data.combo >= 2.5) comboText = "INCREDIBLE!";
           else if (data.combo >= 2.0) comboText = "AWESOME!";
           else if (data.combo >= 1.5) comboText = "GREAT!";
-          else if (streak >= 3) comboText = "STREAK!";
+          else if (newStreak >= 3) comboText = "STREAK!";
+          
+          if (data.combo >= 2) {
+            // Flash screen on high combo
+            setScreenFlash({ 
+              active: true, 
+              type: 'success', 
+              intensity: Math.min(data.combo / 2, 1) 
+            });
+            
+            // Reset flash
+            setTimeout(() => {
+              setScreenFlash({ active: false, type: 'success', intensity: 0 });
+            }, 300);
+          }
           
           return {
             ...prev,
@@ -231,7 +269,7 @@ const CodeStackingQuiz = ({
             lastAction: 'correct',
             comboText,
             pointsText: `+${data.points}`,
-            streak,
+            streak: newStreak,
             feedbackMessages: [
               ...prev.feedbackMessages,
               {
@@ -244,6 +282,21 @@ const CodeStackingQuiz = ({
         });
       })
       .on('incorrect', (data) => {
+        // Flash screen on error
+        setScreenFlash({ 
+          active: true, 
+          type: 'error', 
+          intensity: 0.8 
+        });
+        
+        // Reset flash
+        setTimeout(() => {
+          setScreenFlash({ active: false, type: 'error', intensity: 0 });
+        }, 300);
+        
+        // Reset streak status
+        setStreakStatus({ active: false, count: 0 });
+        
         setGameEffects(prev => ({
           ...prev,
           combo: 1,
@@ -394,18 +447,77 @@ const CodeStackingQuiz = ({
   }
 
   return (
-    <MotionBox
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      bg="#111"
-      border="1px solid #333"
-      borderRadius="md"
-      overflow="hidden"
-      maxW="900px"
-      mx="auto"
-      position="relative"
-    >
+    <Box position="relative">
+      {/* Screen Flash Effect */}
+      {screenFlash.active && (
+        <MotionBox
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: [0, screenFlash.intensity, 0] 
+          }}
+          transition={{ duration: 0.3 }}
+          position="fixed"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg={screenFlash.type === 'success' ? "rgba(0, 255, 0, 0.2)" : "rgba(255, 0, 0, 0.2)"}
+          zIndex={999}
+          pointerEvents="none"
+        />
+      )}
+      
+      {/* Streak Counter */}
+      {streakStatus.active && streakStatus.count >= 3 && (
+        <MotionBox
+          initial={{ opacity: 0, scale: 0, y: 20 }}
+          animate={{ 
+            opacity: 1, 
+            scale: 1,
+            y: 0,
+            boxShadow: [
+              "0 0 20px #ffd93d",
+              "0 0 40px #ffd93d",
+              "0 0 20px #ffd93d"
+            ]
+          }}
+          transition={{ 
+            duration: 0.5,
+            boxShadow: { repeat: Infinity, duration: 1.5 }
+          }}
+          position="fixed"
+          top="20%"
+          right="5%"
+          bg="rgba(0,0,0,0.8)"
+          border="2px solid #ffd93d"
+          borderRadius="full"
+          p={3}
+          px={5}
+          zIndex={1000}
+          pointerEvents="none"
+        >
+          <Text 
+            fontSize="lg" 
+            fontWeight="bold" 
+            color="#ffd93d"
+          >
+            🔥 {streakStatus.count} STREAK!
+          </Text>
+        </MotionBox>
+      )}
+      
+      <MotionBox
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        bg="#111"
+        border="1px solid #333"
+        borderRadius="md"
+        overflow="hidden"
+        maxW="900px"
+        mx="auto"
+        position="relative"
+      >
       {/* Header with progress and score */}
       <HStack 
         bg="#111" 
@@ -655,8 +767,8 @@ const CodeStackingQuiz = ({
         {quizState.status === 'completed' && (
           <MotionBox
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            animate={{ opacity: 1, scale: [0.95, 1] }}
+            transition={{ duration: 0.5, scale: { duration: 0.3, ease: "backOut" } }}
             position="absolute"
             top="0"
             left="0"
@@ -670,23 +782,34 @@ const CodeStackingQuiz = ({
           >
             <VStack
               bg="#111"
-              border="2px solid #00ff00"
+              border="3px solid #00ff00"
               borderRadius="md"
               p={6}
               spacing={4}
-              boxShadow="0 0 30px rgba(0, 255, 0, 0.3)"
+              boxShadow="0 0 30px rgba(0, 255, 0, 0.5)"
               maxW="400px"
             >
               <MotionBox
                 animate={{
-                  scale: [1, 1.1, 1],
+                  scale: [1, 1.1, 1], 
                   rotate: [0, 5, -5, 0]
                 }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Text color="#00ff00" fontSize="2xl" fontWeight="bold">
-                  Quest Complete!
-                </Text>
+                <MotionBox
+                  animate={{
+                    textShadow: [
+                      "0 0 10px #00ff00", 
+                      "0 0 30px #00ff00", 
+                      "0 0 10px #00ff00"
+                    ]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Text color="#00ff00" fontSize="2xl" fontWeight="bold">
+                    Quest Complete!
+                  </Text>
+                </MotionBox>
               </MotionBox>
               
               <VStack spacing={3} align="start" w="100%">
@@ -725,12 +848,56 @@ const CodeStackingQuiz = ({
           </MotionBox>
         )}
         
+        {/* Combo display */}
+        {gameEffects.combo > 1.5 && quizState.status === 'active' && (
+          <MotionBox
+            initial={{ scale: 0, opacity: 0, x: 100 }}
+            animate={{ 
+              scale: 1,
+              opacity: 1,
+              x: 0,
+              boxShadow: [
+                `0 0 10px ${gameEffects.combo >= 2.5 ? "#ff6b6b" : "#4ecdc4"}`,
+                `0 0 25px ${gameEffects.combo >= 2.5 ? "#ff6b6b" : "#4ecdc4"}`,
+                `0 0 10px ${gameEffects.combo >= 2.5 ? "#ff6b6b" : "#4ecdc4"}`
+              ]
+            }}
+            transition={{ 
+              duration: 0.5,
+              boxShadow: { repeat: Infinity, duration: 1.5 }
+            }}
+            position="fixed"
+            top="30%"
+            right="5%"
+            bg={gameEffects.combo >= 2.5 ? 
+              "linear-gradient(135deg, #ff6b6b44, #ff6b6b22)" : 
+              "linear-gradient(135deg, #4ecdc444, #4ecdc422)"}
+            border={`2px solid ${gameEffects.combo >= 2.5 ? "#ff6b6b" : "#4ecdc4"}`}
+            borderRadius="lg"
+            p={4}
+            zIndex={1001}
+          >
+            <VStack spacing={1}>
+              <Text color={gameEffects.combo >= 2.5 ? "#ff6b6b" : "#4ecdc4"} fontSize="sm">
+                COMBO MULTIPLIER
+              </Text>
+              <Text 
+                color={gameEffects.combo >= 2.5 ? "#ff6b6b" : "#4ecdc4"} 
+                fontSize="2xl" 
+                fontWeight="bold"
+              >
+                x{gameEffects.combo.toFixed(1)}
+              </Text>
+            </VStack>
+          </MotionBox>
+        )}
+        
         {/* Quiz failure overlay */}
         {quizState.status === 'failed' && (
           <MotionBox
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
+            animate={{ opacity: 1, scale: [0.95, 1] }}
+            transition={{ duration: 0.5, scale: { duration: 0.3 } }}
             position="absolute"
             top="0"
             left="0"
@@ -744,16 +911,29 @@ const CodeStackingQuiz = ({
           >
             <VStack
               bg="#111"
-              border="2px solid #ff6b6b"
+              border="3px solid #ff6b6b"
               borderRadius="md"
               p={6}
               spacing={4}
-              boxShadow="0 0 30px rgba(255, 107, 107, 0.3)"
+              boxShadow="0 0 30px rgba(255, 107, 107, 0.5)"
               maxW="400px"
             >
-              <Text color="#ff6b6b" fontSize="2xl" fontWeight="bold">
-                Time's Up!
-              </Text>
+              <MotionBox
+                animate={{
+                  scale: [1, 1.1, 1],
+                  rotate: [0, 2, -2, 0],
+                  textShadow: [
+                    "0 0 10px #ff6b6b",
+                    "0 0 20px #ff6b6b",
+                    "0 0 10px #ff6b6b"
+                  ]
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Text color="#ff6b6b" fontSize="2xl" fontWeight="bold">
+                  Time's Up!
+                </Text>
+              </MotionBox>
               
               <VStack spacing={3} align="start" w="100%">
                 <HStack justify="space-between" w="100%">
@@ -778,9 +958,62 @@ const CodeStackingQuiz = ({
             </VStack>
           </MotionBox>
         )}
+        
+        {/* Floating messages */}
+        <AnimatePresence>
+          {gameEffects.feedbackMessages.map((message, index) => (
+            <MotionBox
+              key={message.id}
+              initial={{ opacity: 0, x: -50, y: 0 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              exit={{ opacity: 0, x: 50, y: 0 }}
+              transition={{ duration: 0.5 }}
+              position="fixed"
+              left="5%"
+              top={`${20 + (index * 8)}%`}
+              bg="rgba(0,0,0,0.8)"
+              border={`1px solid ${message.type === 'success' ? '#00ff00' : message.type === 'error' ? '#ff6b6b' : '#ffd93d'}`}
+              color={message.type === 'success' ? '#00ff00' : message.type === 'error' ? '#ff6b6b' : '#ffd93d'}
+              p={2}
+              borderRadius="md"
+              zIndex={999}
+              fontSize="sm"
+              maxW="250px"
+              whiteSpace="nowrap"
+              overflow="hidden"
+              textOverflow="ellipsis"
+            >
+              {message.text}
+            </MotionBox>
+          ))}
+        </AnimatePresence>
       </Box>
     </MotionBox>
+  </Box>
   );
 };
+
+{/* Add custom CSS for streak, shake and other animations */}
+<style jsx="true">{`
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes fadeInOut {
+    0% { opacity: 0.3; }
+    50% { opacity: 1; }
+    100% { opacity: 0.3; }
+  }
+  
+  .pulse-animation {
+    animation: pulse 1s infinite ease-in-out;
+  }
+  
+  .fadeInOut-animation {
+    animation: fadeInOut 2s infinite ease-in-out;
+  }
+`}</style>
 
 export default CodeStackingQuiz;

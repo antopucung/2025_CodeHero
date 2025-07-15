@@ -196,6 +196,9 @@ export const useUserEnrollment = () => {
       console.error('Error adding course achievement:', err);
       setError(err.message);
     }
+    
+    // Return promise to allow for chaining
+    return Promise.resolve();
   };
 
   const getCourseProgress = (courseId) => {

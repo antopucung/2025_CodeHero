@@ -15,7 +15,7 @@ import {
   Progress,
   IconButton
 } from "@chakra-ui/react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import CodeStackingQuiz from './CodeStackingQuiz';
 import { useEffect } from 'react';
 import confetti from 'canvas-confetti';

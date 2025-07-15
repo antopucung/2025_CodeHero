@@ -94,11 +94,22 @@ const UnityCodeEditor = ({
     try {
       const sourceCode = editorRef.current.getValue();
       
+      // Extract using statements from sourceCode
+      const usingRegex = /using\s+[\w\.]+\s*;/g;
+      const usingStatements = sourceCode.match(usingRegex) || [];
+      const sourceCodeWithoutUsing = sourceCode.replace(usingRegex, '').trim();
+      
+      // Combine all using statements at the top
+      const allUsingStatements = [
+        "using System;",
+        "using System.Collections;",
+        "using System.Collections.Generic;",
+        ...usingStatements
+      ].filter((statement, index, array) => array.indexOf(statement) === index).join('\n');
+      
       // Wrap the user code in a simulation environment that mimics Unity
       const wrappedCode = `
-using System;
-using System.Collections;
-using System.Collections.Generic;
+${allUsingStatements}
 
 // Unity simulation environment
 namespace UnityEngine
@@ -201,7 +212,7 @@ namespace UnityEngine
     }
 }
 
-${sourceCode}
+${sourceCodeWithoutUsing}
 
 // Test execution
 public class UnitySimulation
@@ -210,8 +221,7 @@ public class UnitySimulation
     {
         Console.WriteLine("[Unity Simulation Started]");
         
-        try
-        {
+        try {
             // Create an instance of the player controller
             PlayerController player = null;
             try {
@@ -291,6 +301,13 @@ public class UnitySimulation
         setOutput({
           text: formattedOutput,
           hasError: true,
+          isSuccessful: false
+        });
+      } else if (!hasUnityOutput) {
+        // Compiled but didn't produce Unity output
+        setOutput({
+          text: formattedOutput + "\n\nCode compiled successfully, but didn't produce any Unity-related output.",
+          hasError: false,
           isSuccessful: false
         });
       } else {
@@ -504,18 +521,28 @@ public class UnitySimulation
                   </Box>
                 )}
                 
+                {!output.hasError && !output.isSuccessful && (
+                  <Box mt={4} textAlign="right">
+                    <Badge bg="#332200" color="#ffcc00" fontSize="xs" p={1}>
+                      Code Compiled (No Unity Output)
+                    </Badge>
+                  </Box>
+                )}
+                
                 {/* Show error note if compilation failed */}
                 {output.hasError && (
                   <VStack spacing={2} mt={4} align="start">
                     <Box color="#ff6b6b" fontSize="sm" fontWeight="bold">
                       Compilation failed. Please fix the errors above.
                     </Box>
-                    
-                    {!output.hasError && !output.isSuccessful && (
-                      <Box color="#ff9999" fontSize="xs">
-                        ⚠️ Note: Your code compiled but didn't produce any Unity debug output. Make sure your class is named "PlayerController" and inherits from MonoBehaviour.
-                      </Box>
-                    )}
+                    <Box color="#ff9999" fontSize="xs" mt={2}>
+                      ⚠️ Common issues:
+                      <ul style={{ paddingLeft: '20px', marginTop: '4px' }}>
+                        <li>Make sure all 'using' statements are at the top of your code</li>
+                        <li>Ensure your class is named 'PlayerController' and inherits from 'MonoBehaviour'</li>
+                        <li>Check for missing curly braces or semicolons</li>
+                      </ul>
+                    </Box>
                   </VStack>
                 )}
 
@@ -523,7 +550,7 @@ public class UnitySimulation
                 {output.isSuccessful && (
                   <Box mt={4} color="#00ff00" fontSize="xs">
                     ✅ Your code successfully executed with Unity simulation.
-                    </Box>
+                  </Box>
                 )}
               </Box>
             )}

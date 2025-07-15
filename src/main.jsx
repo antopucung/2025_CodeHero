@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { CodeQuizEngine, createCodeBlocksFromString } from '../CodeQuizEngine';
+import { CodeQuizEngine, createCodeBlocksFromString } from './components/learning/CodeQuizEngine';
 import { DebugHelper } from "./utils/debugHelper.js";
-
-// Enable debugging tools in development
-if (process.env.NODE_ENV === 'development') {
-  DebugHelper.log('Debug mode enabled', { env: process.env.NODE_ENV });
-}
 
 /**
  * Custom hook to handle all quiz engine state and logic

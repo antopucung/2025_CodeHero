@@ -1,6 +1,7 @@
 // Updated Typing Challenge Component - Using new engine
 import React, { useState, useEffect } from "react";
 import { Box, Text, VStack, Button, HStack } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import { createTypingEngine } from "../engine/engineFactory";
 import { ConceptualTypingDisplay } from "../engine/components/ConceptualTypingDisplay";
 import { TerminalPanel } from "../design/components/TerminalPanel";
@@ -8,6 +9,8 @@ import { colors, colorPsychology } from "../design/tokens/colors";
 import { typography } from "../design/tokens/typography";
 import { spacing } from "../design/tokens/spacing";
 import { createPulseAnimation } from "../design/tokens/animations";
+
+const MotionBox = motion(Box);
 
 const MotionBox = motion(Box);
 

@@ -3,9 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Text, VStack, HStack, Button, Progress } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
+import { useDisclosure } from "@chakra-ui/react";
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
 import { InteractiveCodeExample } from '../components/learning/InteractiveCodeExample';
+import EnhancedCodeExample from '../components/learning/EnhancedCodeExample';
 import { ConceptExplainer } from '../components/learning/CodeConcepts';
+import QuizPopup from '../components/learning/QuizPopup';
 import TypingChallenge from '../components/TypingChallenge';
 import CodeEditorPage from './CodeEditorPage';
 
@@ -19,6 +22,10 @@ const LessonPage = () => {
   const [allLessons, setAllLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [lessonCompleted, setLessonCompleted] = useState(false);
+  
+  // Quiz popup state
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [quizData, setQuizData] = useState(null);
   
   const { isEnrolled, updateLessonProgress, getCourseProgress } = useUserEnrollment();
   const enrolled = isEnrolled(courseId);
@@ -34,6 +41,32 @@ const LessonPage = () => {
     }
     fetchLessonData();
   }, [courseId, lessonId, enrolled]);
+
+  // Function to create a quiz based on lesson content
+  const createQuizFromLesson = (lesson) => {
+    if (!lesson) return null;
+    
+    const contentData = lesson.content_data || {};
+    let quiz = null;
+    
+    if (contentData.code_example) {
+      // Create a code stacking quiz from the example code
+      quiz = {
+        type: 'code-stacking',
+        title: `Code Challenge: ${lesson.title}`,
+        description: "Arrange the code blocks in the correct order",
+        code: contentData.code_example,
+        language: course?.language || 'csharp',
+        timeLimit: 120, // 2 minutes
+        difficulty: course?.difficulty || 'medium',
+        splitType: 'line',
+        juiciness: 'high',
+        totalBlocks: contentData.code_example.split('\n').filter(line => line.trim()).length
+      };
+    }
+    
+    return quiz;
+  };
 
   const fetchLessonData = async () => {
     try {
@@ -136,6 +169,22 @@ const LessonPage = () => {
         setGameAchievements([]);
       }, 5000);
     }
+    
+    // Show quiz before proceeding to next lesson
+    const nextLesson = getNextLesson();
+    if (nextLesson && !lessonCompleted) {
+      const quiz = createQuizFromLesson(lesson);
+      if (quiz) {
+        setQuizData(quiz);
+        onOpen();
+      }
+    }
+  };
+  
+  // Handle quiz completion
+  const handleQuizComplete = (results) => {
+    console.log('Quiz completed:', results);
+    // Additional logic can be added here if needed
   };
 
   const getNextLesson = () => {
@@ -179,8 +228,8 @@ const LessonPage = () => {
 
               {contentData.code_example && (
                   <InteractiveCodeExample
-                    code={contentData.code_example}
-                    language={course?.language}
+                    code={contentData.code_example || "// No code example available"}
+                    language={course?.language || 'csharp'}
                     mode={
                       contentData.interactive && 
                       !(course?.language === "csharp" && 
@@ -223,6 +272,28 @@ const LessonPage = () => {
               )}
 
               {contentData.concepts && contentData.concepts.length > 0 && (
+                <VStack spacing={3} align="start" w="100%">
+                  <Text fontSize="md" color="#00ff00" fontWeight="bold" mt={2}>
+                    🧩 Key Concepts
+                  </Text>
+                  {contentData.concepts.map((concept, idx) => (
+                    <ConceptExplainer key={idx} concept={concept} />
+                  ))}
+                </VStack>
+              )}
+              
+              {/* Enhanced Code Example with rich hover effects - ideal for Unity code */}
+              {contentData.unity_code_example && (
+                <Box mt={4}>
+                  <EnhancedCodeExample 
+                    code={contentData.unity_code_example} 
+                    language="csharp" 
+                    title={contentData.unity_code_title || "Unity C# Example"}
+                  />
+                </Box>
+              )}
+
+              {contentData.extra_concepts && contentData.extra_concepts.length > 0 && (
                 <VStack spacing={3} align="start" w="100%">
                   <Text fontSize="md" color="#00ff00" fontWeight="bold" mt={2}>
                     🧩 Key Concepts
@@ -537,6 +608,15 @@ const LessonPage = () => {
           </Box>
         )}
       </Box>
+      
+      {/* Quiz Popup */}
+      <QuizPopup 
+        isOpen={isOpen} 
+        onClose={onClose}
+        onComplete={handleQuizComplete}
+        quizData={quizData}
+        lessonTitle={lesson?.title || ""}
+      />
 
       {/* Navigation Footer */}
       <Box 

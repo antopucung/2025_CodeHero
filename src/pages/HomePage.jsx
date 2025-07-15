@@ -28,7 +28,7 @@ const FeatureCard = ({ title, description, icon, color, route, comingSoon = fals
             {title}
           </Text>
         </HStack>
-        <ChakraText color="#ccc">{description}</ChakraText>
+        <Text color="#ccc">{description}</Text>
         {comingSoon ? (
           <Badge bg="#333" color="#ccc">Coming Soon</Badge>
         ) : (

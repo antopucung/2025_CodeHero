@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
-import { CodeQuizEngine, createCodeBlocksFromString } from '../CodeQuizEngine';
+import { CodeQuizEngine, createCodeBlocksFromString } from './CodeQuizEngine';
 
 /**
  * Custom hook to handle all quiz engine state and logic

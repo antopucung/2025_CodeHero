@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, Text as ChakraText, VStack } from "@chakra-ui/react";
-import { useDroppable } from "@dnd-kit/core";
+import { useDroppable } from "@dnd-kit/core"; 
+import { motion } from "framer-motion";
 import DraggableCodeBlock from "../DraggableCodeBlock";
+
+const MotionBox = motion(Box);
 
 /**
  * SolutionArea - Area where blocks are dropped and arranged
@@ -20,12 +23,13 @@ const SolutionArea = ({
       ref={setNodeRef}
       flex="1"
       bg="#000"
-      p={4}
+      p={5}
       borderRadius="md"
       maxH="100%"
       overflowY="auto"
-      border={`1px solid ${isDragging ? "#4ecdc4" : "#333"}`}
+      border={`2px solid ${isDragging ? "#4ecdc4" : "#333"}`}
       position="relative"
+      transition="all 0.3s ease"
       role="region"
       aria-label="Solution area"
     >
@@ -35,25 +39,56 @@ const SolutionArea = ({
       
       {/* Drop indicator overlay */}
       {isDragging && (
-        <Box
+        <MotionBox
           position="absolute"
           top="30px"
           left="4px"
           right="4px"
           bottom="4px"
           borderRadius="md"
-          border="2px dashed #4ecdc4"
-          bg="rgba(78, 205, 196, 0.1)"
+          border="3px dashed #4ecdc4"
+          bg="rgba(78, 205, 196, 0.15)"
           pointerEvents="none"
           zIndex={1}
           display="flex"
           alignItems="center"
           justifyContent="center"
+          animate={{
+            boxShadow: [
+              "0 0 0px rgba(78, 205, 196, 0.3)",
+              "0 0 30px rgba(78, 205, 196, 0.5)",
+              "0 0 0px rgba(78, 205, 196, 0.3)"
+            ],
+            scale: [1, 1.01, 1]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
         >
-          <ChakraText color="#4ecdc4" fontSize="sm">
+          <MotionBox
+            animate={{
+              y: [0, -8, 0],
+              scale: [1, 1.1, 1],
+              opacity: [0.7, 1, 0.7]
+            }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <ChakraText
+              color="#4ecdc4"
+              fontSize="md"
+              fontWeight="bold"
+              textShadow="0 0 10px rgba(78, 205, 196, 0.5)"
+            >
             Drop to place block
-          </ChakraText>
-        </Box>
+            </ChakraText>
+          </MotionBox>
+        </MotionBox>
       )}
       
       <VStack 
@@ -65,9 +100,27 @@ const SolutionArea = ({
         aria-label="Placed code blocks"
       >
         {blocks.length === 0 ? (
-          <ChakraText color="#666" textAlign="center" py={10}>
+          <MotionBox
+            animate={{
+              opacity: [0.5, 0.8, 0.5],
+              scale: isDragging ? [1, 1.05, 1] : 1
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            py={10}
+            textAlign="center"
+          >
+            <ChakraText 
+              color={isDragging ? "#4ecdc4" : "#666"} 
+              fontSize={isDragging ? "md" : "sm"}
+              fontWeight={isDragging ? "bold" : "normal"}
+            >
             {isDragging ? "Drop your first block here" : "Drag blocks here to build your solution"}
-          </ChakraText>
+            </ChakraText>
+          </MotionBox>
         ) : (
           blocks.map((block) => (
             <DraggableCodeBlock

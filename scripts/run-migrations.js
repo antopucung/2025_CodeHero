@@ -130,7 +130,6 @@ async function runMigrations() {
         const filePath = path.join(migrationsDir, file);
         const sql = await fs.readFile(filePath, 'utf8');
         const checksum = calculateChecksum(sql);
-        const checksum = calculateChecksum(sql);
 
         // Apply migration using the apply_migration function
         const { data: result, error: migrationError } = await supabase

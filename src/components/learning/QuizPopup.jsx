@@ -17,7 +17,6 @@ import {
 } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import CodeStackingQuiz from './CodeStackingQuiz';
-import { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 
 const MotionBox = motion(Box);

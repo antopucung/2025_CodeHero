@@ -6,7 +6,7 @@ import { supabase } from '../lib/supabase';
 import { useDisclosure } from "@chakra-ui/react";
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
 import { InteractiveCodeExample } from '../components/learning/InteractiveCodeExample';
-import EnhancedCodeExample from '../components/learning/EnhancedCodeExample';
+import { EnhancedCodeExample } from '../components/learning/EnhancedCodeExample';
 import { ConceptExplainer } from '../components/learning/CodeConcepts';
 import QuizPopup from '../components/learning/QuizPopup';
 import TypingChallenge from '../components/TypingChallenge';
@@ -25,7 +25,7 @@ const LessonPage = () => {
   
   // Quiz popup state
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [quizData, setQuizData] = useState(null);
+  const [quizData, setQuizData] = useState(null); 
   
   const { isEnrolled, updateLessonProgress, getCourseProgress } = useUserEnrollment();
   const enrolled = isEnrolled(courseId);
@@ -45,27 +45,36 @@ const LessonPage = () => {
   // Function to create a quiz based on lesson content
   const createQuizFromLesson = (lesson) => {
     if (!lesson) return null;
-    
+
     const contentData = lesson.content_data || {};
-    let quiz = null;
-    
-    if (contentData.code_example) {
-      // Create a code stacking quiz from the example code
-      quiz = {
+
+    // First check if the lesson already has a quiz defined in its content_data
+    if (contentData.quiz) {
+      return {
+        ...contentData.quiz,
+        // Ensure these fields have default values if not specified
+        language: contentData.quiz.language || course?.language || 'csharp',
+        difficulty: contentData.quiz.difficulty || course?.difficulty || 'medium',
+        juiciness: contentData.quiz.juiciness || 'high'
+      };
+    } 
+    // If no quiz is defined but there's a code example, create one from that
+    else if (contentData.code_example) {
+      return {
         type: 'code-stacking',
         title: `Code Challenge: ${lesson.title}`,
         description: "Arrange the code blocks in the correct order",
         code: contentData.code_example,
         language: course?.language || 'csharp',
-        timeLimit: 120, // 2 minutes
+        timeLimit: course?.difficulty === 'beginner' ? 180 : course?.difficulty === 'advanced' ? 90 : 120,
         difficulty: course?.difficulty || 'medium',
         splitType: 'line',
         juiciness: 'high',
         totalBlocks: contentData.code_example.split('\n').filter(line => line.trim()).length
       };
     }
-    
-    return quiz;
+
+    return null; 
   };
 
   const fetchLessonData = async () => {
@@ -173,7 +182,24 @@ const LessonPage = () => {
     // Show quiz before proceeding to next lesson
     const nextLesson = getNextLesson();
     if (nextLesson && !lessonCompleted) {
-      const quiz = createQuizFromLesson(lesson);
+      let quiz = createQuizFromLesson(lesson);
+      
+      // If the lesson doesn't have a quiz configuration but has code example, create a default one
+      if (!quiz && lesson.content_data?.code_example) {
+        quiz = {
+          type: 'code-stacking',
+          title: `Code Challenge: ${lesson.title}`,
+          description: "Arrange the code blocks in the correct order",
+          code: lesson.content_data.code_example,
+          language: course?.language || 'csharp',
+          timeLimit: 120, 
+          difficulty: course?.difficulty || 'medium',
+          splitType: 'line',
+          juiciness: 'high',
+          totalBlocks: lesson.content_data.code_example.split('\n').filter(line => line.trim()).length
+        };
+      }
+      
       if (quiz) {
         setQuizData(quiz);
         onOpen();
@@ -184,7 +210,25 @@ const LessonPage = () => {
   // Handle quiz completion
   const handleQuizComplete = (results) => {
     console.log('Quiz completed:', results);
-    // Additional logic can be added here if needed
+    
+    // Add quiz score to the lesson completion stats
+    if (results && results.success) {
+      // Only update progress if the quiz was successful
+      const score = results.score || 0;
+      const additionalScore = Math.min(score, 1000); // Cap the score addition at 1000 points
+      
+      // If extremely high score or perfect accuracy, grant achievement
+      if (score > 800 || results.correctPlacements === results.totalBlocks) {
+        setGameAchievements(prev => [...prev, { 
+          type: 'quiz_master', 
+          title: 'QUIZ MASTER',
+          description: 'Mastered the code arrangement challenge!' 
+        }]);
+      }
+      
+      // Update progress with the additional score
+      updateLessonProgress(courseId, lessonId, true, additionalScore);
+    }
   };
 
   const getNextLesson = () => {
@@ -229,14 +273,14 @@ const LessonPage = () => {
               {contentData.code_example && (
                   <InteractiveCodeExample
                     code={contentData.code_example || "// No code example available"}
-                    language={course?.language || 'csharp'}
+                    language={(contentData.language || course?.language || 'csharp')}
                     mode={
                       contentData.interactive && 
-                      !(course?.language === "csharp" && 
-                        (contentData.execution_environment === "unity" || 
-                         contentData.code_title?.includes("Unity"))) 
-                        ? "playground" 
-                        : "annotated"
+                      !((contentData.language || course?.language) === "csharp" && 
+                        (contentData.execution_environment === "unity" || contentData.is_unity_code || 
+                         (contentData.code_title && contentData.code_title.toLowerCase().includes("unity"))))
+                      ? "playground" 
+                      : "annotated"
                     }
                     title={contentData.code_title || "Code Example"}
                     annotations={[

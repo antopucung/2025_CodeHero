@@ -139,7 +139,7 @@ const UNITY_CONCEPTS = {
   }
 };
 
-const EnhancedCodeExample = ({ code, language = "csharp", title = "Unity C# Example" }) => {
+export const EnhancedCodeExample = ({ code, language = "csharp", title = "Unity C# Example" }) => {
   const [highlightedTokens, setHighlightedTokens] = useState([]);
   const [activeToken, setActiveToken] = useState(null);
   const [tokensWithConcepts, setTokensWithConcepts] = useState({});
@@ -333,5 +333,3 @@ const EnhancedCodeExample = ({ code, language = "csharp", title = "Unity C# Exam
     </MotionBox>
   );
 };
-
-export default EnhancedCodeExample;

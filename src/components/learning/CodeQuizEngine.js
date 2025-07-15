@@ -89,11 +89,12 @@ export class CodeQuizEngine {
   }
   
   // Add a block to the user solution
-  placeBlock(blockId) {
+  placeBlock(blockId, insertIndex = -1) {
     if (this.state.status !== 'active') return false;
 
     console.log("Attempting to place block:", blockId);
     console.log("Current blocks:", this.state.blocks);
+    console.log("Insert at index:", insertIndex);
 
     // Find block in available blocks
     const blockIndex = this.state.blocks.findIndex(b => b.id === blockId);
@@ -108,12 +109,21 @@ export class CodeQuizEngine {
     newBlocks.splice(blockIndex, 1);
     this.state.blocks = newBlocks;
     
-    // Add to user solution
-    this.state.userSolution = [...this.state.userSolution, block];
+    // Add to user solution at specified index or append to end if not specified
+    const newUserSolution = [...this.state.userSolution];
+    if (insertIndex >= 0 && insertIndex <= newUserSolution.length) {
+      // Insert at specific position
+      newUserSolution.splice(insertIndex, 0, block);
+    } else {
+      // Append to end
+      newUserSolution.push(block);
+    }
+    this.state.userSolution = newUserSolution;
     console.log("Updated userSolution:", this.state.userSolution);
     
     // Check if placement is correct
-    const isCorrect = this.checkPlacement(block, this.state.userSolution.length - 1);
+    const placementIndex = insertIndex >= 0 ? insertIndex : this.state.userSolution.length - 1;
+    const isCorrect = this.checkPlacement(block, placementIndex);
     console.log("Placement correct?", isCorrect);
     
     if (isCorrect) {
@@ -170,11 +180,26 @@ export class CodeQuizEngine {
     }
     
     // Check if quiz is complete
-    if (this.state.userSolution.length === this.state.solution.length) {
+    if (this.state.userSolution.length === this.state.solution.length && this.areAllPlacementsCorrect()) {
       this.complete();
     }
     
     return isCorrect;
+  }
+  
+  // Check if all current placements are correct
+  areAllPlacementsCorrect() {
+    if (this.state.userSolution.length !== this.state.solution.length) {
+      return false;
+    }
+    
+    for (let i = 0; i < this.state.userSolution.length; i++) {
+      if (this.state.userSolution[i].id !== this.state.solution[i].id) {
+        return false;
+      }
+    }
+    
+    return true;
   }
   
   // Check if a block is placed correctly

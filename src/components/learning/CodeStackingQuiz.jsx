@@ -441,7 +441,7 @@ const CodeStackingQuiz = ({
   // Handle drag end
   const handleDragEnd = (block, info) => {
     console.log("Drag ended:", block.id, info);
-    if (!activeDragBlock || !quizEngineRef.current) return;
+    if (!activeDragBlock || !quizEngineRef.current || !info) return;
     
     // Get the drop point coordinates
     const dropPoint = info?.point ? { x: info.point.x, y: info.point.y } : null;
@@ -452,7 +452,10 @@ const CodeStackingQuiz = ({
       let droppedInZone = false;
       
       dropZoneRefs.current.forEach((ref, index) => {
-        if (!ref.current) return;
+        if (!ref || !ref.current) {
+          console.log("Missing ref for dropzone", index);
+          return;
+        }
         
         const rect = ref.current.getBoundingClientRect();
         console.log("Checking dropzone", index, rect);
@@ -466,7 +469,7 @@ const CodeStackingQuiz = ({
         ) {
           console.log("Dropped in zone", index);
           // Place the block at this index
-          const result = quizEngineRef.current.placeBlock(activeDragBlock.id);
+          const result = quizEngineRef.current.placeBlock(activeDragBlock.id, index);
           console.log("Place block result:", result);
           setQuizState({ ...quizEngineRef.current.getState() });
           droppedInZone = true;
@@ -724,21 +727,24 @@ const CodeStackingQuiz = ({
           <Box w="45%" position="relative" h="100%" display="flex" flexDirection="column">
             <Text color="#666" fontSize="sm" mb={2}>Available Blocks:</Text>
             <Box flex={1} overflowY="auto" ml="30px">
-              <VStack align="start" spacing={1}>
-                {quizState.blocks.map((block, blockIndex) => (
-                  <DraggableCodeBlock
-                    key={`block-${block.id}-${blockIndex}`}
-                    block={block}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    isDragging={activeDragBlock?.id === block.id}
-                    language={language}
-                  />
-                ))}
-                {quizState.blocks.length === 0 && (
-                  <Text color="#666" fontSize="sm">No blocks available</Text>
-                )}
-              </VStack>
+              {quizState.blocks.length > 0 ? (
+                <VStack align="start" spacing={1}>
+                  {quizState.blocks.map((block, blockIndex) => (
+                    <DraggableCodeBlock
+                      key={`block-${block.id}-${blockIndex}`}
+                      block={block}
+                      onDragStart={handleDragStart}
+                      onDragEnd={handleDragEnd}
+                      isDragging={activeDragBlock?.id === block.id}
+                      language={language}
+                    />
+                  ))}
+                </VStack>
+              ) : (
+                <Text color="#666" fontSize="sm" textAlign="center" p={4}>
+                  All blocks have been placed
+                </Text>
+              )}
             </Box>
           </Box>
           
@@ -746,44 +752,35 @@ const CodeStackingQuiz = ({
           <Box w="55%" position="relative" h="100%" display="flex" flexDirection="column">
             <Text color="#666" fontSize="sm" mb={2}>Arrange Here:</Text>
             <Box flex={1} overflowY="auto" ml="30px">
-              <VStack align="start" spacing={0}>
-                {quizState.userSolution.length > 0 ? (
-                  quizState.userSolution.map((block, index) => (
+              <VStack align="start" spacing={1}>
+                {/* Render drop zones for every possible insertion point */}
+                {Array.from({ length: quizState.userSolution.length + 1 }).map((_, index) => (
+                  <Box key={`dropzone-wrapper-${index}`} w="100%">
                     <DropZone 
-                      key={`solution-${block.id}-${index}`}
+                      key={`dropzone-${index}`}
                       index={index}
-                      ref={dropZoneRefs.current[index]}
-                      isActive={false}
+                      ref={el => dropZoneRefs.current[index] = el}
+                      isActive={!!activeDragBlock}
+                      highlightColor={gameEffects.streak >= 3 ? "#ffd93d" : "#4ecdc4"}
                     >
-                      <DraggableCodeBlock
-                        block={block}
-                        isPlaced={true}
-                        isCorrect={quizEngineRef.current.checkPlacement(block, index)}
-                        language={language}
-                      />
+                      {/* If there's a block at this index in the solution, render it */}
+                      {index < quizState.userSolution.length && (
+                        <DraggableCodeBlock
+                          key={`solution-${quizState.userSolution[index].id}`}
+                          block={quizState.userSolution[index]}
+                          isPlaced={true}
+                          isCorrect={quizEngineRef.current.checkPlacement(quizState.userSolution[index], index)}
+                          language={language}
+                        />
+                      )}
+                      
+                      {/* If this is an empty drop zone, show a placeholder when active */}
+                      {index >= quizState.userSolution.length && index === 0 && quizState.userSolution.length === 0 && (
+                        <Text color="#666" fontSize="sm">Drop first block here</Text>
+                      )}
                     </DropZone>
-                  ))
-                ) : (
-                  <DropZone
-                    index={0}
-                    ref={el => dropZoneRefs.current[0] = el}
-                    isActive={!!activeDragBlock}
-                  >
-                    <Text color="#666" fontSize="sm">Drop first block here</Text>
-                  </DropZone>
-                )}
-                
-                {/* Next drop zone */}
-                {quizState.userSolution.length > 0 && 
-                 quizState.userSolution.length < quizState.solution.length && (
-                  <DropZone
-                    key={`next-dropzone-${quizState.userSolution.length}`}
-                    index={quizState.userSolution.length}
-                    ref={dropZoneRefs.current[quizState.userSolution.length]}
-                    isActive={!!activeDragBlock}
-                    highlightColor={gameEffects.streak >= 3 ? "#ffd93d" : "#4ecdc4"}
-                  />
-                )}
+                  </Box>
+                ))}
               </VStack>
             </Box>
           </Box>

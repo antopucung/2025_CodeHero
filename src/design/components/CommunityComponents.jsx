@@ -1,11 +1,12 @@
 // Community-specific reusable components
 import React from 'react';
-import { Box, HStack, VStack, Badge, Image } from '@chakra-ui/react';
+import { Box, HStack, VStack, Badge, Image, Grid } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Card } from './Card';
 import { CustomText } from './Typography';
 import { Button } from './Button';
 import { designSystem } from '../system/DesignSystem';
+import { ProgressBar } from './ProgressBar';
 
 const MotionBox = motion(Box);
 
@@ -436,6 +437,7 @@ export const EnhancedProjectCard = ({
       flexDirection="column"
       h="100%"
       overflow="hidden"
+      position="relative"
       cursor="pointer"
       onClick={onViewDetails}
     >
@@ -513,15 +515,13 @@ export const EnhancedProjectCard = ({
                   of ${fundingGoal.toLocaleString()}
                 </CustomText>
               </HStack>
-              <Box bg="rgba(255,255,255,0.2)" h="4px" borderRadius="2px">
-                <Box 
-                  bg="#FFD700" 
-                  h="100%" 
-                  w={`${Math.min(fundingProgress, 100)}%`} 
-                  borderRadius="2px"
-                  transition="width 0.3s"
-                />
-              </Box>
+              <ProgressBar 
+                value={fundingProgress}
+                colorScheme="gold"
+                bg="rgba(255,255,255,0.2)"
+                height="4px"
+                borderRadius="2px"
+              />
             </VStack>
           </Box>
         )}
@@ -584,6 +584,56 @@ export const EnhancedProjectCard = ({
         >
           {project.description}
         </CustomText>
+
+        {/* Donation Progress */}
+        {project.acceptsDonations && (
+          <VStack spacing={designSystem.spacing[1]} align="stretch" w="100%">
+            <HStack justify="space-between">
+              <CustomText size="xs" color={designSystem.colors.brand.accent}>
+                ${project.donations.toLocaleString()} raised
+              </CustomText>
+              <CustomText size="xs" color="muted">
+                Goal: ${project.fundingGoal.toLocaleString()}
+              </CustomText>
+            </HStack>
+            <ProgressBar 
+              value={(project.donations / project.fundingGoal) * 100}
+              colorScheme="gold"
+              height="4px"
+            />
+          </VStack>
+        )}
+
+        {/* Donation Benefits */}
+        {project.acceptsDonations && (
+          <Box 
+            bg={designSystem.colors.backgrounds.surface} 
+            p={designSystem.spacing[3]}
+            borderRadius={designSystem.radii.md}
+          >
+            <CustomText size="xs" color="accent" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[2]}>
+              Donation Benefits:
+            </CustomText>
+            <Grid templateColumns="repeat(2, 1fr)" gap={designSystem.spacing[2]}>
+              <HStack align="start" spacing={designSystem.spacing[1]}>
+                <Box color={designSystem.colors.brand.accent} fontSize="10px">✓</Box>
+                <CustomText size="xs" color="secondary">Premium tools access</CustomText>
+              </HStack>
+              <HStack align="start" spacing={designSystem.spacing[1]}>
+                <Box color={designSystem.colors.brand.accent} fontSize="10px">✓</Box>
+                <CustomText size="xs" color="secondary">Project source code</CustomText>
+              </HStack>
+              <HStack align="start" spacing={designSystem.spacing[1]}>
+                <Box color={designSystem.colors.brand.accent} fontSize="10px">✓</Box>
+                <CustomText size="xs" color="secondary">Donor recognition</CustomText>
+              </HStack>
+              <HStack align="start" spacing={designSystem.spacing[1]}>
+                <Box color={designSystem.colors.brand.accent} fontSize="10px">✓</Box>
+                <CustomText size="xs" color="secondary">30-day rewards</CustomText>
+              </HStack>
+            </Grid>
+          </Box>
+        )}
 
         {/* Tags */}
         <HStack spacing={designSystem.spacing[1]} flexWrap="wrap">

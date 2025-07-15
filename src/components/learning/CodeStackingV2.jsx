@@ -1,205 +1,207 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, VStack, HStack, Text, Button, Progress, Grid, Badge, useToast } from "@chakra-ui/react";
-import { motion, AnimatePresence } from "framer-motion";
-import { CodeStackingEngine, createCodeBlocks } from './CodeStackingEngine';
-import DraggableCodeBlock from './DraggableCodeBlock';
-import DropZone from './DropZone';
+import { motion } from "framer-motion";
+import { createCodeBlocks } from './CodeStackingEngine';
 
 const MotionBox = motion(Box);
 
-// Main CodeStackingV2 component
+// Simplified DraggableBlock component
+const DraggableBlock = ({ block, isDragging, isPlaced }) => {
+  const handleDragStart = (e) => {
+    e.dataTransfer.setData('text/plain', block.id);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  return (
+    <MotionBox
+      draggable={!isPlaced}
+      onDragStart={handleDragStart}
+      bg={isPlaced ? "#003300" : isDragging ? "#333" : "#222"}
+      border={`1px solid ${isPlaced ? "#00ff00" : isDragging ? "#4ecdc4" : "#444"}`}
+      borderRadius="md"
+      p={2}
+      mb={2}
+      cursor={isPlaced ? "default" : "grab"}
+      whileHover={!isPlaced ? { scale: 1.02 } : {}}
+    >
+      <Text 
+        fontFamily="monospace" 
+        fontSize="sm" 
+        color="#ccc"
+        pl={(block.indentation || 0) / 2 + "px"}
+        whiteSpace="pre"
+      >
+        {block.content}
+      </Text>
+      
+      {isPlaced && (
+        <Badge 
+          position="absolute" 
+          top={1} 
+          right={1}
+          bg="green.600"
+          color="white"
+          fontSize="xs"
+          borderRadius="full"
+        >
+          ✓
+        </Badge>
+      )}
+    </MotionBox>
+  );
+};
+
+// Simplified DropZone component
+const DropZone = ({ onDrop, isActive, children }) => {
+  const handleDragOver = (e) => {
+    if (isActive) {
+      e.preventDefault();
+    }
+  };
+  
+  const handleDrop = (e) => {
+    if (isActive) {
+      e.preventDefault();
+      const blockId = e.dataTransfer.getData('text/plain');
+      onDrop(blockId);
+    }
+  };
+
+  return (
+    <Box
+      minH={children ? "auto" : "40px"}
+      bg={isActive ? "rgba(78, 205, 196, 0.1)" : "transparent"}
+      borderRadius="md"
+      border={isActive ? "2px dashed rgba(78, 205, 196, 0.5)" : "2px dashed transparent"}
+      mb={2}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+    >
+      {children || (isActive && <Text color="#666" fontSize="xs">Drop here</Text>)}
+    </Box>
+  );
+};
+
+// Main CodeStackingV2 component - simplified for functionality
 const CodeStackingV2 = ({
   code,
   language = "javascript",
-  difficulty = "medium",
-  timeLimit = 120,
-  title = "Code Stacking Challenge",
-  description = "Arrange the code blocks in the correct order",
-  onComplete,
-  splitType = "line"
+  onComplete = () => {},
 }) => {
-  const [engine, setEngine] = useState(null);
-  const [quizState, setQuizState] = useState({ status: 'waiting' });
+  const [blocks, setBlocks] = useState([]);
+  const [solution, setSolution] = useState([]);
+  const [timeRemaining, setTimeRemaining] = useState(120);
+  const [score, setScore] = useState(0);
+  const [status, setStatus] = useState('waiting');
   const [activeDragBlock, setActiveDragBlock] = useState(null);
   const toast = useToast();
-  const engineRef = useRef(null); // Keep a ref to avoid closure issues
   
-  // Initialize quiz engine
+  // Initialize code blocks
   useEffect(() => {
-    if (!code) {
-      console.error("No code provided to CodeStackingV2");
-      return;
+    if (code) {
+      const codeBlocks = createCodeBlocks(code, 'line');
+      setBlocks(codeBlocks);
+    }
+  }, [code]);
+  
+  // Timer effect
+  useEffect(() => {
+    let timer;
+    if (status === 'active') {
+      timer = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setStatus('failed');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
     
-    try {
-      console.log("Creating code blocks from code:", code.substring(0, 50) + "...");
-      const codeBlocks = createCodeBlocks(code, splitType);
-      console.log(`Created ${codeBlocks.length} code blocks`);
-      
-      // Configure difficulty settings
-      const difficultySettings = {
-        easy: { timeLimit: 180, basePoints: 50, penalty: 0.05 },
-        medium: { timeLimit: 120, basePoints: 100, penalty: 0.1 },
-        hard: { timeLimit: 90, basePoints: 150, penalty: 0.15 }
-      };
-      
-      const newEngine = new CodeStackingEngine({
-        timeLimit: timeLimit || difficultySettings[difficulty]?.timeLimit || 120,
-        basePoints: difficultySettings[difficulty]?.basePoints || 100,
-        penalty: difficultySettings[difficulty]?.penalty || 0.1
-      });
-      
-      newEngine.setup(codeBlocks, [...codeBlocks]);
-      engineRef.current = newEngine;
-      
-      // Register event handlers
-      newEngine.on('start', (state) => {
-        console.log("Quiz started:", state.status);
-        setQuizState({...state});
-      });
-      
-      newEngine.on('complete', (result) => {
-        console.log("Quiz completed:", result);
-        setQuizState({...newEngine.getState()});
-        
-        if (onComplete) {
-          onComplete(result);
-        }
-        
-        toast({
-          title: "Challenge completed!",
-          description: `You scored ${result.score} points!`,
-          status: "success",
-          duration: 5000,
-          isClosable: true
-        });
-      });
-      
-      newEngine.on('correct', (data) => {
-        console.log("Correct placement:", data);
-        
-        toast({
-          title: "Correct!",
-          description: `+${data.points} points`,
-          status: "success",
-          duration: 1000,
-          isClosable: true,
-          position: "top-right"
-        });
-        
-        // Update state after correct placement
-        setQuizState({...newEngine.getState()});
-      });
-      
-      newEngine.on('incorrect', (data) => {
-        console.log("Incorrect placement:", data);
-        
-        toast({
-          title: "Try again",
-          description: `Incorrect placement -${data.penalty} points`,
-          status: "error",
-          duration: 1000,
-          isClosable: true,
-          position: "top-right"
-        });
-        
-        // Update state after incorrect placement
-        setQuizState({...newEngine.getState()});
-      });
-      
-      newEngine.on('timeout', (result) => {
-        console.log("Quiz timeout:", result);
-        setQuizState({...newEngine.getState()});
-        
-        toast({
-          title: "Time's up!",
-          description: `Your final score: ${result.score}`,
-          status: "warning",
-          duration: 5000,
-          isClosable: true
-        });
-      });
-      
-      newEngine.on('tick', (data) => {
-        // Only update time display, avoid full rerenders
-        setQuizState(prev => ({
-          ...prev,
-          timeRemaining: data.timeRemaining
-        }));
-      });
-      
-      setEngine(newEngine);
-      setQuizState(newEngine.getState());
-      
-    } catch (error) {
-      console.error("Error initializing code stacking engine:", error);
-      toast({
-        title: "Error",
-        description: "Failed to initialize quiz: " + error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true
-      });
-    }
-    
-    // Clean up on unmount
     return () => {
-      if (engineRef.current) {
-        console.log("Cleaning up engine");
-        engineRef.current.destroy();
-        engineRef.current = null;
-      }
+      if (timer) clearInterval(timer);
     };
-  }, [code, difficulty, timeLimit, splitType, onComplete]);
+  }, [status]);
   
   // Start the quiz
   const handleStart = () => {
-    if (!engine) {
-      console.warn("Cannot start quiz: engine not initialized");
-      return;
-    }
-    
-    console.log("Starting quiz...");
-    engine.start();
-    // Force immediate state update
-    setQuizState({...engine.getState()});
+    setStatus('active');
+    setTimeRemaining(120);
+    setScore(0);
+    setSolution([]);
   };
   
   // Reset the quiz
   const handleReset = () => {
-    if (!engine) {
-      console.warn("Cannot reset quiz: engine not initialized");
-      return;
-    }
+    setStatus('waiting');
+    setTimeRemaining(120);
+    setScore(0);
+    setSolution([]);
     
-    console.log("Resetting quiz...");
-    engine.reset();
-    setQuizState({...engine.getState()});
-  };
-  
-  // Handle block drag start
-  const handleDragStart = (block) => {
-    console.log("Drag start:", block.id);
-    setActiveDragBlock(block);
-  };
-  
-  // Handle block drag end
-  const handleDragEnd = () => {
-    console.log("Drag end");
-    setActiveDragBlock(null);
-  };
-  
-  // Handle drop on a zone
-  const handleDrop = (index) => {
-    if (!activeDragBlock || !engine) {
-      console.warn("Cannot drop: no active block or engine");
-      return;
+    if (code) {
+      const codeBlocks = createCodeBlocks(code, 'line');
+      setBlocks(codeBlocks);
     }
+  };
+  
+  // Handle dropping a block at a specific position
+  const handleDrop = (blockId, dropIndex = solution.length) => {
+    // Find the block in the available blocks
+    const blockIndex = blocks.findIndex(b => b.id === blockId);
+    if (blockIndex === -1) return;
     
-    console.log("Dropping block", activeDragBlock.id, "at index", index);
-    engine.placeBlock(activeDragBlock.id, index);
-    setQuizState({...engine.getState()});
-    setActiveDragBlock(null);
+    // Get the block and remove from available blocks
+    const block = blocks[blockIndex];
+    const newBlocks = [...blocks];
+    newBlocks.splice(blockIndex, 1);
+    setBlocks(newBlocks);
+    
+    // Add to solution at the specified position
+    const newSolution = [...solution];
+    newSolution.splice(dropIndex, 0, block);
+    setSolution(newSolution);
+    
+    // Add points
+    setScore(prev => prev + 100);
+    
+    toast({
+      title: "Block placed!",
+      status: "success",
+      duration: 2000,
+      position: "top-right",
+      isClosable: true,
+    });
+    
+    // Check if all blocks are placed
+    if (newBlocks.length === 0) {
+      // Quiz completed
+      setStatus('completed');
+      
+      // Add time bonus
+      const timeBonus = timeRemaining * 10;
+      setScore(prev => prev + timeBonus);
+      
+      toast({
+        title: "Challenge completed!",
+        description: `Time bonus: +${timeBonus} points`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+      
+      if (onComplete) {
+        onComplete({
+          score: score + timeBonus,
+          timeRemaining,
+          success: true
+        });
+      }
+    }
   };
   
   // Format time display
@@ -209,16 +211,10 @@ const CodeStackingV2 = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
   
-  // If engine not initialized, show loading
-  if (!engine) {
-    return (
-      <Box textAlign="center" p={10}>
-        <Text color="#666">Initializing quiz...</Text>
-      </Box>
-    );
-  }
-  
-  console.log("Current quiz state:", quizState.status);
+  const getProgress = () => {
+    if (blocks.length + solution.length === 0) return 0;
+    return (solution.length / (blocks.length + solution.length)) * 100;
+  };
 
   return (
     <Box bg="#111" borderRadius="md" overflow="hidden">
@@ -226,29 +222,29 @@ const CodeStackingV2 = ({
       <Box p={4} borderBottom="1px solid #333">
         <HStack justify="space-between">
           <VStack align="start" spacing={1}>
-            <Text color="#00ff00" fontWeight="bold">{title}</Text>
-            <Text color="#ccc" fontSize="sm">{description}</Text>
+            <Text color="#00ff00" fontWeight="bold">Code Stacking Challenge</Text>
+            <Text color="#ccc" fontSize="sm">Arrange code blocks in the correct order</Text>
           </VStack>
           
-          {quizState.status === 'active' && (
+          {status === 'active' && (
             <HStack>
               <Text color="#ffd93d" fontWeight="bold">
-                Score: {quizState.score}
+                Score: {score}
               </Text>
-              <Text color={quizState.timeRemaining < 10 ? "#ff6b6b" : "#ccc"}>
-                Time: {formatTime(quizState.timeRemaining)}
+              <Text color={timeRemaining < 10 ? "#ff6b6b" : "#ccc"}>
+                Time: {formatTime(timeRemaining)}
               </Text>
             </HStack>
           )}
         </HStack>
         
-        {quizState.status === 'active' && (
+        {status === 'active' && (
           <Box mt={2}>
             <Text color="#666" fontSize="xs" mb={1}>
-              Progress: {Math.round(engine.getProgress())}%
+              Progress: {Math.round(getProgress())}%
             </Text>
             <Progress 
-              value={engine.getProgress()} 
+              value={getProgress()} 
               colorScheme="green" 
               size="xs" 
               bg="#333" 
@@ -259,7 +255,7 @@ const CodeStackingV2 = ({
       </Box>
 
       {/* Quiz Content */}
-      {quizState.status === 'waiting' ? (
+      {status === 'waiting' ? (
         <Box p={10} textAlign="center">
           <VStack spacing={6}>
             <Text fontSize="xl" color="#00ff00" fontWeight="bold">
@@ -287,18 +283,15 @@ const CodeStackingV2 = ({
             <Box bg="#000" p={4} borderRadius="md" maxHeight="400px" overflowY="auto">
               <Text color="#666" mb={3}>Available Blocks:</Text>
               <VStack align="stretch" spacing={1}>
-                {quizState.blocks?.map((block) => (
-                  <DraggableCodeBlock
+                {blocks.map((block) => (
+                  <DraggableBlock
                     key={block.id}
                     block={block}
-                    onDragStart={handleDragStart}
-                    onDragEnd={handleDragEnd}
-                    isDragging={activeDragBlock?.id === block.id}
-                    language={language}
+                    isDragging={activeDragBlock === block.id}
                   />
                 ))}
                 
-                {quizState.blocks?.length === 0 && (
+                {blocks.length === 0 && (
                   <Text color="#666" textAlign="center" p={4}>
                     All blocks placed!
                   </Text>
@@ -310,25 +303,21 @@ const CodeStackingV2 = ({
             <Box bg="#000" p={4} borderRadius="md" maxHeight="400px" overflowY="auto">
               <Text color="#666" mb={3}>Your Solution:</Text>
               <VStack align="stretch" spacing={0}>
-                {/* Drop zones between placed blocks */}
+                {/* First drop zone */}
                 <DropZone 
-                  isActive={!!activeDragBlock} 
-                  onDrop={() => handleDrop(0)}
-                  index={0}
+                  isActive={status === 'active'} 
+                  onDrop={(blockId) => handleDrop(blockId, 0)}
                 />
                 
-                {quizState.userSolution?.map((block, index) => (
+                {solution.map((block, index) => (
                   <React.Fragment key={block.id}>
-                    <DraggableCodeBlock
+                    <DraggableBlock
                       block={block}
                       isPlaced={true}
-                      isCorrect={true}
-                      language={language}
                     />
                     <DropZone 
-                      isActive={!!activeDragBlock} 
-                      onDrop={() => handleDrop(index + 1)}
-                      index={index + 1}
+                      isActive={status === 'active'} 
+                      onDrop={(blockId) => handleDrop(blockId, index + 1)}
                     />
                   </React.Fragment>
                 ))}
@@ -339,7 +328,7 @@ const CodeStackingV2 = ({
       )}
       
       {/* Footer */}
-      {quizState.status === 'completed' && (
+      {status === 'completed' && (
         <Box p={4} bg="#001800" borderTop="1px solid #00ff00">
           <VStack spacing={3}>
             <Text color="#00ff00" fontWeight="bold" fontSize="xl">
@@ -349,13 +338,13 @@ const CodeStackingV2 = ({
             <HStack spacing={6}>
               <VStack>
                 <Text color="#666">Final Score</Text>
-                <Text color="#ffd93d" fontWeight="bold" fontSize="xl">{quizState.score}</Text>
+                <Text color="#ffd93d" fontWeight="bold" fontSize="xl">{score}</Text>
               </VStack>
               
               <VStack>
-                <Text color="#666">Time Bonus</Text>
+                <Text color="#666">Time Remaining</Text>
                 <Text color="#00ff00" fontWeight="bold">
-                  +{quizState.feedback?.find(f => f.type === 'timeBonus')?.points || 0}
+                  {formatTime(timeRemaining)}
                 </Text>
               </VStack>
             </HStack>
@@ -367,7 +356,7 @@ const CodeStackingV2 = ({
         </Box>
       )}
       
-      {quizState.status === 'failed' && (
+      {status === 'failed' && (
         <Box p={4} bg="#180000" borderTop="1px solid #ff6b6b">
           <VStack spacing={3}>
             <Text color="#ff6b6b" fontWeight="bold" fontSize="xl">
@@ -375,7 +364,7 @@ const CodeStackingV2 = ({
             </Text>
             
             <Text color="#ccc">
-              Final Score: {quizState.score}
+              Final Score: {score}
             </Text>
             
             <Button colorScheme="blue" onClick={handleReset}>

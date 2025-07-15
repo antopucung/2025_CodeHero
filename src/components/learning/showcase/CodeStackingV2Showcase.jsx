@@ -12,7 +12,8 @@ const CodeStackingV2Showcase = () => {
 
   // Sample code for the quiz
   const sampleCode = 
-`function calculateTotal(items) {
+`// A simple function to calculate cart total
+function calculateTotal(items) {
   let total = 0;
   for (let i = 0; i < items.length; i++) {
     total += items[i].price;
@@ -32,9 +33,10 @@ console.log('Total:', totalPrice);`;
   const handleQuizComplete = (results) => {
     setQuizResult(results);
     
+    console.log("Quiz completed:", results);
     toast({
       title: results.success ? "Great job!" : "Keep practicing!",
-      description: `You scored ${results.score} points.`,
+      description: `You scored ${results.score} points!`,
       status: results.success ? "success" : "info",
       duration: 5000,
       isClosable: true,
@@ -118,14 +120,12 @@ console.log('Total:', totalPrice);`;
               ← Back to Showcase
             </Badge>
             
-            {quizResult && (
-              <Badge bg={quizResult.success ? "#00ff00" : "#ffd93d"} color="#000">
-                Score: {quizResult.score}
-              </Badge>
-            )}
+            <Badge bg="#00ff00" color="#000">
+              Try It Now!
+            </Badge>
           </HStack>
           
-          <Box w="100%" minH="500px">
+          <Box w="100%" minH="500px" bg="#111" borderRadius="md" overflow="hidden">
             <CodeStackingV2
               code={sampleCode}
               language="javascript"

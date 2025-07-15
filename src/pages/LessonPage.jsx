@@ -21,6 +21,8 @@ const LessonPage = () => {
   const { isEnrolled, updateLessonProgress, getCourseProgress } = useUserEnrollment();
   const enrolled = isEnrolled(courseId);
   const progress = getCourseProgress(courseId);
+  const [gameAchievements, setGameAchievements] = useState([]);
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
   useEffect(() => {
     if (!enrolled && lesson && lesson.order_index > 0) {
@@ -76,9 +78,62 @@ const LessonPage = () => {
   };
 
   const handleLessonComplete = (stats = {}) => {
-    const score = stats.totalScore || stats.score || 0;
+    // Calculate score based on completion stats
+    let score = stats.totalScore || stats.score || 0;
+    
+    // Bonus score for perfect accuracy
+    if (stats.accuracy === 100) {
+      score += 500;
+      setGameAchievements(prev => [...prev, { 
+        type: 'perfectionist', 
+        title: 'PERFECTIONIST',
+        description: 'Completed with 100% accuracy!' 
+      }]);
+    }
+    
+    // Bonus for high WPM
+    if (stats.wpm >= 60) {
+      score += 300;
+      setGameAchievements(prev => [...prev, { 
+        type: 'speed_racer', 
+        title: 'SPEED RACER',
+        description: 'Achieved 60+ WPM!' 
+      }]);
+    }
+    
+    // Bonus for high combo
+    if (stats.maxCombo >= 30) {
+      score += 250;
+      setGameAchievements(prev => [...prev, { 
+        type: 'combo_master', 
+        title: 'COMBO MASTER',
+        description: 'Reached 30+ combo!' 
+      }]);
+    }
+    
+    // Check if user completed the course with this lesson
+    const completedCount = progress.completedLessons.length;
+    if (!lessonCompleted && completedCount >= allLessons.length - 1) {
+      score += 1000; // Bonus for completing the course
+      setGameAchievements(prev => [...prev, { 
+        type: 'course_master', 
+        title: 'COURSE MASTER',
+        description: 'Completed the entire course!' 
+      }]);
+      
+      // Show level up animation on course completion
+      setShowLevelUp(true);
+    }
+    
     updateLessonProgress(courseId, lessonId, true, score);
     setLessonCompleted(true);
+    
+    // If achievements were earned, show them for a few seconds
+    if (gameAchievements.length > 0) {
+      setTimeout(() => {
+        setGameAchievements([]);
+      }, 5000);
+    }
   };
 
   const getNextLesson = () => {
@@ -363,6 +418,77 @@ const LessonPage = () => {
         ) : (
           <Box h="100%" overflow="auto" p={6}>
             {renderLessonContent()}
+            
+            {/* Achievement Unlocked Animation */}
+            {gameAchievements.length > 0 && (
+              <MotionBox
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0, opacity: 0 }}
+                position="fixed"
+                top="20%"
+                left="50%"
+                transform="translateX(-50%)"
+                bg="#111"
+                border="2px solid #ffaa00"
+                borderRadius="md"
+                p={4}
+                zIndex={1000}
+                boxShadow="0 0 20px #ffaa00"
+                textAlign="center"
+                w="300px"
+              >
+                <Text fontSize="xl" color="#ffaa00" fontWeight="bold" mb={2}>
+                  🏆 Achievement Unlocked!
+                </Text>
+                <Text fontSize="md" color="#00ff00" fontWeight="bold">
+                  {gameAchievements[0].title}
+                </Text>
+                <Text fontSize="sm" color="#ccc" mt={1}>
+                  {gameAchievements[0].description}
+                </Text>
+              </MotionBox>
+            )}
+            
+            {/* Level Up Animation */}
+            {showLevelUp && (
+              <MotionBox
+                initial={{ scale: 0, opacity: 0, rotate: -180 }}
+                animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                exit={{ scale: 0, opacity: 0, rotate: 180 }}
+                position="fixed"
+                top="50%"
+                left="50%"
+                transform="translate(-50%, -50%)"
+                bg="#111"
+                border="4px solid #00ff00"
+                borderRadius="md"
+                p={8}
+                zIndex={1000}
+                boxShadow="0 0 40px #00ff00"
+                textAlign="center"
+                w="400px"
+                h="300px"
+                display="flex"
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="center"
+                onClick={() => setShowLevelUp(false)}
+              >
+                <Text fontSize="4xl" color="#00ff00" fontWeight="bold" mb={4}>
+                  🎉 LEVEL UP! 🎉
+                </Text>
+                <Text fontSize="xl" color="#ffaa00" mb={6}>
+                  Course Completed!
+                </Text>
+                <Text fontSize="md" color="#ccc">
+                  You've mastered the fundamentals of C# in Unity!
+                </Text>
+                <Text fontSize="sm" color="#ccc" mt={4}>
+                  Click anywhere to continue
+                </Text>
+              </MotionBox>
+            )}
           </Box>
         )}
       </Box>

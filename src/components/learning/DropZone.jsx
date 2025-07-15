@@ -2,6 +2,8 @@ import React from 'react';
 import { Box, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
+const MotionBox = motion(Box);
+
 // Drop Zone for placing code blocks
 const DropZone = React.forwardRef(({ index, children, isActive, highlightColor = "#4ecdc4" }, ref) => {
   return (
@@ -17,7 +19,7 @@ const DropZone = React.forwardRef(({ index, children, isActive, highlightColor =
       mb={2}
       position="relative"
       transition="all 0.2s ease"
-      zIndex={isActive ? 0 : 1} // Lower z-index when active to allow dragged items to appear above
+      zIndex={isActive ? 1 : 2} // Lower z-index when active to allow dragged items to appear above
       _hover={{
         borderColor: isActive ? highlightColor : "#666"
       }}

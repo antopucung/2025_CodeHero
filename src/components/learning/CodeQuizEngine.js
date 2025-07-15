@@ -90,7 +90,10 @@ export class CodeQuizEngine {
   
   // Add a block to the user solution
   placeBlock(blockId, insertIndex = -1) {
-    if (this.state.status !== 'active') return false;
+    if (this.state.status !== 'active') {
+      console.log("Quiz not active, can't place block");
+      return false;
+    }
 
     console.log("Attempting to place block:", blockId);
     console.log("Current blocks:", this.state.blocks);
@@ -111,7 +114,7 @@ export class CodeQuizEngine {
     
     // Add to user solution at specified index or append to end if not specified
     const newUserSolution = [...this.state.userSolution];
-    if (insertIndex >= 0 && insertIndex <= newUserSolution.length) {
+    if (insertIndex >= 0 && insertIndex <= this.state.userSolution.length) {
       // Insert at specific position
       newUserSolution.splice(insertIndex, 0, block);
     } else {
@@ -395,7 +398,7 @@ export class CodeQuizEngine {
 export const createCodeBlocksFromString = (code, blockType = 'line') => {
   if (!code) return [];
   
-  const blocks = [];
+  let blocks = [];
   let id = 0;
   
   if (blockType === 'line') {

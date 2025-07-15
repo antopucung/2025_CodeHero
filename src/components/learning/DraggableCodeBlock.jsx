@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, Text, Badge } from "@chakra-ui/react";
+import { Box, Badge } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { CustomText } from '../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -92,7 +93,7 @@ const DraggableCodeBlock = ({
       className="draggable-block"
     >
       {/* Line number */}
-      <Text 
+      <CustomText 
         position="absolute" 
         left="-30px" 
         top="50%" 
@@ -101,7 +102,7 @@ const DraggableCodeBlock = ({
         color="#666"
       >
         {block.lineNumber || ''}
-      </Text>
+      </CustomText>
       
       {/* Code content with syntax highlighting */}
       <Box 

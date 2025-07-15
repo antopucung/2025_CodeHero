@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
+import { CustomText } from '../design/components/Typography';
 
 // Enhanced floating score with speed and pattern indicators
 export const FloatingScore = ({ score, x, y, color = '#00ff00', combo = 1, speed = 'lame', patterns = 0, onComplete }) => {

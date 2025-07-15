@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, VStack, Text } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import DraggableCodeBlock from '../DraggableCodeBlock';
+import { CustomText } from '../../../design/components/Typography';
 
 /**
  * AvailableBlocks Component - displays the blocks available to be placed
@@ -22,7 +23,7 @@ export const AvailableBlocks = ({
       borderRadius="md" 
       h="100%"
     >
-      <Text color="#666" fontSize="sm" mb={2}>Drag Blocks:</Text>
+      <CustomText color="#666" fontSize="sm" mb={2}>Drag Blocks:</CustomText>
       <VStack align="stretch" spacing={2} overflow="visible">
         {blocks.map((block) => (
           <DraggableCodeBlock
@@ -36,9 +37,9 @@ export const AvailableBlocks = ({
           />
         ))}
         {blocks.length === 0 && (
-          <Text color="#666" fontSize="sm" textAlign="center" py={4}>
+          <CustomText color="#666" fontSize="sm" textAlign="center" py={4}>
             All blocks placed!
-          </Text>
+          </CustomText>
         )}
       </VStack>
     </Box>

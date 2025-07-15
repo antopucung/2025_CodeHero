@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Box, VStack, Button, Text, HStack, Badge, useToast } from "@chakra-ui/react";
+import { Box, VStack, Button, HStack, Badge, useToast } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import QuizManager from '../QuizManager';
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -76,21 +77,21 @@ const MultipleChoiceShowcase = () => {
             transition={{ duration: 0.5 }}
             textAlign="center"
           >
-            <Text fontSize="2xl" fontWeight="bold" color="#6bcf7f" mb={2}>
+            <CustomText fontSize="2xl" fontWeight="bold" color="#6bcf7f" mb={2}>
               🎯 Multiple Choice Quiz
-            </Text>
-            <Text color="#ccc" mb={4}>
+            </CustomText>
+            <CustomText color="#ccc" mb={4}>
               Test your knowledge with interactive multiple-choice questions.
-            </Text>
+            </CustomText>
           </MotionBox>
           
           <VStack spacing={3} p={4} bg="#000" borderRadius="md" w="100%">
-            <Text color="#6bcf7f" fontWeight="bold">Sample Questions:</Text>
+            <CustomText color="#6bcf7f" fontWeight="bold">Sample Questions:</CustomText>
             <Box p={3} bg="#111" borderRadius="md" w="100%">
-              <Text color="#ccc">What is the correct way to declare a constant in JavaScript?</Text>
+              <CustomText color="#ccc">What is the correct way to declare a constant in JavaScript?</CustomText>
             </Box>
             <Box p={3} bg="#111" borderRadius="md" w="100%">
-              <Text color="#ccc">Which of these is NOT a JavaScript data type?</Text>
+              <CustomText color="#ccc">Which of these is NOT a JavaScript data type?</CustomText>
             </Box>
           </VStack>
           

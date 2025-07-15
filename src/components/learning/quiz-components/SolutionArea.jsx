@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, VStack, Text } from "@chakra-ui/react";
+import { Box, VStack } from "@chakra-ui/react";
 import DraggableCodeBlock from '../DraggableCodeBlock';
 import DropZone from '../DropZone';
+import { CustomText } from '../../../design/components/Typography';
 
 /**
  * SolutionArea Component - displays the area where blocks are arranged
@@ -26,7 +27,7 @@ export const SolutionArea = ({
       bg="#111"
       overflow="visible"
     >
-      <Text color="#666" fontSize="sm" mb={2}>Arrange Here:</Text>
+      <CustomText color="#666" fontSize="sm" mb={2}>Arrange Here:</CustomText>
       <Box 
         flex={1} 
         overflowY="auto" 
@@ -59,7 +60,7 @@ export const SolutionArea = ({
                 
                 {/* If this is an empty drop zone, show a placeholder when active */}
                 {index >= (userSolution?.length || 0) && index === 0 && (userSolution?.length || 0) === 0 && (
-                  <Text color="#666" fontSize="sm">Drop first block here</Text>
+                  <CustomText color="#666" fontSize="sm">Drop first block here</CustomText>
                 )}
               </DropZone>
             </Box>

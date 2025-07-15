@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Box, VStack, Button, Text, HStack, Badge, useToast } from "@chakra-ui/react";
+import { Box, VStack, Button, HStack, Badge, useToast } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import QuizManager from '../QuizManager';
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -79,12 +80,12 @@ console.log('Average score:', averageScore);`;
             transition={{ duration: 0.5 }}
             textAlign="center"
           >
-            <Text fontSize="2xl" fontWeight="bold" color="#ff6b6b" mb={2}>
+            <CustomText fontSize="2xl" fontWeight="bold" color="#ff6b6b" mb={2}>
               🔍 Debug Challenge
-            </Text>
-            <Text color="#ccc" mb={4}>
+            </CustomText>
+            <CustomText color="#ccc" mb={4}>
               Find and fix the bugs in the code to make it work correctly.
-            </Text>
+            </CustomText>
           </MotionBox>
           
           <Box 

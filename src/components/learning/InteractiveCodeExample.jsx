@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, VStack, HStack, Text, Button, Tooltip, Badge, Flex, useDisclosure } from '@chakra-ui/react';
+import { Box, VStack, HStack, Button, Tooltip, Badge, Flex, useDisclosure } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Editor } from '@monaco-editor/react';
 import { executeCode } from '../../api';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { CustomText } from '../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -15,8 +16,8 @@ const CodeAnnotation = ({ children, title, explanation, language = 'csharp' }) =
       hasArrow
       label={
         <VStack spacing={2} p={2} align="start">
-          <Text fontWeight="bold" fontSize="sm">{title}</Text>
-          <Text fontSize="xs">{explanation}</Text>
+          <CustomText fontWeight="bold" fontSize="sm">{title}</CustomText>
+          <CustomText fontSize="xs">{explanation}</CustomText>
         </VStack>
       }
       bg="#111"
@@ -96,7 +97,7 @@ const InteractiveCodeSegment = ({ code, annotations, language = 'csharp' }) => {
     
     // Convert segments to JSX
     return (
-      <Text as="div" whiteSpace="pre-wrap" fontFamily="monospace" fontSize="sm">
+      <CustomText as="div" whiteSpace="pre-wrap" fontFamily="monospace" fontSize="sm">
         {segments.map((segment, index) => 
           segment.isAnnotation ? (
             <CodeAnnotation
@@ -111,7 +112,7 @@ const InteractiveCodeSegment = ({ code, annotations, language = 'csharp' }) => {
             <Box as="span" key={index}>{segment.text}</Box>
           )
         )}
-      </Text>
+      </CustomText>
     );
   };
   
@@ -197,9 +198,9 @@ const CodePlayground = ({ initialCode, language = 'csharp', annotations = [], re
     >
       <VStack spacing={4} align="stretch">
         <HStack justify="space-between">
-          <Text color="#00ff00" fontWeight="bold" fontSize="sm">
+          <CustomText color="#00ff00" fontWeight="bold" fontSize="sm">
             ▶️ Interactive Code Playground
-          </Text>
+          </CustomText>
           <HStack spacing={2}>
             <Button 
               size="sm" 
@@ -259,21 +260,21 @@ const CodePlayground = ({ initialCode, language = 'csharp', annotations = [], re
             borderRadius="md"
             p={3}
           >
-            <Text fontSize="xs" color="#666" mb={1}>Output:</Text>
-            <Text 
+            <CustomText fontSize="xs" color="#666" mb={1}>Output:</CustomText>
+            <CustomText 
               color={output.error ? "#ff4444" : "#00ff00"} 
               fontSize="sm"
               whiteSpace="pre-wrap"
               fontFamily="monospace"
             >
               {output.text}
-            </Text>
+            </CustomText>
           </MotionBox>
         )}
         
         {/* Concept Hints */}
         <Box borderTop="1px solid #333" pt={3}>
-          <Text fontSize="xs" color="#666" mb={2}>✨ Concepts Used</Text>
+          <CustomText fontSize="xs" color="#666" mb={2}>✨ Concepts Used</CustomText>
           <Flex flexWrap="wrap" gap={2}>
             {annotations.map((annotation, index) => (
               <Tooltip 
@@ -339,18 +340,18 @@ const InteractiveCodeExample = ({
       p={4}
       w="100%"
     >
-      <Text color="#00ff00" fontWeight="bold" fontSize="sm" mb={3}>
+      <CustomText color="#00ff00" fontWeight="bold" fontSize="sm" mb={3}>
         📝 {title}
-      </Text>
+      </CustomText>
       <InteractiveCodeSegment 
         code={code}
         annotations={annotations}
         language={language}
       />
       {annotations.length > 0 && (
-        <Text fontSize="xs" color="#666" mt={2} textAlign="center">
+        <CustomText fontSize="xs" color="#666" mt={2} textAlign="center">
           Hover over highlighted text for explanations
-        </Text>
+        </CustomText>
       )}
     </Box>
   );

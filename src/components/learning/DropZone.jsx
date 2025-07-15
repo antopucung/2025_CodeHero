@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react';
 import { Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { CustomText } from '../../design/components/Typography';
 
 const MotionBox = motion(Box);
 

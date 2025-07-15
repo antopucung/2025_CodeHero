@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Box, VStack, Button, Text, HStack, Badge, useToast } from "@chakra-ui/react";
+import { Box, VStack, Button, HStack, Badge, useToast } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import QuizManager from '../QuizManager';
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -63,12 +64,12 @@ const CodeCompletionShowcase = () => {
             transition={{ duration: 0.5 }}
             textAlign="center"
           >
-            <Text fontSize="2xl" fontWeight="bold" color="#ffd93d" mb={2}>
+            <CustomText fontSize="2xl" fontWeight="bold" color="#ffd93d" mb={2}>
               ✏️ Code Completion Quiz
-            </Text>
-            <Text color="#ccc" mb={4}>
+            </CustomText>
+            <CustomText color="#ccc" mb={4}>
               Fill in the blanks to complete the code snippet.
-            </Text>
+            </CustomText>
           </MotionBox>
           
           <Box 

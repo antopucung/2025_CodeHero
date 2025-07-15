@@ -1,6 +1,7 @@
 import React from 'react';
-import { VStack, Text, Button } from "@chakra-ui/react";
+import { VStack, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion.div;
 
@@ -40,18 +41,18 @@ export const QuizStartScreen = ({
           repeat: Infinity
         }}
       >
-        <Text color="#00ff00" fontSize="2xl" fontWeight="bold">
+        <CustomText color="#00ff00" fontSize="2xl" fontWeight="bold">
           {title}
-        </Text>
+        </CustomText>
       </MotionBox>
       
-      <Text color="#ccc" fontSize="md" maxW="500px">
+      <CustomText color="#ccc" fontSize="md" maxW="500px">
         {description}
-      </Text>
+      </CustomText>
       
-      <Text color="#666" fontSize="sm">
+      <CustomText color="#666" fontSize="sm">
         Time Limit: {formattedTime} | Difficulty: {difficulty.toUpperCase()}
-      </Text>
+      </CustomText>
       
       <Button
         colorScheme="green"

@@ -1,6 +1,7 @@
 import React from 'react';
-import { HStack, VStack, Text } from "@chakra-ui/react";
+import { HStack, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion.div;
 
@@ -22,23 +23,23 @@ export const QuizHeader = ({
       justify="space-between"
     >
       <VStack align="start" spacing={1}>
-        <Text color="#00ff00" fontWeight="bold" fontSize="sm">
+        <CustomText color="#00ff00" fontWeight="bold" fontSize="sm">
           {title}
-        </Text>
-        <Text color="#666" fontSize="xs">
+        </CustomText>
+        <CustomText color="#666" fontSize="xs">
           {description}
-        </Text>
+        </CustomText>
       </VStack>
       
       {quizState.status === 'active' && (
         <VStack spacing={1} align="end">
           <HStack>
-            <Text color={quizState.timeRemaining < 10 ? "#ff6b6b" : "#ccc"} fontSize="sm">
+            <CustomText color={quizState.timeRemaining < 10 ? "#ff6b6b" : "#ccc"} fontSize="sm">
               Time: {formatTime ? formatTime(quizState.timeRemaining) : quizState.timeRemaining}
-            </Text>
-            <Text color="#ffd93d" fontSize="sm">
+            </CustomText>
+            <CustomText color="#ffd93d" fontSize="sm">
               Score: {quizState.score}
-            </Text>
+            </CustomText>
           </HStack>
           <MotionBox
             w="200px"

@@ -1,10 +1,11 @@
 // Pattern Bonus Display Component - Shows bonus pattern achievements
 import React from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { colors } from '../tokens/colors';
 import { typography } from '../tokens/typography';
 import { spacing } from '../tokens/spacing';
+import { CustomText } from './Typography';
 
 const PatternBonus = ({ pattern, onComplete }) => {
   const getPatternInfo = (type) => {
@@ -69,15 +70,15 @@ const PatternBonus = ({ pattern, onComplete }) => {
           repeat: 2
         }}
       >
-        <Text fontSize={typography.sizes.xl} mb={spacing[1]}>
+        <CustomText fontSize={typography.sizes.xl} mb={spacing[1]}>
           {patternInfo.icon}
-        </Text>
-        <Text fontSize={typography.sizes.sm} mb={spacing[1]}>
+        </CustomText>
+        <CustomText fontSize={typography.sizes.sm} mb={spacing[1]}>
           {patternInfo.name}
-        </Text>
-        <Text fontSize={typography.sizes.xs} color="#ffff00">
+        </CustomText>
+        <CustomText fontSize={typography.sizes.xs} color="#ffff00">
           +{pattern.bonus} BONUS POINTS!
-        </Text>
+        </CustomText>
       </motion.div>
     </motion.div>
   );

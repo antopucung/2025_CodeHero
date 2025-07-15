@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Box, HStack, VStack, Text, Button, Badge, Tooltip, Flex } from "@chakra-ui/react";
+import { Box, HStack, VStack, Button, Badge, Tooltip, Flex } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Editor } from "@monaco-editor/react";
 import { executeCode } from "../../api";
+import { CustomText } from '../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -367,9 +368,9 @@ public class UnitySimulation
         justify="space-between"
       >
         <HStack spacing={2}>
-          <Text color="#00ff00" fontWeight="bold" fontSize="sm">
+          <CustomText color="#00ff00" fontWeight="bold" fontSize="sm">
             {title}
-          </Text>
+          </CustomText>
           <Badge bg="#222" color="#4ecdc4">C#</Badge>
           <Badge bg="#222" color="#ff6b6b">UNITY</Badge>
         </HStack>
@@ -439,7 +440,7 @@ public class UnitySimulation
               borderTop="1px solid #333"
               p={2}
             >
-              <Text fontSize="xs" color="#666" mb={2}>Hover on code or click keywords:</Text>
+              <CustomText fontSize="xs" color="#666" mb={2}>Hover on code or click keywords:</CustomText>
               <Flex flexWrap="wrap" gap={2}>
                 {annotations.map((annotation, idx) => (
                   <Tooltip
@@ -478,7 +479,7 @@ public class UnitySimulation
             bg="#111"
             borderBottom="1px solid #333"
           >
-            <Text fontSize="xs" color="#666">Unity C# Output:</Text>
+            <CustomText fontSize="xs" color="#666">Unity C# Output:</CustomText>
           </Box>
           
           {/* Output/Preview Area */}
@@ -497,13 +498,13 @@ public class UnitySimulation
                   animate={{ y: [0, -10, 0] }}
                   transition={{ repeat: Infinity, duration: 1.5 }}
                 >
-                  <Text fontSize="md" color="#666" textAlign="center">
+                  <CustomText fontSize="md" color="#666" textAlign="center">
                     🎮 Press "Run" to execute the code
-                  </Text>
+                  </CustomText>
                 </MotionBox>
-                <Text fontSize="xs" color="#444" textAlign="center">
+                <CustomText fontSize="xs" color="#444" textAlign="center">
                   Preview will show Unity simulation results
-                </Text>
+                </CustomText>
               </VStack>
             ) : (
               <Box
@@ -574,9 +575,9 @@ public class UnitySimulation
           zIndex={10}
         >
           <HStack justify="space-between">
-            <Text color="#00ff00" fontWeight="bold" fontSize="sm">
+            <CustomText color="#00ff00" fontWeight="bold" fontSize="sm">
               {activeAnnotation.title}
-            </Text>
+            </CustomText>
             <Button 
               size="xs" 
               onClick={() => setActiveAnnotation(null)}
@@ -585,9 +586,9 @@ public class UnitySimulation
               ✕
             </Button>
           </HStack>
-          <Text color="#ccc" fontSize="sm">
+          <CustomText color="#ccc" fontSize="sm">
             {activeAnnotation.explanation}
-          </Text>
+          </CustomText>
         </MotionBox>
       )}
     </Box>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Box } from '@chakra-ui/react';
+import { CustomText } from '../design/components/Typography';
 
 // Enhanced block letter typing with Candy Crush-style effects
 export const BlockLetterTyping = ({ text, currentIndex, getCharacterStatus, getCharacterSpeed, getCharacterUpgrade, onCharacterClick, combo = 1, typingSpeed = 'lame', anticipationLevel = 1, ANTICIPATION_COLORS, RESULT_COLORS }) => {

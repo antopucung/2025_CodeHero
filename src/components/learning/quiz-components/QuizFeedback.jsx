@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -67,13 +68,13 @@ export const QuizFeedback = ({
           zIndex={1000}
           pointerEvents="none"
         >
-          <Text 
+          <CustomText 
             fontSize="lg" 
             fontWeight="bold" 
             color="#ffd93d"
           >
             🔥 {streakStatus.count} STREAK!
-          </Text>
+          </CustomText>
         </MotionBox>
       )}
       
@@ -108,13 +109,13 @@ export const QuizFeedback = ({
           py={2}
           zIndex={10}
         >
-          <Text 
+          <CustomText 
             color={gameEffects.combo >= 2 ? "#ff6b6b" : "#4ecdc4"} 
             fontWeight="bold"
             fontSize="sm"
           >
             x{gameEffects.combo.toFixed(1)} COMBO
-          </Text>
+          </CustomText>
         </MotionBox>
       )}
       

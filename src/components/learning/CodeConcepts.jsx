@@ -1,6 +1,7 @@
 import React from 'react';
-import { Box, VStack, HStack, Text, Badge, Divider } from '@chakra-ui/react';
+import { Box, VStack, HStack, Badge, Divider } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import { CustomText } from '../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -162,29 +163,29 @@ const ConceptExplainer = ({ concept, size = "md" }) => {
         <HStack>
           <Badge colorScheme="green">{selected.title}</Badge>
           {size === "sm" && (
-            <Text fontSize="xs" color="#666">
+            <CustomText fontSize="xs" color="#666">
               Hover for examples
-            </Text>
+            </CustomText>
           )}
         </HStack>
         
-        <Text fontSize="sm" color="#ccc">
+        <CustomText fontSize="sm" color="#ccc">
           {selected.explanation}
-        </Text>
+        </CustomText>
         
         {size === "md" && selected.examples && (
           <>
             <Divider borderColor="#333" />
-            <Text fontSize="xs" color="#666" mb={1}>Examples:</Text>
+            <CustomText fontSize="xs" color="#666" mb={1}>Examples:</CustomText>
             <VStack spacing={2} align="start" w="100%">
               {selected.examples.map((example, idx) => (
                 <Box key={idx} bg="#000" p={2} borderRadius="md" w="100%">
-                  <Text color="#00ff00" fontSize="sm" fontFamily="monospace" mb={1}>
+                  <CustomText color="#00ff00" fontSize="sm" fontFamily="monospace" mb={1}>
                     {example.text}
-                  </Text>
-                  <Text fontSize="xs" color="#ccc">
+                  </CustomText>
+                  <CustomText fontSize="xs" color="#ccc">
                     {example.explanation}
-                  </Text>
+                  </CustomText>
                 </Box>
               ))}
             </VStack>

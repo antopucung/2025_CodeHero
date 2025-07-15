@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, VStack, Button, Text, HStack, Badge, Image } from "@chakra-ui/react";
+import { Box, VStack, Button, HStack, Badge, Image } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -16,13 +17,13 @@ const DinoRunQuizShowcase = () => {
           transition={{ duration: 0.5 }}
           textAlign="center"
         >
-          <Text fontSize="2xl" fontWeight="bold" color="#a374db" mb={2}>
+          <CustomText fontSize="2xl" fontWeight="bold" color="#a374db" mb={2}>
             🦖 Dino Run Quiz
-          </Text>
+          </CustomText>
           <Badge colorScheme="purple" mb={4}>Coming Soon</Badge>
-          <Text color="#ccc" mb={4}>
+          <CustomText color="#ccc" mb={4}>
             Jump to collect correct answers while avoiding obstacles in this endless runner style quiz game.
-          </Text>
+          </CustomText>
         </MotionBox>
         
         <Box 
@@ -67,9 +68,9 @@ const DinoRunQuizShowcase = () => {
               borderRadius: "4px"
             }}
           >
-            <Text fontSize="2xl" position="absolute" top="0" left="0" right="0" bottom="0" textAlign="center" lineHeight="50px">
+            <CustomText fontSize="2xl" position="absolute" top="0" left="0" right="0" bottom="0" textAlign="center" lineHeight="50px">
               🦖
-            </Text>
+            </CustomText>
           </MotionBox>
           
           <MotionBox
@@ -88,7 +89,7 @@ const DinoRunQuizShowcase = () => {
               borderRadius: "4px"
             }}
           >
-            <Text color="#000" fontWeight="bold" fontSize="xs">WRONG!</Text>
+            <CustomText color="#000" fontWeight="bold" fontSize="xs">WRONG!</CustomText>
           </MotionBox>
           
           <MotionBox
@@ -107,7 +108,7 @@ const DinoRunQuizShowcase = () => {
               borderRadius: "4px"
             }}
           >
-            <Text color="#000" fontWeight="bold" fontSize="xs">CORRECT!</Text>
+            <CustomText color="#000" fontWeight="bold" fontSize="xs">CORRECT!</CustomText>
           </MotionBox>
           
           <Box
@@ -126,7 +127,7 @@ const DinoRunQuizShowcase = () => {
             right="0"
             textAlign="center"
           >
-            <Text color="#ccc">Question: What is 2 + 2?</Text>
+            <CustomText color="#ccc">Question: What is 2 + 2?</CustomText>
           </Box>
           
           <Box
@@ -139,8 +140,8 @@ const DinoRunQuizShowcase = () => {
             borderRadius="md"
           >
             <HStack spacing={2}>
-              <Text fontSize="xs" color="#666">SCORE:</Text>
-              <Text fontSize="xs" color="#ffd93d" fontWeight="bold">120</Text>
+              <CustomText fontSize="xs" color="#666">SCORE:</CustomText>
+              <CustomText fontSize="xs" color="#ffd93d" fontWeight="bold">120</CustomText>
             </HStack>
           </Box>
         </Box>
@@ -170,7 +171,7 @@ const DinoRunQuizShowcase = () => {
           borderRadius="md"
           w="100%"
         >
-          <Text fontSize="sm" color="#ccc">
+          <CustomText fontSize="sm" color="#ccc">
             <span style={{ color: "#a374db", fontWeight: "bold" }}>Features:</span>
             <br />
             • Jump to collect correct answers
@@ -180,7 +181,7 @@ const DinoRunQuizShowcase = () => {
             • Score based on correct answers and distance
             <br />
             • Progressive difficulty as score increases
-          </Text>
+          </CustomText>
         </Box>
       </VStack>
     </Box>

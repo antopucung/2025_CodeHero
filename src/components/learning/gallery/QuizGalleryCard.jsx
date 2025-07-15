@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, VStack, HStack, Text, Badge } from "@chakra-ui/react";
+import { Box, VStack, HStack, Badge } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { designSystem } from '../../../design/system/DesignSystem';
+import { CustomText } from '../../../design/components/Typography';
 
 const MotionBox = motion(Box);
 
@@ -36,9 +37,9 @@ const QuizGalleryCard = ({ quiz, onClick }) => {
         justifyContent="space-between"
         alignItems="center"
       >
-        <Text fontSize="3xl" lineHeight="1">
+        <CustomText fontSize="3xl" lineHeight="1">
           {quiz.icon}
-        </Text>
+        </CustomText>
         
         <Badge 
           bg={getDifficultyColor(quiz.difficulty)} 
@@ -52,13 +53,13 @@ const QuizGalleryCard = ({ quiz, onClick }) => {
       
       {/* Card Content */}
       <VStack p={4} align="start" spacing={3}>
-        <Text fontSize="xl" fontWeight="bold" color={quiz.color}>
+        <CustomText fontSize="xl" fontWeight="bold" color={quiz.color}>
           {quiz.title}
-        </Text>
+        </CustomText>
         
-        <Text fontSize="sm" color="#ccc">
+        <CustomText fontSize="sm" color="#ccc">
           {quiz.description}
-        </Text>
+        </CustomText>
         
         <HStack>
           {quiz.comingSoon ? (

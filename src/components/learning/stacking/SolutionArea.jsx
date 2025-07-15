@@ -1,28 +1,18 @@
 import React from "react";
 import { Box, Text, VStack } from "@chakra-ui/react";
-import DraggableBlock from "./DraggableBlock";
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import SortableBlock from "./SortableBlock";
 
 /**
  * SolutionArea - Area where blocks are dropped and arranged
- * 
- * @param {Object} props - Component props
- * @param {Array} props.blocks - Array of placed block objects
- * @param {boolean} props.isDragging - Whether a block is being dragged
- * @param {Function} props.onDragOver - Function to call when dragging over
- * @param {Function} props.onDrop - Function to call when a block is dropped
- * @param {React.RefObject} props.containerRef - Ref for the container element
- * @returns {JSX.Element} - Rendered component
  */
 const SolutionArea = ({ 
   blocks, 
-  isDragging, 
-  onDragOver, 
-  onDrop,
-  containerRef
+  blockIds,
+  isDragging
 }) => {
   return (
     <Box
-      ref={containerRef}
       flex="1"
       bg="#000"
       p={4}
@@ -30,8 +20,6 @@ const SolutionArea = ({
       maxH="100%"
       overflowY="auto"
       border={`1px solid ${isDragging ? "#4ecdc4" : "#333"}`}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
       position="relative"
       role="region"
       aria-label="Solution area"
@@ -63,33 +51,33 @@ const SolutionArea = ({
         </Box>
       )}
       
-      <VStack 
-        align="stretch" 
-        spacing={1} 
-        zIndex={2} 
-        position="relative"
-        role="list"
-        aria-label="Placed code blocks"
+      <SortableContext 
+        items={blockIds}
+        strategy={verticalListSortingStrategy}
       >
-        {blocks.length === 0 ? (
-          <Text color="#666" textAlign="center" py={10}>
-            {isDragging ? "Drop your first block here" : "Drag blocks here to build your solution"}
-          </Text>
-        ) : (
-          blocks.map((block, index) => (
-            <Box
-              key={block.id}
-              className="solution-block"
-              data-index={index}
-            >
-              <DraggableBlock 
-                block={block} 
-                isPlaced={true} 
+        <VStack 
+          align="stretch" 
+          spacing={1} 
+          zIndex={2} 
+          position="relative"
+          role="list"
+          aria-label="Placed code blocks"
+        >
+          {blocks.length === 0 ? (
+            <Text color="#666" textAlign="center" py={10}>
+              {isDragging ? "Drop your first block here" : "Drag blocks here to build your solution"}
+            </Text>
+          ) : (
+            blocks.map((block) => (
+              <SortableBlock
+                key={block.id}
+                id={block.id}
+                block={block}
               />
-            </Box>
-          ))
-        )}
-      </VStack>
+            ))
+          )}
+        </VStack>
+      </SortableContext>
     </Box>
   );
 };

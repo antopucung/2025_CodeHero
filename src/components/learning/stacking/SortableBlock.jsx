@@ -1,32 +1,31 @@
 import React from "react";
 import { Box, Text } from "@chakra-ui/react";
-import { useDraggable } from "@dnd-kit/core";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 /**
- * DraggableBlock - A draggable code block for the available blocks panel
+ * SortableBlock - A draggable and sortable code block for the solution area
  */
-const DraggableBlock = ({ 
-  block,
-  id
+const SortableBlock = ({ 
+  block, 
+  id,
+  isCorrect = true
 }) => {
   const {
     attributes,
     listeners,
     setNodeRef,
     transform,
+    transition,
     isDragging
-  } = useDraggable({
-    id,
-    data: {
-      block
-    }
-  });
+  } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
+    transition,
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 10 : 1
+    zIndex: isDragging ? 10 : 1,
+    position: 'relative'
   };
 
   return (
@@ -34,17 +33,16 @@ const DraggableBlock = ({
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      bg="#222"
-      border="1px solid #444"
+      bg={isCorrect ? "#003300" : "#330000"}
+      border={`1px solid ${isCorrect ? "#00ff00" : "#ff0000"}`}
       borderRadius="md"
       p={2}
       mb={1}
       cursor="grab"
-      _hover={{ borderColor: "#4ecdc4" }}
       _active={{ cursor: "grabbing" }}
       style={style}
       data-block-id={id}
-      className="code-block"
+      className="solution-block"
       role="listitem"
       aria-label={`Code block: ${block.content.substring(0, 20)}${block.content.length > 20 ? '...' : ''}`}
     >
@@ -61,4 +59,4 @@ const DraggableBlock = ({
   );
 };
 
-export default DraggableBlock;
+export default SortableBlock;

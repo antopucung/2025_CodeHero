@@ -4,13 +4,8 @@ import DraggableBlock from "./DraggableBlock";
 
 /**
  * BlocksPanel - Panel containing available blocks to drag
- * 
- * @param {Object} props - Component props
- * @param {Array} props.blocks - Array of block objects
- * @param {Function} props.onDragStart - Function to call when dragging starts
- * @returns {JSX.Element} - Rendered component
  */
-const BlocksPanel = ({ blocks, onDragStart }) => {
+const BlocksPanel = ({ blocks }) => {
   return (
     <Box
       flex="1"
@@ -36,8 +31,8 @@ const BlocksPanel = ({ blocks, onDragStart }) => {
         {blocks.map((block) => (
           <DraggableBlock 
             key={block.id} 
+            id={block.id}
             block={block} 
-            onDragStart={onDragStart}
           />
         ))}
 

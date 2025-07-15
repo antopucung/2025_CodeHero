@@ -90,12 +90,12 @@ export class CodeQuizEngine {
   
   // Add a block to the user solution
   placeBlock(blockId, insertIndex = -1) {
+    console.log(`Attempting to place block ${blockId} at index ${insertIndex}`);
     if (this.state.status !== 'active') {
       console.log("Quiz not active, can't place block");
       return false;
     }
 
-    console.log("Attempting to place block:", blockId);
     console.log("Current blocks:", this.state.blocks);
     console.log("Insert at index:", insertIndex);
 
@@ -184,10 +184,26 @@ export class CodeQuizEngine {
     
     // Check if quiz is complete
     if (this.state.userSolution.length === this.state.solution.length && this.areAllPlacementsCorrect()) {
+      console.log("All blocks placed correctly, completing quiz");
       this.complete();
     }
     
     return isCorrect;
+  }
+  
+  // Check if all current placements are correct
+  areAllPlacementsCorrect() {
+    if (this.state.userSolution.length !== this.state.solution.length) {
+      return false;
+    }
+    
+    for (let i = 0; i < this.state.userSolution.length; i++) {
+      if (this.state.userSolution[i].id !== this.state.solution[i].id) {
+        return false;
+      }
+    }
+    
+    return true;
   }
   
   // Check if all current placements are correct

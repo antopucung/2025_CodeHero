@@ -28,6 +28,8 @@ function calculateChecksum(content) {
   return crypto.createHash('md5').update(content).digest('hex');
 }
 
+async function runMigrations() {
+  try {
     // Check if the schema_migrations table exists by trying to query it directly
     const { data: tablesData, error: tablesError } = await supabase
       .from('schema_migrations')
@@ -62,18 +64,18 @@ function calculateChecksum(content) {
         const { error: directError } = await supabase.auth.admin.executeRaw(trackingSql);
         
         if (directError) {
-        // If we got an error, it might be because the function doesn't exist yet
-        // In that case, we need to find another way to execute the SQL
-        console.log('Could not execute tracking setup via RPC. Attempting direct SQL...');
-        
-        // Try executing via SQL API (if available)
-        const { error: directError } = await supabase.auth.admin.executeRaw(trackingSql);
-        
-        if (directError) {
-          console.error('Failed to initialize migration tracking system:', directError.message);
-          console.error('Please execute the migration_tracking_system.sql file manually in the Supabase SQL editor.');
-          process.exit(1);
-        }
+          // If we got an error, it might be because the function doesn't exist yet
+          // In that case, we need to find another way to execute the SQL
+          console.log('Could not execute tracking setup via RPC. Attempting direct SQL...');
+          
+          // Try executing via SQL API (if available)
+          const { error: directError } = await supabase.auth.admin.executeRaw(trackingSql);
+          
+          if (directError) {
+            console.error('Failed to initialize migration tracking system:', directError.message);
+            console.error('Please execute the migration_tracking_system.sql file manually in the Supabase SQL editor.');
+            process.exit(1);
+          }
         }
       }
       
@@ -122,107 +124,108 @@ function calculateChecksum(content) {
       }
       
       if (appliedVersionsMap.has(file)) {
-      if (file.includes('migration_tracking_system') && !appliedVersionsMap.has(file)) {
-        appliedVersionsMap.set(file, ''); // Mark as processed
-        console.log(`Skipping tracking system file: ${file} (already initialized)`);
-        skippedCount++;
-        continue;
-      }
-      
-      if (appliedVersionsMap.has(file)) {
-        console.log(`Migration already applied: ${file}`);
-        skippedCount++;
-        skippedCount++;
-        continue;
-      }
-
-      console.log(`Processing migration: ${file}`);
-      const filePath = path.join(migrationsDir, file);
-      const sql = await fs.readFile(filePath, 'utf8');
-      const checksum = calculateChecksum(sql);
-      const checksum = calculateChecksum(sql);
-
-      // Apply migration using the apply_migration function
-      const { data: result, error: migrationError } = await supabase
-        .rpc('apply_migration', {
-          migration_name: file,
-          migration_sql: sql
-        });
-
-      if (migrationError) {
-        console.error(`Error applying migration ${file}:`, migrationError.message);
-        
-        // Attempt to apply via execute_sql_query as fallback
-        console.log(`Attempting to apply ${file} via execute_sql_query...`);
-        const { error: executeError } = await supabase
-          .rpc('execute_sql_query', { query: sql });
-          
-        if (executeError) {
-          console.error(`Failed to apply ${file} via execute_sql_query:`, executeError.message);
-          errorCount++;
-          // Skip to the next migration instead of stopping completely
+        if (file.includes('migration_tracking_system') && !appliedVersionsMap.has(file)) {
+          appliedVersionsMap.set(file, ''); // Mark as processed
+          console.log(`Skipping tracking system file: ${file} (already initialized)`);
+          skippedCount++;
           continue;
         }
         
-        // Manually record the migration since we bypassed apply_migration
-        const { error: recordError } = await supabase
-          .from('schema_migrations')
-          .insert([{ 
-            version: file, 
-            checksum: checksum,
-            description: 'Applied via execute_sql_query fallback' 
-          }]);
+        if (appliedVersionsMap.has(file)) {
+          console.log(`Migration already applied: ${file}`);
+          skippedCount++;
+          skippedCount++;
+          continue;
+        }
+
+        console.log(`Processing migration: ${file}`);
+        const filePath = path.join(migrationsDir, file);
+        const sql = await fs.readFile(filePath, 'utf8');
+        const checksum = calculateChecksum(sql);
+        const checksum = calculateChecksum(sql);
+
+        // Apply migration using the apply_migration function
+        const { data: result, error: migrationError } = await supabase
+          .rpc('apply_migration', {
+            migration_name: file,
+            migration_sql: sql
+          });
+
+        if (migrationError) {
+          console.error(`Error applying migration ${file}:`, migrationError.message);
           
-        if (recordError) {
-          console.error(`Error recording migration ${file}:`, recordError.message);
-          // Continue anyway
-        }
-        
-        console.log(`Successfully applied ${file} via fallback method`);
-        appliedCount++;
-      } else {
-      // Apply migration using the apply_migration function
-      const { data: result, error: migrationError } = await supabase
-        .rpc('apply_migration', {
-          migration_name: file,
-          migration_sql: sql
-        });
-          appliedCount++;
-    }
-      if (migrationError) {
-        console.error(`Error applying migration ${file}:`, migrationError.message);
-        
-        // These are common errors that we can safely ignore and continue
-        const nonFatalErrors = [
-          "already exists",
-          "duplicate key",
-          "invalid input syntax for type uuid", // Handle UUID issues
-          "relation",
-          "does not exist"
-        ];
-        
-        // Check if it's a non-fatal error
-        const isNonFatal = nonFatalErrors.some(errMsg => migrationError.message.includes(errMsg));
-        
-        if (!isNonFatal) {
-          // Stop on fatal errors
-          console.error('This appears to be a fatal error. Migration aborted.');
-          process.exit(1);
-        }
-        
-        // For non-fatal errors, just increment the error count and continue
-        errorCount++;
-        console.log(`This is a non-fatal error. Continuing with next migration.`);
-        continue;
-      } else {
-        if (result && result.success) {
-          console.log(`Successfully applied: ${file} - ${result.message}`);
+          // Attempt to apply via execute_sql_query as fallback
+          console.log(`Attempting to apply ${file} via execute_sql_query...`);
+          const { error: executeError } = await supabase
+            .rpc('execute_sql_query', { query: sql });
+            
+          if (executeError) {
+            console.error(`Failed to apply ${file} via execute_sql_query:`, executeError.message);
+            errorCount++;
+            // Skip to the next migration instead of stopping completely
+            continue;
+          }
+          
+          // Manually record the migration since we bypassed apply_migration
+          const { error: recordError } = await supabase
+            .from('schema_migrations')
+            .insert([{ 
+              version: file, 
+              checksum: checksum,
+              description: 'Applied via execute_sql_query fallback' 
+            }]);
+            
+          if (recordError) {
+            console.error(`Error recording migration ${file}:`, recordError.message);
+            // Continue anyway
+          }
+          
+          console.log(`Successfully applied ${file} via fallback method`);
           appliedCount++;
         } else {
-          console.error(`Error applying ${file}: ${result ? result.message : 'Unknown error'}`);
-          errorCount++;
+          // Apply migration using the apply_migration function
+          const { data: result, error: migrationError } = await supabase
+            .rpc('apply_migration', {
+              migration_name: file,
+              migration_sql: sql
+            });
+          appliedCount++;
         }
-    if (errorCount > 0) {
+        if (migrationError) {
+          console.error(`Error applying migration ${file}:`, migrationError.message);
+          
+          // These are common errors that we can safely ignore and continue
+          const nonFatalErrors = [
+            "already exists",
+            "duplicate key",
+            "invalid input syntax for type uuid", // Handle UUID issues
+            "relation",
+            "does not exist"
+          ];
+          
+          // Check if it's a non-fatal error
+          const isNonFatal = nonFatalErrors.some(errMsg => migrationError.message.includes(errMsg));
+          
+          if (!isNonFatal) {
+            // Stop on fatal errors
+            console.error('This appears to be a fatal error. Migration aborted.');
+            process.exit(1);
+          }
+          
+          // For non-fatal errors, just increment the error count and continue
+          errorCount++;
+          console.log(`This is a non-fatal error. Continuing with next migration.`);
+          continue;
+        } else {
+          if (result && result.success) {
+            console.log(`Successfully applied: ${file} - ${result.message}`);
+            appliedCount++;
+          } else {
+            console.error(`Error applying ${file}: ${result ? result.message : 'Unknown error'}`);
+            errorCount++;
+          }
+        }
+      }
     }
 
     console.log(`
@@ -251,7 +254,6 @@ Migration Summary:
 runMigrations().catch(err => {
   console.error('Unhandled error in migration script:', err);
   // Don't exit with error code, so the server can still start
-});
   console.error('Unhandled error in migration script:', err);
   process.exit(1);
 });

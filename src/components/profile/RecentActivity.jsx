@@ -28,19 +28,20 @@ export const RecentActivity = () => {
       <Heading level={3} size="lg" color="accent" mb={designSystem.spacing[4]}>
         📈 Recent Activity
       </Heading>
-      <VStack spacing={designSystem.spacing[3]} align="stretch">
+      <VStack spacing={designSystem.spacing[4]} align="stretch">
         {activities.map((activity, index) => (
           <HStack 
             key={index}
-            spacing={designSystem.spacing[3]} 
+            spacing={designSystem.spacing[4]} 
             p={designSystem.spacing[3]} 
+            px={designSystem.spacing[4]}
             bg={designSystem.colors.backgrounds.secondary} 
             borderRadius={designSystem.radii.md}
           >
-            <Text>{activity.icon}</Text>
+            <Text fontSize={designSystem.typography.sizes.lg} lineHeight="1">{activity.icon}</Text>
             <VStack align="start" spacing={0} flex={1}>
               <Text size="sm" color="secondary">{activity.title}</Text>
-              <Text size="xs" color="muted">{activity.time}</Text>
+              <Text size="xs" color="muted" mt={designSystem.spacing[1]}>{activity.time}</Text>
             </VStack>
           </HStack>
         ))}

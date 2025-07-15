@@ -31,6 +31,9 @@ export const Card = ({
       cursor={onClick ? 'pointer' : 'default'}
       transition="all 0.2s ease"
       {...hoverAnimation}
+      overflow="hidden"
+      display="flex"
+      flexDirection="column"
       {...props}
     >
       {children}
@@ -146,9 +149,11 @@ export const CourseCard = ({
         display="flex" 
         flexDirection="column" 
         flex={1}
-        gap={designSystem.spacing[3]}
+        px={designSystem.spacing[4]}
+        pb={designSystem.spacing[4]}
       >
         <Box
+          mb={designSystem.spacing[3]}
           fontSize={designSystem.typography.sizes.lg}
           fontWeight={designSystem.typography.weights.bold}
           color={designSystem.colors.brand.primary}
@@ -159,6 +164,7 @@ export const CourseCard = ({
         </Box>
 
         <Box
+          mb={designSystem.spacing[4]}
           fontSize={designSystem.typography.sizes.sm}
           color={designSystem.colors.text.secondary}
           noOfLines={3}
@@ -168,7 +174,7 @@ export const CourseCard = ({
         </Box>
 
         {/* Course Stats */}
-        <Box display="flex" flexDirection="column" gap={designSystem.spacing[2]}>
+        <Box display="flex" flexDirection="column" gap={designSystem.spacing[3]} mb={designSystem.spacing[4]}>
           <Box 
             display="flex" 
             justifyContent="space-between" 

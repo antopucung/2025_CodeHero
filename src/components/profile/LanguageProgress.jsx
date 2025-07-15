@@ -32,7 +32,7 @@ export const LanguageProgress = ({ languageProgress }) => {
       <Heading level={3} size="lg" color="brand" mb={designSystem.spacing[4]}>
         📊 Language Progress
       </Heading>
-      <VStack spacing={designSystem.spacing[4]} align="stretch">
+      <VStack spacing={designSystem.spacing[5]} align="stretch">
         {progressData.map((lang, index) => (
           <MotionBox
             key={lang.language}
@@ -40,7 +40,8 @@ export const LanguageProgress = ({ languageProgress }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
           >
-            <HStack justify="space-between" mb={designSystem.spacing[2]}>
+            <Box px={designSystem.spacing[2]}>
+            <HStack justify="space-between" mb={designSystem.spacing[3]}>
               <HStack spacing={designSystem.spacing[2]}>
                 <Text fontWeight={designSystem.typography.weights.bold} color="secondary">
                   {lang.language.toUpperCase()}
@@ -58,6 +59,7 @@ export const LanguageProgress = ({ languageProgress }) => {
               h="8px"
               borderRadius={designSystem.radii.base}
               overflow="hidden"
+              mx={designSystem.spacing[1]}
             >
               <Box
                 bg={lang.color}
@@ -65,6 +67,7 @@ export const LanguageProgress = ({ languageProgress }) => {
                 w={`${Math.min((lang.xp / (lang.level * 50)) * 100, 100)}%`}
                 transition="width 0.3s"
               />
+            </Box>
             </Box>
           </MotionBox>
         ))}

@@ -9,11 +9,11 @@ const MotionBox = motion.div;
 
 export const AchievementsSection = ({ achievements }) => {
   return (
-    <Card variant="elevated" p={designSystem.spacing[6]}>
+    <Card variant="elevated" p={designSystem.spacing[6]}>  
       <Heading level={3} size="lg" color="accent" mb={designSystem.spacing[4]}>
         🏆 Achievements
       </Heading>
-      <VStack spacing={designSystem.spacing[2]} align="stretch">
+      <VStack spacing={designSystem.spacing[3]} align="stretch">
         {achievements.length > 0 ? (
           achievements.map((achievement, index) => (
             <MotionBox
@@ -28,22 +28,20 @@ export const AchievementsSection = ({ achievements }) => {
                 border: `1px solid ${designSystem.colors.borders.default}`
               }}
             >
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: designSystem.spacing[3] 
-              }}>
-                <Text size="lg">🏆</Text>
+              <HStack spacing={designSystem.spacing[3]} px={designSystem.spacing[1]}>
+                <Text size="lg" lineHeight="1">🏆</Text>
                 <Text color="brand" fontWeight={designSystem.typography.weights.bold}>
                   {achievement.replace('_', ' ').toUpperCase()}
                 </Text>
-              </div>
+              </HStack>
             </MotionBox>
           ))
         ) : (
-          <Text color="muted" textAlign="center">
-            Complete challenges to unlock achievements!
-          </Text>
+          <Box p={designSystem.spacing[4]} textAlign="center">
+            <Text color="muted">
+              Complete challenges to unlock achievements!
+            </Text>
+          </Box>
         )}
       </VStack>
     </Card>

@@ -7,8 +7,8 @@ import { designSystem } from '../../design/system/DesignSystem';
 
 export const ProfileCard = ({ userData, progress }) => {
   return (
-    <Card variant="elevated" p={designSystem.spacing[6]}>
-      <VStack spacing={designSystem.spacing[4]} align="center">
+    <Card variant="elevated" p={designSystem.spacing[6]}>  
+      <VStack spacing={designSystem.spacing[5]} align="center">
         <Box position="relative">
           <Image
             src={userData.avatar}
@@ -32,7 +32,7 @@ export const ProfileCard = ({ userData, progress }) => {
           </Badge>
         </Box>
         
-        <VStack spacing={designSystem.spacing[2]} textAlign="center">
+        <VStack spacing={designSystem.spacing[3]} textAlign="center" px={designSystem.spacing[3]}>
           <Heading level={2} size="xl" color="brand">
             {userData.name}
           </Heading>
@@ -41,11 +41,13 @@ export const ProfileCard = ({ userData, progress }) => {
           <Text size="sm" color="muted">Joined {userData.joinDate}</Text>
         </VStack>
 
-        <Text size="sm" color="secondary" textAlign="center" lineHeight="1.5">
-          {userData.bio}
-        </Text>
+        <Box px={designSystem.spacing[4]} py={designSystem.spacing[2]}>
+          <Text size="sm" color="secondary" textAlign="center" lineHeight="1.5">
+            {userData.bio}
+          </Text>
+        </Box>
 
-        <HStack spacing={designSystem.spacing[2]} w="100%">
+        <HStack spacing={designSystem.spacing[4]} w="100%" px={designSystem.spacing[3]}>
           <CustomButton variant="primary" size="sm" flex={1}>
             🔗 Portfolio
           </CustomButton>

@@ -25,7 +25,7 @@ export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNa
       </HStack>
       
       {enrolledCourses.length > 0 ? (
-        <VStack spacing={designSystem.spacing[3]} align="stretch">
+        <VStack spacing={designSystem.spacing[4]} align="stretch">
           {enrolledCourses.slice(0, 3).map((course, index) => (
             <MotionBox
               key={course.id}
@@ -34,7 +34,7 @@ export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNa
               transition={{ delay: index * 0.1 }}
               style={{
                 background: designSystem.colors.backgrounds.secondary,
-                padding: designSystem.spacing[4],
+                padding: 0,
                 borderRadius: designSystem.radii.md,
                 border: `1px solid ${designSystem.colors.borders.default}`,
                 cursor: 'pointer'
@@ -47,8 +47,9 @@ export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNa
               }}
               onClick={() => onNavigateToCourse(course.slug)}
             >
-              <VStack align="start" spacing={designSystem.spacing[2]}>
-                <HStack justify="space-between" w="100%">
+              <Box p={designSystem.spacing[4]}>
+              <VStack align="start" spacing={designSystem.spacing[3]}>
+                <HStack justify="space-between" w="100%" spacing={designSystem.spacing[2]}>
                   <Text color="brand" fontWeight={designSystem.typography.weights.bold}>
                     {course.title}
                   </Text>
@@ -56,7 +57,7 @@ export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNa
                     {course.language.toUpperCase()}
                   </Badge>
                 </HStack>
-                <Text size="sm" color="muted" style={{ 
+                <Text size="sm" color="muted" mt={designSystem.spacing[1]} style={{ 
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
                   WebkitBoxOrient: 'vertical',
@@ -64,31 +65,34 @@ export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNa
                 }}>
                   {course.description}
                 </Text>
-                <HStack spacing={designSystem.spacing[4]} fontSize="xs" color={designSystem.colors.text.muted}>
+                <HStack spacing={designSystem.spacing[4]} fontSize="xs" color={designSystem.colors.text.muted} mt={designSystem.spacing[2]}>
                   <Text>📚 {course.lessons_count} lessons</Text>
                   <Text>⏱️ {course.duration_hours}h</Text>
                   <Text>⭐ {course.rating}</Text>
                 </HStack>
               </VStack>
+              </Box>
             </MotionBox>
           ))}
           
           {enrolledCourses.length > 3 && (
-            <Text size="sm" color="muted" textAlign="center">
+            <Text size="sm" color="muted" textAlign="center" py={designSystem.spacing[2]}>
               +{enrolledCourses.length - 3} more courses
             </Text>
           )}
         </VStack>
       ) : (
-        <VStack spacing={designSystem.spacing[4]} textAlign="center" py={designSystem.spacing[6]}>
+        <VStack spacing={designSystem.spacing[5]} textAlign="center" py={designSystem.spacing[8]}>
           <Text size="lg">📚</Text>
           <Text color="muted">No courses enrolled yet</Text>
-          <CustomButton 
-            variant="primary" 
-            onClick={onNavigateToMarketplace}
-          >
-            Explore Marketplace
-          </CustomButton>
+          <Box pt={designSystem.spacing[2]}>
+            <CustomButton 
+              variant="primary" 
+              onClick={onNavigateToMarketplace}
+            >
+              Explore Marketplace
+            </CustomButton>
+          </Box>
         </VStack>
       )}
     </Card>

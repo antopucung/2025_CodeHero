@@ -180,10 +180,11 @@ export const CollaborationCard = ({
         variant="elevated"
         bg={designSystem.colors.backgrounds.elevated}
         borderColor={designSystem.colors.borders.default}
+        p={designSystem.spacing[6]}
       >
-        <VStack spacing={designSystem.spacing[4]} align="stretch">
+        <VStack spacing={designSystem.spacing[5]} align="stretch">
           <HStack justify="space-between" align="start">
-            <VStack align="start" spacing={designSystem.spacing[1]}>
+            <VStack align="start" spacing={designSystem.spacing[2]}>
               <Text size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
                 {collab.title}
               </Text>
@@ -202,64 +203,77 @@ export const CollaborationCard = ({
             </Badge>
           </HStack>
 
-          <HStack spacing={designSystem.spacing[6]}>
-            <VStack align="start" spacing={designSystem.spacing[1]} flex={1}>
-              <Text size="sm" color="muted">Progress</Text>
-              <HStack w="100%" spacing={designSystem.spacing[2]}>
-                <Box 
-                  flex={1} 
-                  bg={designSystem.colors.backgrounds.surface} 
-                  h="8px" 
-                  borderRadius={designSystem.radii.base}
-                  overflow="hidden"
-                >
-                  <Box
-                    bg={designSystem.colors.brand.accent}
-                    h="100%"
-                    w={`${collab.progress}%`}
-                    transition="width 0.3s"
-                  />
-                </Box>
-                <Text size="sm" color="accent" fontWeight={designSystem.typography.weights.bold}>
-                  {collab.progress}%
+          <Box 
+            bg={designSystem.colors.backgrounds.secondary} 
+            borderRadius={designSystem.radii.md}
+            p={designSystem.spacing[4]}
+            mx={designSystem.spacing[2]}
+          >
+            <HStack spacing={designSystem.spacing[4]}>
+              <VStack align="start" spacing={designSystem.spacing[1]} flex={1}>
+                <Text size="sm" color="muted" mb={designSystem.spacing[1]}>Progress</Text>
+                <HStack w="100%" spacing={designSystem.spacing[2]}>
+                  <Box 
+                    flex={1} 
+                    bg={designSystem.colors.backgrounds.surface} 
+                    h="8px" 
+                    borderRadius={designSystem.radii.base}
+                    overflow="hidden"
+                  >
+                    <Box
+                      bg={designSystem.colors.brand.accent}
+                      h="100%"
+                      w={`${collab.progress}%`}
+                      transition="width 0.3s"
+                    />
+                  </Box>
+                  <Text size="sm" color="accent" fontWeight={designSystem.typography.weights.bold}>
+                    {collab.progress}%
+                  </Text>
+                </HStack>
+              </VStack>
+              <VStack align="center" spacing={designSystem.spacing[1]}>
+                <Text size="sm" color="muted" mb={designSystem.spacing[1]}>Budget</Text>
+                <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
+                  ${collab.budget.toLocaleString()}
                 </Text>
-              </HStack>
-            </VStack>
-            <VStack align="center" spacing={0}>
-              <Text size="sm" color="muted">Budget</Text>
-              <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
-                ${collab.budget.toLocaleString()}
-              </Text>
-            </VStack>
-            <VStack align="end" spacing={0}>
-              <Text size="sm" color="muted">Deadline</Text>
-              <Text size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-                {collab.deadline}
-              </Text>
-            </VStack>
-          </HStack>
-
-          <HStack justify="space-between" align="center">
-            <Text size="xs" color="muted">
-              Last update: {collab.lastUpdate}
-            </Text>
-            <HStack spacing={designSystem.spacing[2]}>
-              <Button variant="secondary" size="sm">
-                💬 Chat
-              </Button>
-              <Button variant="secondary" size="sm">
-                📁 Files
-              </Button>
-              <Button
-                bg={designSystem.colors.brand.accent}
-                color={designSystem.colors.text.inverse}
-                size="sm"
-                onClick={() => onViewDetails?.(collab)}
-              >
-                📊 Details
-              </Button>
+              </VStack>
+              <VStack align="end" spacing={designSystem.spacing[1]}>
+                <Text size="sm" color="muted" mb={designSystem.spacing[1]}>Deadline</Text>
+                <Text size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
+                  {collab.deadline}
+                </Text>
+              </VStack>
             </HStack>
-          </HStack>
+          </Box>
+
+          <Box 
+            borderTop={`1px solid ${designSystem.colors.borders.default}`}
+            pt={designSystem.spacing[4]}
+            px={designSystem.spacing[2]}
+          >
+            <HStack justify="space-between" align="center" spacing={designSystem.spacing[2]}>
+              <Text size="xs" color="muted">
+                Last update: {collab.lastUpdate}
+              </Text>
+              <HStack spacing={designSystem.spacing[3]}>
+                <Button variant="secondary" size="sm">
+                  💬 Chat
+                </Button>
+                <Button variant="secondary" size="sm">
+                  📁 Files
+                </Button>
+                <Button
+                  bg={designSystem.colors.brand.accent}
+                  color={designSystem.colors.text.inverse}
+                  size="sm"
+                  onClick={() => onViewDetails?.(collab)}
+                >
+                  📊 Details
+                </Button>
+              </HStack>
+            </HStack>
+          </Box>
         </VStack>
       </Card>
     </MotionBox>
@@ -284,8 +298,9 @@ export const CreatorCard = ({
         textAlign="center"
         bg={designSystem.colors.backgrounds.elevated}
         borderColor={designSystem.colors.borders.default}
+        p={designSystem.spacing[6]}
       >
-        <VStack spacing={designSystem.spacing[4]}>
+        <VStack spacing={designSystem.spacing[5]}>
           <Box position="relative">
             <Image
               src={creator.avatar}
@@ -308,55 +323,71 @@ export const CreatorCard = ({
             </Badge>
           </Box>
           
-          <VStack spacing={designSystem.spacing[2]}>
-            <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
-              {creator.name}
-            </Text>
-            <HStack spacing={designSystem.spacing[3]}>
-              <Text size="sm" color="accent">
-                ⭐ {creator.rating}
+          <Box px={designSystem.spacing[3]}>
+            <VStack spacing={designSystem.spacing[3]}>
+              <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
+                {creator.name}
               </Text>
-              <Text size="sm" color="secondary">
-                {creator.completedProjects} projects
-              </Text>
-            </HStack>
-            <Text size="sm" color="muted">
-              {creator.hourlyRate}/hour
-            </Text>
-          </VStack>
-
-          <HStack spacing={designSystem.spacing[1]} flexWrap="wrap" justify="center">
-            {creator.specialties.map((skill, i) => (
-              <Badge 
-                key={i} 
-                bg={designSystem.colors.brand.primary} 
-                color={designSystem.colors.text.inverse}
+              <HStack spacing={designSystem.spacing[3]}>
+                <Text size="sm" color="accent">
+                  ⭐ {creator.rating}
+                </Text>
+                <Text size="sm" color="secondary">
+                  {creator.completedProjects} projects
+                </Text>
+              </HStack>
+              <Box 
+                bg={designSystem.colors.backgrounds.secondary} 
+                borderRadius={designSystem.radii.sm}
+                px={designSystem.spacing[3]}
+                py={designSystem.spacing[1]}
               >
-                {skill}
-              </Badge>
-            ))}
-          </HStack>
+                <Text size="sm" color="muted">
+                  {creator.hourlyRate}/hour
+                </Text>
+              </Box>
+            </VStack>
+          </Box>
 
-          <HStack spacing={designSystem.spacing[2]} w="100%">
-            <Button 
-              variant="secondary" 
-              size="sm" 
-              flex={1}
-              onClick={() => onViewProfile?.(creator)}
-            >
-              📁 Portfolio
-            </Button>
-            <Button
-              bg={creator.available ? designSystem.colors.brand.primary : designSystem.colors.interactive.disabled}
-              color={designSystem.colors.text.inverse}
-              size="sm"
-              flex={1}
-              disabled={!creator.available}
-              onClick={() => onHire?.(creator)}
-            >
-              {creator.available ? '🤝 Hire' : '💬 Message'}
-            </Button>
-          </HStack>
+          <Box px={designSystem.spacing[3]} py={designSystem.spacing[2]}>
+            <HStack spacing={designSystem.spacing[2]} flexWrap="wrap" justify="center">
+              {creator.specialties.map((skill, i) => (
+                <Badge 
+                  key={i} 
+                  bg={designSystem.colors.brand.primary} 
+                  color={designSystem.colors.text.inverse}
+                  m={designSystem.spacing[1]}
+                >
+                  {skill}
+                </Badge>
+              ))}
+            </HStack>
+          </Box>
+
+          <Box px={designSystem.spacing[3]}>
+            <HStack spacing={designSystem.spacing[3]} w="100%">
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                flex={1}
+                h={designSystem.spacing[12]}
+                onClick={() => onViewProfile?.(creator)}
+              >
+                📁 Portfolio
+              </Button>
+              <Button
+                bg={creator.available ? designSystem.colors.brand.primary : designSystem.colors.interactive.disabled}
+                color={designSystem.colors.text.inverse}
+                size="sm"
+                flex={1}
+                h={designSystem.spacing[12]}
+                disabled={!creator.available}
+                onClick={() => onHire?.(creator)}
+              >
+                {creator.available ? '🤝 Hire' : '💬 Message'}
+              </Button>
+            </HStack>
+          </Box>
         </VStack>
       </Card>
     </MotionBox>
@@ -659,15 +690,15 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
       borderColor={designSystem.colors.borders.default}
       p={designSystem.spacing[6]}
     >
-      <Text size="md" color="brand" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[3]}>
+      <Text size="md" color="brand" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[4]}>
         🌟 Featured Creators
       </Text>
-      <VStack spacing={designSystem.spacing[3]} align="stretch">
+      <VStack spacing={designSystem.spacing[4]} align="stretch"> 
         {creators.map((creator) => (
           <Box
             key={creator.id}
             bg={designSystem.colors.backgrounds.secondary}
-            p={designSystem.spacing[3]}
+            p={designSystem.spacing[4]}
             borderRadius={designSystem.radii.md}
             border={`1px solid ${designSystem.colors.borders.default}`}
             _hover={{
@@ -676,7 +707,7 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
             }}
             onClick={() => onCreatorClick?.(creator)}
           >
-            <HStack spacing={designSystem.spacing[3]}>
+            <HStack spacing={designSystem.spacing[4]}>
               <Image
                 src={creator.avatar}
                 alt={creator.name}
@@ -685,8 +716,8 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
                 borderRadius="full"
                 objectFit="cover"
               />
-              <VStack align="start" spacing={designSystem.spacing[1]} flex={1}>
-                <HStack justify="space-between" w="100%">
+              <VStack align="start" spacing={designSystem.spacing[3]} flex={1}>
+                <HStack justify="space-between" w="100%" mb={designSystem.spacing[1]}>
                   <Text size="sm" color="brand" fontWeight={designSystem.typography.weights.bold}>
                     {creator.name}
                   </Text>
@@ -705,17 +736,19 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
                   borderRadius={designSystem.radii.sm}
                   px={designSystem.spacing[2]}
                   py={designSystem.spacing[1]}
+                  my={designSystem.spacing[1]}
                 >
                 <Text size="xs" color="secondary">
                   {creator.hourlyRate}/hr
                 </Text>
                 </Box>
-                <HStack spacing={designSystem.spacing[1]} flexWrap="wrap">
+                <HStack spacing={designSystem.spacing[2]} flexWrap="wrap">
                   {creator.specialties.slice(0, 2).map((skill, i) => (
                     <Badge 
                       key={i} 
                       bg={designSystem.colors.backgrounds.surface} 
                       color={designSystem.colors.text.secondary}
+                      mr={designSystem.spacing[1]}
                     >
                       {skill}
                     </Badge>

@@ -325,32 +325,36 @@ export const useCodeQuizEngine = ({
     }
     
     // Get the drop point coordinates
-    const dropPoint = info?.point ? { x: info.point.x, y: info.point.y } : null;
+    const dropPoint = info?.point ? { x: info.point.x, y: info.point.y } : null; // Use clientX/Y from pointer info
+    console.log("Drag ended. Drop point:", dropPoint);
     
     if (dropPoint) {
-      console.log("Drop point:", dropPoint);
       // Check each dropzone to see if the point is within its bounds
       let droppedInZone = false;
       
       // Add visual feedback when dropped
       setScreenFlash({ active: true, type: 'info', intensity: 0.3 });
       setTimeout(() => {
-        setScreenFlash({ active: false, type: 'info', intensity: 0 });
+        setScreenFlash({ active: false, type: 'info', intensity: 0 }); // Reset flash
       }, 200);
       
       dropZoneRefs.current.forEach((ref, index) => {
         if (!ref || !ref.current) {
-          console.log("Missing ref for dropzone", index);
+          // This drop zone might not be rendered yet or is empty
+          // console.log("Missing ref for dropzone", index);
           return;
         }
         
         const rect = ref.current.getBoundingClientRect();
-        console.log("Checking dropzone", index, rect);
+        console.log(`Checking dropzone ${index}:`, rect);
         
         // Check if drop point is within this dropzone
         if (
+          // Check if the drop point is within the horizontal bounds of the drop zone
           dropPoint.x >= rect.left && 
           dropPoint.x <= rect.right && 
+          // Check if the drop point is within the vertical bounds of the drop zone
+          // We give a bit of leeway vertically to make dropping easier
           dropPoint.y >= rect.top && 
           dropPoint.y <= rect.bottom
         ) {
@@ -358,7 +362,7 @@ export const useCodeQuizEngine = ({
           // Place the block at this index
           const result = quizEngineRef.current.placeBlock(activeDragBlock.id, index);
           console.log("Place block result:", result);
-          setQuizState({ ...quizEngineRef.current.getState() });
+          setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
           droppedInZone = true;
         }
       });

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
 import { InteractiveCodeExample } from '../components/learning/InteractiveCodeExample';
+import UnityCodeEditor from '../components/learning/UnityCodeEditor';
 import { ConceptExplainer } from '../components/learning/CodeConcepts';
 import TypingChallenge from '../components/TypingChallenge';
 import CodeEditorPage from './CodeEditorPage';
@@ -178,29 +179,68 @@ const LessonPage = () => {
               </Text>
 
               {contentData.code_example && (
-                <InteractiveCodeExample
-                  code={contentData.code_example}
-                  language={course?.language || "csharp"}
-                  mode={contentData.interactive ? "playground" : "annotated"}
-                  title={contentData.code_title || "Code Example"}
-                  annotations={[
-                    {
-                      text: "void Start()",
-                      title: "Unity Lifecycle Method",
-                      explanation: "The Start method is called once when the script is enabled before any Update methods are called."
-                    },
-                    {
-                      text: "transform.position",
-                      title: "Transform Property",
-                      explanation: "Gets or sets the position of the GameObject in world space coordinates (X, Y, Z)."
-                    },
-                    {
-                      text: "GetComponent<Rigidbody>()",
-                      title: "Component Access",
-                      explanation: "Retrieves the Rigidbody component attached to the same GameObject."
-                    }
-                  ]}
-                />
+                course?.language === "csharp" ? (
+                  <UnityCodeEditor
+                    initialCode={contentData.code_example}
+                    title={contentData.code_title || "Unity C# Example"}
+                    readOnly={!contentData.interactive}
+                    annotations={[
+                      {
+                        text: "void Start()",
+                        title: "Unity Lifecycle Method",
+                        line: contentData.code_example.split('\n').findIndex(line => line.includes("void Start")),
+                        explanation: "The Start method is called once when the script is enabled before any Update methods are called."
+                      },
+                      {
+                        text: "Update",
+                        title: "Frame Update Method",
+                        line: contentData.code_example.split('\n').findIndex(line => line.includes("void Update")),
+                        explanation: "The Update method is called once per frame. This is where most game logic happens."
+                      },
+                      {
+                        text: "Debug.Log",
+                        title: "Debug Output",
+                        line: contentData.code_example.split('\n').findIndex(line => line.includes("Debug.Log")),
+                        explanation: "Prints a message to the Unity Console. Useful for debugging and tracking what's happening in your game."
+                      },
+                      {
+                        text: "MonoBehaviour",
+                        title: "Unity Base Class",
+                        line: contentData.code_example.split('\n').findIndex(line => line.includes("MonoBehaviour")),
+                        explanation: "The base class that all Unity scripts derive from. Provides access to Unity's event functions like Start and Update."
+                      }
+                    ]}
+                    onExecutionComplete={(result) => {
+                      if (result.success) {
+                        // Could award points or mark progress
+                      }
+                    }}
+                  />
+                ) : (
+                  <InteractiveCodeExample
+                    code={contentData.code_example}
+                    language={course?.language}
+                    mode={contentData.interactive ? "playground" : "annotated"}
+                    title={contentData.code_title || "Code Example"}
+                    annotations={[
+                      {
+                        text: "void Start()",
+                        title: "Unity Lifecycle Method",
+                        explanation: "The Start method is called once when the script is enabled before any Update methods are called."
+                      },
+                      {
+                        text: "transform.position",
+                        title: "Transform Property",
+                        explanation: "Gets or sets the position of the GameObject in world space coordinates (X, Y, Z)."
+                      },
+                      {
+                        text: "GetComponent<Rigidbody>()",
+                        title: "Component Access",
+                        explanation: "Retrieves the Rigidbody component attached to the same GameObject."
+                      }
+                    ]}
+                  />
+                )
               )}
 
               {contentData.concepts && contentData.concepts.length > 0 && (

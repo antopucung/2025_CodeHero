@@ -79,7 +79,7 @@ const DraggableCodeBlock = ({
       }}
       transition={{ 
         duration: 0.3,
-        y: { duration: 0.5, type: "spring", stiffness: 300 }
+        y: { duration: 0.5 }
       }}
       bg={style.bg}
       border={`1px solid ${style.border}`}

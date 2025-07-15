@@ -10,6 +10,7 @@ import CodeCompletionShowcase from '../components/learning/showcase/CodeCompleti
 import DebugChallengeShowcase from '../components/learning/showcase/DebugChallengeShowcase';
 import MultipleChoiceShowcase from '../components/learning/showcase/MultipleChoiceShowcase';
 import DinoRunQuizShowcase from '../components/learning/showcase/DinoRunQuizShowcase';
+import CodeStackingV2Showcase from '../components/learning/showcase/CodeStackingV2Showcase';
 
 const MotionBox = motion(Box);
 
@@ -27,6 +28,15 @@ const QuizGalleryPage = () => {
   
   // Quiz types for the gallery
   const quizTypes = [
+    {
+      id: 'code-stacking-v2',
+      title: 'Code Stacking V2',
+      description: 'Improved version with drag and drop code arrangement',
+      icon: '🧩',
+      color: '#4ecdc4',
+      difficulty: 'medium',
+      component: CodeStackingV2Showcase
+    },
     {
       id: 'code-stacking',
       title: 'Code Stacking',

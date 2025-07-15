@@ -35,7 +35,14 @@ export const designSystem = {
       default: '#4a5568',
       hover: '#2d3748',
       active: '#1a202c',
-      focus: '#3182ce',
+      focus: '#3182ce', // Blue
+      disabled: '#2d3748'
+    },
+    
+    // Quiz-specific interactive states
+    quiz: {
+      correct: '#38A169', // Green
+      incorrect: '#E53E3E', // Red
       disabled: '#2d3748'
     },
     

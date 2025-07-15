@@ -331,17 +331,19 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
             </Text>
             <VStack align="stretch" spacing={0}>
               {/* First drop zone */}
-              <DropZone
-                isActive={status === "active"}
-                onDrop={handleDrop}
-                index={0}
-              />
+            <DropZone
+              key="dropzone-0"
+              isActive={status === "active"}
+              onDrop={handleDrop}
+              index={0}
+            />
 
               {/* Existing blocks and drop zones in between */}
               {solutionBlocks.map((block, index) => (
                 <React.Fragment key={block.id}>
                   <DraggableBlock block={block} isPlaced={true} />
                   <DropZone
+                    key={`dropzone-${index + 1}`}
                     isActive={status === "active"}
                     onDrop={handleDrop}
                     index={index + 1}

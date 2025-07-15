@@ -212,8 +212,6 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               </VStack>
             </MotionBox>
             
-            </VStack>
-            
             <MotionBox
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -237,6 +235,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
                 🚀 BEGIN QUEST 🚀
               </Button>
             </MotionBox>
+          </VStack>
           </VStack>
         </TerminalPanel>
       </MotionBox>

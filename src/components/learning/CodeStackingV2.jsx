@@ -17,7 +17,7 @@ import SolutionArea from "./stacking/SolutionArea";
 import GameHeader from "./stacking/GameHeader";
 import GameFooter from "./stacking/GameFooter";
 import StartScreen from "./stacking/StartScreen";
-import DraggableCodeBlock from "./stacking/DraggableCodeBlock";
+import DraggableBlock from "./stacking/DraggableBlock";
 
 // Import utilities
 import { 
@@ -302,7 +302,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
           {/* Drag Overlay */}
           <DragOverlay adjustScale={true}>
             {activeId && activeBlock && (
-              <Box
+              <DraggableBlock
                 bg="#333"
                 border="1px solid #4ecdc4"
                 borderRadius="md"

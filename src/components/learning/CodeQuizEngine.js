@@ -230,6 +230,37 @@ export class CodeQuizEngine {
     }
   }
   
+  // Pause the quiz
+  pause() {
+    if (this.state.status !== 'active') return;
+    
+    this.state.status = 'paused';
+    this.stopTimer(); // Stop timer while paused
+    
+    // Store the time when paused
+    this.state.pauseTime = Date.now();
+  }
+  
+  // Resume the quiz
+  resume() {
+    if (this.state.status !== 'paused') return;
+    
+    // Calculate how long the quiz was paused
+    const pauseDuration = Date.now() - (this.state.pauseTime || Date.now());
+    
+    // Adjust the start time by the pause duration
+    if (this.state.startTime) {
+      this.state.startTime += pauseDuration;
+    }
+    
+    this.state.status = 'active';
+    
+    // Restart timer
+    if (this.options.timeLimit > 0) {
+      this.startTimer();
+    }
+  }
+  
   // Shuffle blocks for presentation
   shuffleBlocks() {
     // Fisher-Yates shuffle algorithm

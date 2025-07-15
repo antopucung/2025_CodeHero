@@ -12,8 +12,6 @@ import { createPulseAnimation } from "../design/tokens/animations";
 
 const MotionBox = motion(Box);
 
-const MotionBox = motion(Box);
-
 const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel, fullScreen = false }) => {
   const [engine] = useState(() => createTypingEngine({ 
     minimalistMode: true,

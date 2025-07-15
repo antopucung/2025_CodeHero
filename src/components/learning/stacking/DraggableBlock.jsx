@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Text as ChakraText } from "@chakra-ui/react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable } from "@dnd-kit/core"; 
 import { CSS } from "@dnd-kit/utilities";
 
 /**
@@ -23,10 +23,19 @@ const DraggableBlock = ({
     }
   });
 
+  // Enhanced style with hardware acceleration and anti-stretching properties
   const style = {
     transform: CSS.Transform.toString(transform),
+    WebkitTransform: CSS.Transform.toString(transform),
     opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 10 : 1
+    zIndex: isDragging ? 10 : 1,
+    // Critical properties to prevent stretching
+    willChange: 'transform',
+    transformOrigin: 'center center',
+    touchAction: 'none', 
+    userSelect: 'none',
+    // Remove transitions during drag to avoid conflicts
+    transition: isDragging ? 'none' : undefined
   };
 
   return (
@@ -44,9 +53,22 @@ const DraggableBlock = ({
       _active={{ cursor: "grabbing" }}
       style={style}
       data-block-id={id}
-      className="code-block"
+      className="code-block draggable-block"
       role="listitem"
       aria-label={`Code block: ${block.content.substring(0, 20)}${block.content.length > 20 ? '...' : ''}`}
+      sx={{
+        // Force hardware acceleration
+        transform: 'translate3d(0,0,0)',
+        backfaceVisibility: 'hidden',
+        transformStyle: 'preserve-3d',
+        // Prevent default browser behaviors
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        // Prevent deformation
+        '&:active': {
+          transform: `${CSS.Transform.toString(transform)} !important`,
+          scale: '1 !important'
+        }
+      }}
     >
       <ChakraText
         fontFamily="monospace"

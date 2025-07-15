@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, HStack, Button, useToast, Text as ChakraText } from "@chakra-ui/react";
+import { Box, HStack, Button, useToast, Text as ChakraText, extendTheme, ChakraProvider } from "@chakra-ui/react";
 import {
   DndContext,
   closestCorners,
@@ -25,6 +25,30 @@ import {
   shuffleArray,
   formatTime
 } from "./stacking/utils/codeStackingUtils";
+
+// Custom theme extension to fix draggable elements
+const fixedDraggableTheme = extendTheme({
+  styles: {
+    global: {
+      '.draggable-block': {
+        transformStyle: 'preserve-3d',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        WebkitTransform: 'translateZ(0)',
+        transform: 'translateZ(0)',
+        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+      },
+      // Fix for elements being squished on active state
+      '.draggable-block:active': {
+        transform: 'none !important',
+        WebkitTransform: 'none !important',
+        filter: 'brightness(0.95)'
+      }
+    }
+  }
+});
 
 /**
  * CodeStackingV2 - A drag-and-drop code stacking challenge component without reordering
@@ -244,7 +268,13 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
   };
   
   return (
-    <Box bg="#111" borderRadius="md" overflow="hidden">
+    <ChakraProvider theme={fixedDraggableTheme}>
+      <Box 
+        bg="#111" 
+        borderRadius="md" 
+        overflow="hidden"
+        className="code-stacking-container"
+      >
       {/* Game Header */}
       <GameHeader 
         status={status}
@@ -306,8 +336,8 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
           <DragOverlay adjustScale={true}>
             {activeId && activeBlock && (
               <DraggableBlock
-                id={activeBlock.id}
-                block={activeBlock}
+                id={activeId}
+                block={activeBlock || { content: '', indentation: 0 }}
                 isPlaced={false}
                 isDragging={true} 
                 language={language}
@@ -325,7 +355,8 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
         onReset={handleReset}
         formatTime={formatTime}
       />
-    </Box>
+      </Box>
+    </ChakraProvider>
   );
 };
 

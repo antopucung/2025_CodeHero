@@ -44,7 +44,7 @@ const BlocksPanel = ({ blocks }) => {
             <DraggableBlock
               key={block.id}
               id={block.id}
-              block={block}
+              block={block || { content: '', indentation: 0 }}
             />
           </MotionBox>
         ))}

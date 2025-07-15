@@ -27,20 +27,14 @@ async function runMigrations() {
     console.log('Starting database migrations...');
     console.log(`Migration directory: ${migrationsDir}`);
 
-    // Check if the schema_migrations table exists
+    // Check if the schema_migrations table exists by trying to query it directly
     const { data: tablesData, error: tablesError } = await supabase
-      .from('information_schema.tables')
-      .select('table_name')
-      .eq('table_schema', 'public')
-      .eq('table_name', 'schema_migrations');
-
-    if (tablesError) {
-      console.error('Error checking for schema_migrations table:', tablesError.message);
-      process.exit(1);
-    }
+      .from('schema_migrations')
+      .select('version')
+      .limit(1);
 
     // If schema_migrations table doesn't exist, we need to run the initial migration
-    if (!tablesData || tablesData.length === 0) {
+    if (tablesError && tablesError.message.includes('relation "public.schema_migrations" does not exist')) {
       console.log('Schema migrations table not found. Running initial migration setup...');
       
       // Find the migration tracking system file

@@ -6,6 +6,7 @@ import {
   MenuItem,
   MenuList,
   Text,
+} from "@chakra-ui/react";
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text as ChakraText } from "@chakra-ui/react";
 import { LANGUAGE_VERSIONS } from "../constants";
 

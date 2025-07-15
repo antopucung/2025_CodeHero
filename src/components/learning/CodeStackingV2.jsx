@@ -12,7 +12,8 @@ import {
 import { 
   arrayMove, 
   SortableContext, 
-  sortableKeyboardCoordinates
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy
 } from "@dnd-kit/sortable";
 
 // Import component parts

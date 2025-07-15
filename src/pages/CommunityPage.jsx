@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Box, Grid, GridItem, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useGameProgress } from '../hooks/useGameProgress';
+import { useDonationSystem } from '../hooks/useDonationSystem';
+import { useCommissionSystem } from '../hooks/useCommissionSystem';
+import { useCollaborationSystem } from '../hooks/useCollaborationSystem';
 import { PageLayout, SectionLayout, GridLayout } from '../design/layouts/PageLayout';
 import { CustomText } from '../design/components/Typography';
 import { Button } from '../design/components/Button';
@@ -15,8 +19,10 @@ import {
   FeaturedCreatorsSidebar,
   TipsCard 
 } from '../design/components/CommunityComponents';
+import { ContentLibrary } from '../design/components/ContentLibrary';
 import { CourseCard } from '../design/components/Card';
 import { designSystem } from '../design/system/DesignSystem';
+import { TieredDonationModal } from '../components/modals/TieredDonationModal';
 
 const MotionBox = motion(Box);
 
@@ -24,6 +30,19 @@ const CommunityPage = () => {
   const navigate = useNavigate();
   const { progress } = useGameProgress();
   const [activeTab, setActiveTab] = useState(0);
+  const { processDonation, getHighestActiveTier, getAccessibleContent, donationTiers } = useDonationSystem();
+  const { hasCollaborationProfile, createCollaborationRequest } = useCollaborationSystem();
+  const [accessibleContent, setAccessibleContent] = useState(null);
+  const [activeDonationProject, setActiveDonationProject] = useState(null);
+  const [isUserProfileComplete, setIsUserProfileComplete] = useState(false);
+  const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+
+  // Fetch user's accessible content on mount
+  useEffect(() => {
+    const content = getAccessibleContent();
+    setAccessibleContent(content);
+    setIsUserProfileComplete(hasCollaborationProfile());
+  }, []);
 
   // Mock data for showcase projects (existing)
   const [showcaseProjects] = useState([
@@ -205,6 +224,19 @@ const CommunityPage = () => {
     }
   ]);
 
+  // Handle donate button click
+  const handleProjectDonate = (project) => {
+    setActiveDonationProject(project);
+    setIsDonationModalOpen(true);
+  };
+
+  // Handle donation completion
+  const handleDonationComplete = (donation) => {
+    // Refresh accessible content
+    const content = getAccessibleContent();
+    setAccessibleContent(content);
+  };
+
   // Community stats for header
   const stats = [
     { value: showcaseProjects.length, label: 'PROJECTS' },
@@ -216,10 +248,11 @@ const CommunityPage = () => {
   // Event handlers
   const handleProjectView = (project) => {
     console.log('View project:', project);
+    navigate(`/project/${project.id}`);
   };
 
   const handleProjectDonate = (project) => {
-    console.log('Donate to project:', project);
+    handleProjectDonate(project);
   };
 
   const handleProjectHire = (project) => {
@@ -315,6 +348,18 @@ const CommunityPage = () => {
                 fontWeight={designSystem.typography.weights.bold}
               >
                 👨‍💻 CREATORS
+              </Tab>
+              <Tab 
+                color={designSystem.colors.text.muted}
+                _selected={{ 
+                  color: designSystem.colors.text.inverse,
+                  bg: designSystem.colors.brand.primary 
+                }}
+                fontFamily={designSystem.typography.fonts.mono}
+                fontSize={designSystem.typography.sizes.sm}
+                fontWeight={designSystem.typography.weights.bold}
+              >
+                🎁 REWARDS
               </Tab>
             </TabList>
           </Box>
@@ -483,9 +528,40 @@ const CommunityPage = () => {
                 </GridLayout>
               </SectionLayout>
             </TabPanel>
+
+            {/* REWARDS HUB TAB */}
+            <TabPanel p={0} pt={designSystem.spacing[6]}>
+              <SectionLayout spacing="loose">
+                <Box w="100%">
+                  <ContentLibrary
+                    accessibleContent={accessibleContent || { tools: [], tutorials: [], lockedTools: [], lockedTutorials: [] }}
+                    currentTier={getHighestActiveTier()}
+                    onToolPreview={(tool) => console.log('Preview tool', tool)}
+                    onToolDownload={(tool) => console.log('Download tool', tool)}
+                    onTutorialPreview={(tutorial) => console.log('Preview tutorial', tutorial)}
+                    onTutorialWatch={(tutorial) => console.log('Watch tutorial', tutorial)}
+                    onUpgradeTier={() => {
+                      // Set a default project for donation if none is selected
+                      if (!activeDonationProject && showcaseProjects.length > 0) {
+                        setActiveDonationProject(showcaseProjects[0]);
+                      }
+                      setIsDonationModalOpen(true);
+                    }}
+                  />
+                </Box>
+              </SectionLayout>
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </SectionLayout>
+      
+      {/* Tiered Donation Modal */}
+      <TieredDonationModal
+        isOpen={isDonationModalOpen}
+        onClose={() => setIsDonationModalOpen(false)}
+        project={activeDonationProject}
+        onDonationComplete={handleDonationComplete}
+      />
     </PageLayout>
   );
 };

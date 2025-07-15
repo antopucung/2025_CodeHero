@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { CodeQuizEngine, createCodeBlocksFromString } from '../CodeQuizEngine';
+import { useState, useEffect, useRef } from 'react';
+import { CodeQuizEngine, createCodeBlocksFromString } from '../components/learning/CodeQuizEngine';
+import { DebugHelper } from '../utils/debugHelper';
+import { logError } from '../utils/errorHandler';
 
 /**
  * Custom hook to handle all quiz engine state and logic
@@ -18,7 +20,7 @@ export const useCodeQuizEngine = ({
   // UI state
   const [quizState, setQuizState] = useState(null);
   const [activeDragBlock, setActiveDragBlock] = useState(null);
-  const [isDraggingBlock, setIsDraggingBlock] = useState(false); // New state
+  const [isDraggingBlock, setIsDraggingBlock] = useState(false);
   const [gameEffects, setGameEffects] = useState({
     combo: 1,
     lastAction: null,
@@ -50,12 +52,14 @@ export const useCodeQuizEngine = ({
     if (!code) return;
     
     try {
+      DebugHelper.log('Initializing code quiz engine', { code, splitType, difficulty });
+      
       // Create code blocks
       const codeBlocks = createCodeBlocksFromString(code, splitType);
       
       // Create quiz engine
       const quizEngine = new CodeQuizEngine({
-        timeLimit: difficultySettings[difficulty]?.timeLimit || timeLimit,
+        timeLimit: timeLimit || difficultySettings[difficulty]?.timeLimit || 120,
         basePoints: difficultySettings[difficulty]?.basePoints || 100,
         penalty: difficultySettings[difficulty]?.penalty || 0.1
       });
@@ -83,6 +87,7 @@ export const useCodeQuizEngine = ({
           });
         })
         .on('complete', (result) => {
+          DebugHelper.log('Quiz completed', result);
           if (onComplete) {
             onComplete({
               score: result.score,
@@ -183,6 +188,7 @@ export const useCodeQuizEngine = ({
           }));
         })
         .on('timeout', (result) => {
+          DebugHelper.log('Quiz timed out', result);
           setGameEffects(prev => ({
             ...prev,
             lastAction: 'timeout',
@@ -226,7 +232,7 @@ export const useCodeQuizEngine = ({
         dropZoneRefs.current = Array(numDropZones).fill().map(() => React.createRef());
       }
     } catch (error) {
-      console.error('Error initializing quiz engine:', error);
+      logError(error, { component: 'useCodeQuizEngine', code, splitType });
     }
     
     return () => {
@@ -311,6 +317,12 @@ export const useCodeQuizEngine = ({
     if (!activeDragBlock || !quizEngineRef.current) {
       return;
     }
+    
+    DebugHelper.log('Dropping block', { 
+      blockId: activeDragBlock.id, 
+      dropZoneIndex 
+    });
+    
     const result = quizEngineRef.current.placeBlock(activeDragBlock.id, dropZoneIndex);
     setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
 
@@ -339,16 +351,18 @@ export const useCodeQuizEngine = ({
     patternCelebrations,
     isPaused,
     activeDragBlock, 
-    isDraggingBlock, // Expose new state
+    isDraggingBlock,
     dropZoneRefs,
     handleStart,
     handleReset, 
     handlePause,
     handleResume,
     handleAbort, 
-    handleBlockDragStart, // Expose new handler
-    handleBlockDragEnd,   // Expose new handler
-    handleDropOnZone,     // Expose new handler
+    handleBlockDragStart,
+    handleBlockDragEnd,
+    handleDropOnZone,
     checkPlacement
   };
 };
+
+export default useCodeQuizEngine;

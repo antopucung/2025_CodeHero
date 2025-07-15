@@ -1,354 +1,182 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { CodeQuizEngine, createCodeBlocksFromString } from '../components/learning/CodeQuizEngine';
+import React, { useState } from 'react';
+import { Box, Grid, Text, VStack, HStack, Button, Badge } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
-/**
- * Custom hook to handle all quiz engine state and logic
- */
-export const useCodeQuizEngine = ({
-  code,
-  splitType = "line",
-  difficulty = "medium",
-  timeLimit = 120,
-  juiciness = "high",
-  onComplete
-}) => {
-  // Quiz engine reference
-  const quizEngineRef = useRef(null);
+const MotionBox = motion(Box);
+
+// Feature card component for homepage
+const FeatureCard = ({ title, description, icon, color, route, comingSoon = false }) => {
+  const navigate = useNavigate();
   
-  // UI state
-  const [quizState, setQuizState] = useState(null);
-  const [activeDragBlock, setActiveDragBlock] = useState(null);
-  const [isDraggingBlock, setIsDraggingBlock] = useState(false); // New state
-  const [gameEffects, setGameEffects] = useState({
-    combo: 1,
-    lastAction: null,
-    comboText: "",
-    pointsText: "",
-    streak: 0,
-    feedbackMessages: []
-  });
-  
-  // Visual effects state
-  const [errorPositions, setErrorPositions] = useState(new Set());
-  const [screenFlash, setScreenFlash] = useState({ active: false, type: 'success', intensity: 1 });
-  const [streakStatus, setStreakStatus] = useState({ active: false, count: 0 });
-  const [patternCelebrations, setPatternCelebrations] = useState([]);
-  const [isPaused, setIsPaused] = useState(false);
-  
-  // Refs for drop zones
-  const dropZoneRefs = useRef([]);
-  
-  // Configure difficulty settings
-  const difficultySettings = {
-    easy: { timeLimit: 180, basePoints: 50, penalty: 0.05 },
-    medium: { timeLimit: 120, basePoints: 100, penalty: 0.1 },
-    hard: { timeLimit: 90, basePoints: 150, penalty: 0.15 }
-  };
-  
-  // Initialize quiz engine
-  useEffect(() => {
-    if (!code) return;
-    
-    try {
-      // Create code blocks
-      const codeBlocks = createCodeBlocksFromString(code, splitType);
+  return (
+    <MotionBox
+      bg="#111"
+      borderRadius="md"
+      border="1px solid #333"
+      p={6}
+      whileHover={{ scale: 1.03, y: -5, borderColor: color }}
+      whileTap={{ scale: 0.98 }}
+      onClick={() => !comingSoon && navigate(route)}
+      cursor={comingSoon ? "default" : "pointer"}
+      position="relative"
+    >
+      <VStack spacing={4} align="start">
+        <HStack>
+          <Text fontSize="2xl">{icon}</Text>
+          <Text fontSize="xl" fontWeight="bold" color={color}>
+            {title}
+          </Text>
+        </HStack>
+        <Text color="#ccc">{description}</Text>
+        {comingSoon ? (
+          <Badge bg="#333" color="#ccc">Coming Soon</Badge>
+        ) : (
+          <Button size="sm" colorScheme="blue">
+            Explore
+          </Button>
+        )}
+      </VStack>
       
-      // Create quiz engine
-      const quizEngine = new CodeQuizEngine({
-        timeLimit: difficultySettings[difficulty]?.timeLimit || timeLimit,
-        basePoints: difficultySettings[difficulty]?.basePoints || 100,
-        penalty: difficultySettings[difficulty]?.penalty || 0.1
-      });
-      
-      // Set up quiz with code blocks
-      quizEngine.setup(codeBlocks, [...codeBlocks]);
-      
-      // Register event handlers
-      quizEngine
-        .on('start', (state) => {
-          setQuizState({...state});
-          setGameEffects({
-            combo: 1,
-            lastAction: 'start',
-            comboText: "",
-            pointsText: "",
-            streak: 0,
-            feedbackMessages: [
-              {
-                id: Date.now(),
-                text: "Quiz Started!",
-                type: "info"
-              }
-            ]
-          });
-        })
-        .on('complete', (result) => {
-          if (onComplete) {
-            onComplete({
-              score: result.score,
-              maxCombo: result.maxCombo,
-              timeElapsed: result.timeElapsed,
-              correctPlacements: result.correctPlacements,
-              incorrectPlacements: result.incorrectPlacements,
-              success: true,
-              totalBlocks: quizEngine.state.solution.length
-            });
-          }
-        })
-        .on('correct', (data) => {
-          setGameEffects(prev => {
-            const newStreak = prev.streak + 1;
-            
-            // Update streak status for visual effects
-            if (newStreak >= 3 && !streakStatus.active) {
-              setStreakStatus({ active: true, count: newStreak });
-              
-              // Clear streak after animation time
-              setTimeout(() => {
-                setStreakStatus({ active: false, count: 0 });
-              }, 3000);
-            } else if (newStreak >= 3) {
-              setStreakStatus(prev => ({ ...prev, count: newStreak }));
-            }
-            
-            let comboText = "";
-            if (data.combo >= 2.5) comboText = "INCREDIBLE!";
-            else if (data.combo >= 2.0) comboText = "AWESOME!";
-            else if (data.combo >= 1.5) comboText = "GREAT!";
-            else if (newStreak >= 3) comboText = "STREAK!";
-            
-            if (data.combo >= 2) {
-              // Flash screen on high combo
-              setScreenFlash({ 
-                active: true, 
-                type: 'success', 
-                intensity: Math.min(data.combo / 2, 1) 
-              });
-              
-              // Reset flash
-              setTimeout(() => {
-                setScreenFlash({ active: false, type: 'success', intensity: 0 });
-              }, 300);
-            }
-            
-            return {
-              ...prev,
-              combo: data.combo,
-              lastAction: 'correct',
-              comboText,
-              pointsText: `+${data.points}`,
-              streak: newStreak,
-              feedbackMessages: [
-                ...prev.feedbackMessages,
-                {
-                  id: Date.now(),
-                  text: `Correct! +${data.points} points`,
-                  type: "success"
-                }
-              ].slice(-5) // Keep only last 5 messages
-            };
-          });
-        })
-        .on('incorrect', (data) => {
-          // Flash screen on error
-          setScreenFlash({ 
-            active: true, 
-            type: 'error', 
-            intensity: 0.8 
-          });
-          
-          // Reset flash
-          setTimeout(() => {
-            setScreenFlash({ active: false, type: 'error', intensity: 0 });
-          }, 300);
-          
-          // Reset streak status
-          setStreakStatus({ active: false, count: 0 });
-          
-          setGameEffects(prev => ({
-            ...prev,
-            combo: 1,
-            lastAction: 'incorrect',
-            comboText: "OOPS!",
-            pointsText: `-${data.penalty}`,
-            streak: 0,
-            feedbackMessages: [
-              ...prev.feedbackMessages,
-              {
-                id: Date.now(),
-                text: `Incorrect! -${data.penalty} points`,
-                type: "error"
-              }
-            ].slice(-5)
-          }));
-        })
-        .on('timeout', (result) => {
-          setGameEffects(prev => ({
-            ...prev,
-            lastAction: 'timeout',
-            feedbackMessages: [
-              ...prev.feedbackMessages,
-              {
-                id: Date.now(),
-                text: "Time's up!",
-                type: "warning"
-              }
-            ].slice(-5)
-          }));
-          
-          // Call onComplete with failure
-          if (onComplete) {
-            onComplete({
-              score: result.score,
-              maxCombo: 1,
-              timeElapsed: result.timeElapsed,
-              correctPlacements: result.correctPlacements,
-              incorrectPlacements: result.incorrectPlacements,
-              success: false,
-              totalBlocks: quizEngine.state.solution.length
-            });
-          }
-        })
-        .on('tick', (data) => {
-          setQuizState(prevState => ({
-            ...prevState,
-            timeRemaining: data.timeRemaining
-          }));
-        });
-      
-      quizEngineRef.current = quizEngine;
-      setQuizState(quizEngine.getState());
-      
-      // Initialize drop zone refs
-      if (quizEngine.state.solution) {
-        // Create a ref for each potential drop position (solution length + 1)
-        const numDropZones = quizEngine.state.solution.length + 1;
-        dropZoneRefs.current = Array(numDropZones).fill().map(() => React.createRef());
-      }
-    } catch (error) {
-      console.error('Error initializing quiz engine:', error);
-    }
-    
-    return () => {
-      // Clean up
-      if (quizEngineRef.current) {
-        quizEngineRef.current.destroy();
-      }
-    };
-  }, [code, splitType, difficulty, timeLimit, onComplete]);
-
-  // Start the quiz
-  const handleStart = () => {
-    if (quizEngineRef.current) {
-      setIsPaused(false);
-      quizEngineRef.current.start();
-    }
-  };
-
-  // Reset the quiz
-  const handleReset = () => {
-    if (quizEngineRef.current) {
-      quizEngineRef.current.reset();
-      setQuizState(quizEngineRef.current.getState());
-      setGameEffects({
-        combo: 1,
-        lastAction: null,
-        comboText: "",
-        pointsText: "",
-        streak: 0,
-        feedbackMessages: []
-      });
-    }
-  };
-
-  // Pause the quiz
-  const handlePause = () => {
-    if (quizEngineRef.current && quizState.status === 'active') {
-      quizEngineRef.current.pause();
-      setQuizState({ ...quizEngineRef.current.getState() });
-      setIsPaused(true);
-    }
-  };
-
-  // Resume the quiz
-  const handleResume = () => {
-    if (quizEngineRef.current && quizState.status === 'paused') {
-      quizEngineRef.current.resume();
-      setQuizState({ ...quizEngineRef.current.getState() });
-      setIsPaused(false);
-    }
-  };
-
-  // Close/Abort the quiz
-  const handleAbort = () => {
-    // If onClose prop exists (from parent QuizPopup), call it
-    if (onComplete) {
-      // Call onComplete with a failed result
-      onComplete({
-        score: quizState?.score || 0,
-        maxCombo: quizState?.maxComboReached || 1,
-        correctPlacements: quizState?.correctPlacements || 0,
-        success: false,
-        totalBlocks: quizState?.solution?.length || 0
-      });
-    }
-  };
-
-  // Handle drag start
-  const handleBlockDragStart = (block) => {
-    setActiveDragBlock(block);
-    setIsDraggingBlock(true);
-  };
-
-  // Handle drag end for a block
-  const handleBlockDragEnd = () => {
-    setActiveDragBlock(null);
-    setIsDraggingBlock(false);
-  };
-
-  // Handle drop on a specific drop zone
-  const handleDropOnZone = (dropZoneIndex) => {
-    if (!activeDragBlock || !quizEngineRef.current) {
-      return;
-    }
-    const result = quizEngineRef.current.placeBlock(activeDragBlock.id, dropZoneIndex);
-    setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
-
-    // Trigger a small screen flash for feedback
-    setScreenFlash({
-      active: true,
-      type: result ? 'success' : 'error', // Flash green for correct, red for incorrect
-      intensity: 0.3
-    });
-
-    setTimeout(() => {
-      setScreenFlash({ active: false, type: 'info', intensity: 0 });
-    }, 300);
-  };
-  
-  // Check placement of a block
-  const checkPlacement = (block, index) => {
-    return quizEngineRef.current?.checkPlacement(block, index) || false;
-  };
-
-  return {
-    quizState,
-    gameEffects,
-    screenFlash,
-    streakStatus,
-    patternCelebrations,
-    isPaused,
-    activeDragBlock, 
-    isDraggingBlock, // Expose new state
-    dropZoneRefs,
-    handleStart,
-    handleReset, 
-    handlePause,
-    handleResume,
-    handleAbort, 
-    handleBlockDragStart, // Expose new handler
-    handleBlockDragEnd,   // Expose new handler
-    handleDropOnZone,     // Expose new handler
-    checkPlacement
-  };
+      {/* Coming soon overlay */}
+      {comingSoon && (
+        <Box
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="rgba(0,0,0,0.5)"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          borderRadius="md"
+        >
+          <Badge bg="#111" color="#ccc" p={2} fontSize="md">
+            Coming Soon
+          </Badge>
+        </Box>
+      )}
+    </MotionBox>
+  );
 };
+
+const HomePage = () => {
+  // Define features for the homepage
+  const features = [
+    {
+      title: "Typing Challenge",
+      description: "Practice typing code with real-time feedback and gamification",
+      icon: "⌨️",
+      color: "#ff6b6b",
+      route: "/typing-challenge"
+    },
+    {
+      title: "Code Editor",
+      description: "Write and execute code in multiple languages",
+      icon: "💻",
+      color: "#4ecdc4",
+      route: "/code-editor"
+    },
+    {
+      title: "Hybrid Mode",
+      description: "Type and execute code in a single interface",
+      icon: "🚀",
+      color: "#ffd93d",
+      route: "/hybrid-mode"
+    },
+    {
+      title: "Quiz Gallery",
+      description: "Explore interactive quiz components for code learning",
+      icon: "🎮",
+      color: "#6bcf7f",
+      route: "/quiz-gallery"
+    },
+    {
+      title: "Marketplace",
+      description: "Browse and enroll in interactive coding courses",
+      icon: "🛒",
+      color: "#a374db",
+      route: "/marketplace"
+    },
+    {
+      title: "Community",
+      description: "Connect with other developers and share projects",
+      icon: "🌐",
+      color: "#45b7d1",
+      route: "/community"
+    }
+  ];
+
+  return (
+    <Box minH="100vh" bg="#000">
+      {/* Hero section */}
+      <Box py={20} textAlign="center">
+        <MotionBox
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Text fontSize="5xl" fontWeight="bold" color="#00ff00" mb={4}>
+            Terminal IDE
+          </Text>
+          <Text fontSize="2xl" color="#ccc" maxW="800px" mx="auto">
+            An interactive coding platform with gamified learning experiences
+          </Text>
+        </MotionBox>
+        
+        <MotionBox
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          mt={10}
+        >
+          <Button
+            as="a"
+            href="#features"
+            colorScheme="green"
+            size="lg"
+            fontWeight="bold"
+            px={8}
+          >
+            Explore Features
+          </Button>
+        </MotionBox>
+      </Box>
+      
+      {/* Features section */}
+      <Box id="features" py={16} px={8}>
+        <Text fontSize="3xl" fontWeight="bold" color="#00ff00" mb={12} textAlign="center">
+          Interactive Features
+        </Text>
+        
+        <Grid
+          templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
+          gap={8}
+          maxW="1200px"
+          mx="auto"
+        >
+          {features.map((feature, index) => (
+            <MotionBox
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+            >
+              <FeatureCard
+                title={feature.title}
+                description={feature.description}
+                icon={feature.icon}
+                color={feature.color}
+                route={feature.route}
+                comingSoon={feature.comingSoon}
+              />
+            </MotionBox>
+          ))}
+        </Grid>
+      </Box>
+    </Box>
+  );
+};
+
+export default HomePage;

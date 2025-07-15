@@ -1,4 +1,4 @@
-// Quiz Engine Core - For code arrangement and stacking challenges
+// Code Quiz Engine - For code arrangement and stacking challenges
 export class CodeQuizEngine {
   constructor(options = {}) {
     this.options = {
@@ -236,7 +236,8 @@ export class CodeQuizEngine {
         maxCombo: this.state.maxComboReached,
         timeElapsed: (this.state.endTime - this.state.startTime) / 1000,
         correctPlacements: this.state.correctPlacements,
-        incorrectPlacements: this.state.incorrectPlacements
+        incorrectPlacements: this.state.incorrectPlacements,
+        success: true
       });
     }
   }
@@ -254,7 +255,8 @@ export class CodeQuizEngine {
         score: this.state.score,
         timeElapsed: (this.state.endTime - this.state.startTime) / 1000,
         correctPlacements: this.state.correctPlacements,
-        incorrectPlacements: this.state.incorrectPlacements
+        incorrectPlacements: this.state.incorrectPlacements,
+        success: false
       });
     }
   }

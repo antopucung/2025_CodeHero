@@ -9,6 +9,7 @@ import { InteractiveCodeExample } from '../components/learning/InteractiveCodeEx
 import { EnhancedCodeExample } from '../components/learning/EnhancedCodeExample';
 import { ConceptExplainer } from '../components/learning/CodeConcepts';
 import QuizPopup from '../components/learning/QuizPopup';
+import { BaseQuizEngine } from '../components/learning/BaseQuizEngine';
 import TypingChallenge from '../components/TypingChallenge';
 import CodeEditorPage from './CodeEditorPage';
 
@@ -63,6 +64,49 @@ const LessonPage = () => {
         juiciness: contentData.quiz.juiciness || 'high'
       };
     } 
+    // If the lesson has a multiple-choice quiz
+    else if (contentData.questions && Array.isArray(contentData.questions)) {
+      return {
+        type: 'multiple-choice',
+        title: `Quiz: ${lesson.title}`,
+        description: "Select the correct answer for each question",
+        questions: contentData.questions,
+        language: course?.language || 'csharp',
+        timeLimit: course?.difficulty === 'beginner' ? 180 : course?.difficulty === 'advanced' ? 90 : 120,
+        difficulty: course?.difficulty || 'medium',
+        juiciness: 'high'
+      };
+    }
+    // If the lesson has code with blanks for a fill-in-the-blank quiz
+    else if (contentData.code_with_blanks) {
+      return {
+        type: 'code-completion',
+        title: `Code Completion: ${lesson.title}`,
+        description: "Fill in the blanks to complete the code",
+        code: contentData.code_with_blanks,
+        blanks: contentData.blanks || [],
+        language: course?.language || 'csharp',
+        timeLimit: course?.difficulty === 'beginner' ? 240 : course?.difficulty === 'advanced' ? 120 : 180,
+        difficulty: course?.difficulty || 'medium',
+        juiciness: 'high'
+      };
+    }
+    // If the lesson has buggy code for a debugging quiz
+    else if (contentData.buggy_code && contentData.fixed_code) {
+      return {
+        type: 'debug-challenge',
+        title: `Debug Challenge: ${lesson.title}`,
+        description: "Find and fix the bugs in the code",
+        buggyCode: contentData.buggy_code,
+        fixedCode: contentData.fixed_code,
+        bugs: contentData.bugs || [],
+        totalBugs: contentData.total_bugs || contentData.bugs?.length || 3,
+        language: course?.language || 'csharp',
+        timeLimit: course?.difficulty === 'beginner' ? 300 : course?.difficulty === 'advanced' ? 180 : 240,
+        difficulty: course?.difficulty || 'medium',
+        juiciness: 'high'
+      };
+    }
     // If no quiz is defined but there's a code example, create one from that
     else if (contentData.code_example) {
       return {
@@ -212,22 +256,104 @@ const LessonPage = () => {
       let quiz = createQuizFromLesson(lesson);
       
       // If the lesson doesn't have a quiz configuration but has code example, create a default one
-      if (!quiz && lesson.content_data?.code_example) {
-        quiz = {
-          type: 'code-stacking',
-          title: `Code Challenge: ${lesson.title}`,
-          description: "Arrange the code blocks in the correct order",
-          code: lesson.content_data.code_example,
-          language: course?.language || 'csharp',
-          timeLimit: 120, 
-          difficulty: course?.difficulty || 'medium',
-          splitType: 'line',
-          juiciness: 'high',
-          totalBlocks: lesson.content_data.code_example.split('\n').filter(line => line.trim()).length
-        };
+      if (!quiz) {
+        // For text lessons with code examples, default to code stacking quiz
+        if (lesson.content_data?.code_example) {
+          quiz = {
+            type: 'code-stacking',
+            title: `Code Challenge: ${lesson.title}`,
+            description: "Arrange the code blocks in the correct order",
+            code: lesson.content_data.code_example,
+            language: course?.language || 'csharp',
+            timeLimit: 120, 
+            difficulty: course?.difficulty || 'medium',
+            splitType: 'line',
+            juiciness: 'high',
+            totalBlocks: lesson.content_data.code_example.split('\n').filter(line => line.trim()).length
+          };
+        }
+        // For C# lessons, create a debug challenge by default
+        else if (course?.language === 'csharp') {
+          const basicCSharpCode = `
+public class Player : MonoBehaviour
+{
+    // Player movement speed
+    public float moveSpeed = 5f;
+    private Rigidbody rb;
+
+    void Start()
+    {
+        // Get the Rigidbody component
+        rb = GetComponent<Rigidbody>(); 
+        rb.freezeRotation = true;
+    }
+
+    void Update()
+    {
+        // Get input axes
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+        
+        // Calculate movement direction
+        Vector3 movement = new Vector3(horizontalInput, 0, verticalInput) * Time.deltaTime;
+        
+        // Apply movement
+        transform.Translate(movement * moveSpeed);
+    }
+}`;
+          
+          const buggyVersion = `
+public class Player : MonoBehaviour
+{
+    // Player movement speed
+    public int moveSpeed = 5f;
+    private Rigidbody rb;
+
+    void Awake()
+    {
+        // Get the Rigidbody component
+        rb = GetComponents<Rigidbody>(); 
+        rb.freezeRotation = true;
+    }
+
+    void Update()
+    {
+        // Get input axes
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
+        
+        // Calculate movement direction
+        Vector3 movement = new Vector3(horizontalInput, verticalInput, 0) * Time.deltaTime;
+        
+        // Apply movement
+        transform.Translate(movement + moveSpeed);
+    }
+}`;
+
+          quiz = {
+            type: 'debug-challenge',
+            title: `Debug Challenge: ${lesson.title}`,
+            description: "Find and fix the bugs in the Unity C# code",
+            buggyCode: buggyVersion,
+            fixedCode: basicCSharpCode,
+            bugs: [
+              "Incorrect type for moveSpeed (should be float)",
+              "Wrong method for initialization (should be Start)",
+              "Incorrect GetComponents call (should be GetComponent)",
+              "Incorrect movement vector construction",
+              "Incorrect movement calculation"
+            ],
+            totalBugs: 5,
+            language: 'csharp',
+            timeLimit: 240,
+            difficulty: course?.difficulty || 'medium',
+            juiciness: 'high'
+          };
+        }
       }
       
       if (quiz) {
+          setQuizData(quiz);
           
           // Short delay to show completion message before quiz
           setTimeout(() => {
@@ -298,12 +424,15 @@ const LessonPage = () => {
       // Success toast
       toast({
         title: "Quiz completed successfully!",
-        description: `You earned ${additionalScore} points from the quiz!`,
+        description: `You earned ${additionalScore} points from the quiz${achievements.length > 0 ? ' and unlocked an achievement!' : '!'}`,
         status: "success",
         duration: 5000,
         isClosable: true,
         position: "top-right"
       });
+
+      // If quiz was successful, set quiz data in case user wants to try again
+      setQuizData(results);
       
       // Update progress with the additional score
       updateLessonProgress(courseId, lessonId, true, additionalScore);
@@ -313,7 +442,9 @@ const LessonPage = () => {
       // If quiz failed, show feedback but don't enable next lesson
       toast({
         title: "Quiz needs more work",
-        description: "Try the quiz again when you're ready to move on.",
+        description: results && results.score > 0 
+          ? `You earned ${results.score} points but need to reach a higher score to pass.` 
+          : "Try the quiz again when you're ready to move on.",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -612,7 +743,7 @@ const LessonPage = () => {
   return (
     <Box w="100%" h="100%" overflow="hidden" display="flex" flexDirection="column" bg="#000">
       {/* Lesson Header */}
-      <MotionBox 
+      <MotionBox
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -832,10 +963,7 @@ const LessonPage = () => {
       <QuizPopup 
         isOpen={isOpen} 
         onClose={onClose}
-        onComplete={(results) => {
-          onClose();
-          handleQuizComplete(results);
-        }}
+        onComplete={handleQuizComplete}
         quizData={quizData}
         lessonTitle={lesson?.title || ""}
       />
@@ -844,10 +972,15 @@ const LessonPage = () => {
       <Box 
         bg="#111" 
         borderTop="1px solid #333" 
-        p={4}
+        p={quizRequired && !quizCompleted && !lessonCompleted ? 5 : 4}
         flexShrink={0}
       >
-        <HStack justify="space-between" maxW="1200px" mx="auto">
+        <HStack 
+          justify="space-between" 
+          maxW="1200px" 
+          mx="auto" 
+          position="relative"
+        >
           <Box>
             {prevLesson ? (
               <Button
@@ -875,8 +1008,8 @@ const LessonPage = () => {
                   } else if (quizRequired && !quizCompleted) {
                     // If quiz is required but not completed, remind the user
                     toast({
-                      title: "Quiz required",
-                      description: "Please complete the quiz to unlock the next lesson",
+                      title: "Quiz Required",
+                      description: "Please complete the quiz successfully to unlock the next lesson",
                       status: "info",
                       duration: 3000,
                       isClosable: true,
@@ -908,6 +1041,23 @@ const LessonPage = () => {
               <Box />
             )}
           </Box>
+          
+          {/* Quiz requirement indicator */}
+          {quizRequired && !quizCompleted && !lessonCompleted && (
+            <MotionBox
+              animate={{
+                y: [0, -3, 0],
+                opacity: [0.7, 1, 0.7]
+              }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
+              position="absolute"
+              top="-40px"
+              left="50%"
+              transform="translateX(-50%)"
+            >
+              <Text color="#ffd93d" fontSize="sm">👉 Quiz required to proceed to next lesson</Text>
+            </MotionBox>
+          )}
         </HStack>
       </Box>
     </Box>

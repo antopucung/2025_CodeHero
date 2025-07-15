@@ -33,8 +33,10 @@ const CommunityPage = () => {
   const { hasCollaborationProfile, createCollaborationRequest } = useCollaborationSystem();
   const [accessibleContent, setAccessibleContent] = useState(null);
   const [activeDonationProject, setActiveDonationProject] = useState(null);
+  const [activeCollabProject, setActiveCollabProject] = useState(null);
   const [isUserProfileComplete, setIsUserProfileComplete] = useState(false);
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+  const [isCollabModalOpen, setIsCollabModalOpen] = useState(false);
 
   // Fetch user's accessible content on mount
   useEffect(() => {
@@ -229,6 +231,12 @@ const CommunityPage = () => {
     setIsDonationModalOpen(true);
   };
 
+  // Handle collaboration button click
+  const handleProjectCollab = (project) => {
+    setActiveCollabProject(project);
+    setIsCollabModalOpen(true);
+  };
+
   // Handle donation completion
   const handleDonationComplete = (donation) => {
     // Refresh accessible content
@@ -276,6 +284,12 @@ const CommunityPage = () => {
         stats={stats}
       />
       
+      {/* Collaboration Modal */}
+      <CollaborationModal
+        isOpen={isCollabModalOpen}
+        onClose={() => setIsCollabModalOpen(false)}
+        project={activeCollabProject}
+      />
       <SectionLayout spacing="default">
         <Tabs 
           index={activeTab} 
@@ -386,7 +400,7 @@ const CommunityPage = () => {
                         project={project}
                         onViewDetails={() => navigate(`/project/${project.id}`)}
                         onDonate={() => handleProjectDonate(project)}
-                        onCollaborate={() => handleProjectDonate(project)}
+                        onCollaborate={() => handleProjectCollab(project)}
                       />
                     </MotionBox>
                   ))}

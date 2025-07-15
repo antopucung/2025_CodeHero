@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Grid, GridItem, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import { useGameProgress } from '../hooks/useGameProgress';
 import { useDonationSystem } from '../hooks/useDonationSystem';
 import { useCommissionSystem } from '../hooks/useCommissionSystem';

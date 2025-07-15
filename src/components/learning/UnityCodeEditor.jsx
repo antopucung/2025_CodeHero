@@ -32,10 +32,12 @@ const UnityCodeEditor = ({
   const handleEditorDidMount = (editor) => {
     editorRef.current = editor;
     
-    // Add custom markers for annotations if not read-only
-    if (!readOnly && annotations.length > 0) {
-      addAnnotationMarkers(editor, annotations);
-    }
+    // Add custom markers for annotations
+    setTimeout(() => {
+      if (!readOnly && annotations.length > 0) {
+        addAnnotationMarkers(editor, annotations);
+      }
+    }, 100);
   };
   
   // Add interactive markers for code annotations
@@ -87,83 +89,73 @@ const UnityCodeEditor = ({
       
       // For Unity C#, we add some wrapper code to make it runnable in isolation
       // since Unity components rely on MonoBehaviour
-      const wrappedCode = `
-using System;
+      const wrappedCode = `using System;
 using System.Collections.Generic;
 
-// Unity simulation environment
-public static class UnityEngine 
-{
-  public static class Debug 
-  {
-    public static void Log(string message) 
-    {
-      Console.WriteLine("[Unity Debug]: " + message);
+namespace UnitySimulation {
+  // Unity simulation environment
+  public static class UnityEngine {
+    public static class Debug {
+      public static void Log(string message) {
+        Console.WriteLine("[Unity Debug]: " + message);
+      }
     }
-  }
-  
-  public static class Vector3 
-  {
-    public float x, y, z;
-    public static Vector3 up = new Vector3(0, 1, 0);
-    public static Vector3 right = new Vector3(1, 0, 0);
     
-    public Vector3(float x = 0, float y = 0, float z = 0) 
-    {
-      this.x = x;
-      this.y = y;
-      this.z = z;
+    public class Vector3 {
+      public float x, y, z;
+      public static Vector3 up = new Vector3(0, 1, 0);
+      public static Vector3 right = new Vector3(1, 0, 0);
+      
+      public Vector3(float x = 0, float y = 0, float z = 0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+      }
+    }
+    
+    public class MonoBehaviour {}
+    
+    public static class Time {
+      public static float deltaTime = 0.016f; // ~60fps
     }
   }
   
-  public class MonoBehaviour {}
+  // User code starts here
+  ${sourceCode}
   
-  public static class Time {
-    public static float deltaTime = 0.016f; // ~60fps
-  }
-}
-
-// User code starts here
-${sourceCode}
-
-// Test execution code
-public class Program 
-{
-  public static void Main() 
-  {
-    Console.WriteLine("[Unity Simulation Started]");
-    // Instantiate player controller
-    try 
-    {
-      var player = new PlayerController();
-      
-      // Simulate Start method call
+  // Test execution code
+  public class Program {
+    public static void Main() {
+      Console.WriteLine("[Unity Simulation Started]");
+      // Instantiate player controller
       try {
-        player.Start();
-      } catch (Exception e) {
-        Console.WriteLine("Error in Start(): " + e.Message);
-      }
-      
-      // Simulate a few Update calls
-      Console.WriteLine("[Running Update frames...]");
-      for (int i = 0; i < 3; i++) {
+        var player = new PlayerController();
+        
+        // Simulate Start method call
         try {
-          Console.WriteLine("Frame " + (i+1));
-          player.Update();
+          player.Start();
         } catch (Exception e) {
-          Console.WriteLine("Error in Update(): " + e.Message);
+          Console.WriteLine("Error in Start(): " + e.Message);
         }
+        
+        // Simulate a few Update calls
+        Console.WriteLine("[Running Update frames...]");
+        for (int i = 0; i < 3; i++) {
+          try {
+            Console.WriteLine("Frame " + (i+1));
+            player.Update();
+          } catch (Exception e) {
+            Console.WriteLine("Error in Update(): " + e.Message);
+          }
+        }
+        Console.WriteLine("[Unity Simulation Completed]");
       }
-      Console.WriteLine("[Unity Simulation Completed]");
-    }
-    catch (Exception e) 
-    {
-      Console.WriteLine("Error: " + e.Message);
-      Environment.Exit(1);
+      catch (Exception e) {
+        Console.WriteLine("Error: " + e.Message);
+      }
     }
   }
-}
-`;
+}`;
       
       // Execute the wrapped code
       const { run: result } = await executeCode("csharp", wrappedCode);
@@ -174,17 +166,24 @@ public class Program
       
       // Format Unity debug logs for better visibility
       if (!hasError) {
-        formattedOutput = formattedOutput.replace(/\[Unity Debug\]:/g, '🎮 ');
-        formattedOutput = formattedOutput.replace(/\[Unity Simulation Started\]/g, '🚀 Unity Simulation Started\n');
-        formattedOutput = formattedOutput.replace(/\[Running Update frames\.\.\.\]/g, '\n⏱️ Running Update Frames...\n');
-        formattedOutput = formattedOutput.replace(/\[Unity Simulation Completed\]/g, '\n✅ Unity Simulation Completed');
-      } else {
-        // Don't show the "Execution Successful" badge if there was a compilation error
-        return setOutput({
-          text: formattedOutput,
-          hasError: true,
-          stderr: result.stderr
-        });
+        try {
+          formattedOutput = formattedOutput.replace(/\[Unity Debug\]:/g, '🎮 ');
+          formattedOutput = formattedOutput.replace(/\[Unity Simulation Started\]/g, '🚀 Unity Simulation Started\n');
+          formattedOutput = formattedOutput.replace(/\[Running Update frames\.\.\.\]/g, '\n⏱️ Running Update Frames...\n');
+          formattedOutput = formattedOutput.replace(/\[Unity Simulation Completed\]/g, '\n✅ Unity Simulation Completed');
+          
+          // Check if we actually got any Unity debug output
+          const hasUnityOutput = formattedOutput.includes('Unity Debug') || 
+                                formattedOutput.includes('Unity Simulation Started');
+          
+          if (!hasUnityOutput && !result.stderr) {
+            // No Unity-specific output and no errors means the code probably doesn't follow expected structure
+            formattedOutput += '\n\n⚠️ Note: Your code compiled but didn\'t produce any Unity debug output. ' +
+                              'Make sure your class is named "PlayerController" and inherits from MonoBehaviour.';
+          }
+        } catch (e) {
+          console.error("Error formatting output:", e);
+        }
       }
       
       setOutput({
@@ -273,8 +272,8 @@ public class Program
       {/* Main Content: Editor + Preview Split */}
       <HStack spacing={0} align="stretch">
         {/* Code Editor Panel */}
-        <Box 
-          width="55%" 
+        <Box
+          width="50%" 
           borderRight="1px solid #333"
           position="relative"
         >
@@ -333,8 +332,8 @@ public class Program
         </Box>
         
         {/* Preview Panel */}
-        <VStack 
-          width="45%" 
+        <VStack
+          width="50%" 
           spacing={0} 
           align="stretch"
         >
@@ -373,6 +372,7 @@ public class Program
                 <Text 
                   fontSize="xs" 
                   color="#666"
+                  fontFamily="monospace"
                   mb={2}
                 >
                   Unity C# Output:
@@ -381,20 +381,20 @@ public class Program
                 <Box
                   p={3}
                   bg="#111"
-                  border={`1px solid ${output.hasError ? '#ff4444' : '#333'}`}
+                  border={`1px solid ${output.hasError ? '#ff4444' : '#00ff00'}`}
                   borderRadius="md"
                   fontFamily="monospace"
                   fontSize="sm"
                   color={output.hasError ? "#ff4444" : "#00ff00"}
-                  whiteSpace="pre"
+                  whiteSpace="pre-wrap"
                   overflowY="auto"
-                  maxHeight="330px"
+                  maxHeight="320px"
                 >
                   {output.text}
                 </Box>
                 
-                {/* Only show "Success" badge when there was no error */}
-                {!output.hasError && (
+                {/* Only show "Success" badge when there was no error and execution was successful */}
+                {!output.hasError && !output.text.includes("error CS") && (
                   <HStack justify="flex-end">
                     <Badge colorScheme="green">
                       Execution Successful

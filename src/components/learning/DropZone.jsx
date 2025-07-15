@@ -19,6 +19,7 @@ export const useCodeQuizEngine = ({
   // UI state
   const [quizState, setQuizState] = useState(null);
   const [activeDragBlock, setActiveDragBlock] = useState(null);
+  const [isDraggingBlock, setIsDraggingBlock] = useState(false); // New state
   const [gameEffects, setGameEffects] = useState({
     combo: 1,
     lastAction: null,
@@ -310,91 +311,40 @@ export const useCodeQuizEngine = ({
   };
 
   // Handle drag start
-  const handleDragStart = (block) => {
-    console.log("Drag started:", block.id);
+  const handleBlockDragStart = (block) => {
+    console.log("Block drag started:", block.id);
     setActiveDragBlock(block);
+    setIsDraggingBlock(true);
   };
 
-  // Handle drag end
-  const handleDragEnd = (block, info) => {
-    console.log("Drag ended:", block.id, info);
+  // New: Handle drag end for a block
+  const handleBlockDragEnd = () => {
+    console.log("Block drag ended.");
+    setActiveDragBlock(null);
+    setIsDraggingBlock(false);
+  };
+
+  // New: Handle drop on a specific drop zone
+  const handleDropOnZone = (dropZoneIndex) => {
     if (!activeDragBlock || !quizEngineRef.current) {
-      console.log("Missing required data for drag end");
-      setActiveDragBlock(null);
+      console.log("No active drag block or quiz engine for drop.");
       return;
     }
-    
-    // Get the drop point coordinates
-    const dropPoint = info?.point ? { x: info.point.x, y: info.point.y } : null; // Use clientX/Y from pointer info
-    console.log("Drag ended. Drop point:", dropPoint);
-    
-    if (dropPoint) {
-      // Check each dropzone to see if the point is within its bounds
-      let droppedInZone = false;
-      
-      // Add visual feedback when dropped
-      setScreenFlash({ active: true, type: 'info', intensity: 0.3 });
-      setTimeout(() => {
-        setScreenFlash({ active: false, type: 'info', intensity: 0 }); // Reset flash
-      }, 200);
-      
-      dropZoneRefs.current.forEach((ref, index) => {
-        if (!ref || !ref.current) {
-          // This drop zone might not be rendered yet or is empty
-          // console.log("Missing ref for dropzone", index);
-          return;
-        }
-        
-        const rect = ref.current.getBoundingClientRect();
-        console.log(`Checking dropzone ${index}:`, rect);
-        
-        // Check if drop point is within this dropzone
-        if (
-          // Check if the drop point is within the horizontal bounds of the drop zone
-          dropPoint.x >= rect.left && 
-          dropPoint.x <= rect.right && 
-          // Check if the drop point is within the vertical bounds of the drop zone
-          // We give a bit of leeway vertically to make dropping easier
-          dropPoint.y >= rect.top && 
-          dropPoint.y <= rect.bottom
-        ) {
-          console.log("Dropped in zone", index);
-          // Place the block at this index
-          const result = quizEngineRef.current.placeBlock(activeDragBlock.id, index);
-          console.log("Place block result:", result);
-          setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
-          droppedInZone = true;
-        }
-      });
-      
-      if (!droppedInZone) {
-        console.log("Not dropped in any zone");
-        setGameEffects(prev => ({
-          ...prev,
-          feedbackMessages: [
-            ...prev.feedbackMessages,
-            {
-              id: Date.now(),
-              text: "Block not placed in a drop zone",
-              type: "warning"
-            }
-          ].slice(-5)
-        }));
-      } else {
-        // Trigger a small screen flash for feedback
-        setScreenFlash({ 
-          active: true, 
-          type: 'info', 
-          intensity: 0.3 
-        });
-        
-        setTimeout(() => {
-          setScreenFlash({ active: false, type: 'info', intensity: 0 });
-        }, 300);
-      }
-    }
-    
-    setActiveDragBlock(null);
+    console.log(`Dropped block ${activeDragBlock.id} on zone ${dropZoneIndex}`);
+    const result = quizEngineRef.current.placeBlock(activeDragBlock.id, dropZoneIndex);
+    console.log("Place block result:", result);
+    setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
+
+    // Trigger a small screen flash for feedback
+    setScreenFlash({
+      active: true,
+      type: result ? 'success' : 'error', // Flash green for correct, red for incorrect
+      intensity: 0.3
+    });
+
+    setTimeout(() => {
+      setScreenFlash({ active: false, type: 'info', intensity: 0 });
+    }, 300);
   };
   
   // Check placement of a block
@@ -409,15 +359,17 @@ export const useCodeQuizEngine = ({
     streakStatus,
     patternCelebrations,
     isPaused,
-    activeDragBlock,
+    activeDragBlock, 
+    isDraggingBlock, // Expose new state
     dropZoneRefs,
     handleStart,
-    handleReset,
+    handleReset, 
     handlePause,
     handleResume,
-    handleAbort,
-    handleDragStart,
-    handleDragEnd,
+    handleAbort, 
+    handleBlockDragStart, // Expose new handler
+    handleBlockDragEnd,   // Expose new handler
+    handleDropOnZone,     // Expose new handler
     checkPlacement
   };
 };

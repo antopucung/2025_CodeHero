@@ -97,6 +97,7 @@ const UnityCodeEditor = ({
       // Wrap the user code in a simulation environment that mimics Unity
       const wrappedCode = `
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 // Unity simulation environment
@@ -200,7 +201,6 @@ namespace UnityEngine
     }
 }
 
-// User code
 ${sourceCode}
 
 // Test execution
@@ -287,11 +287,19 @@ public class UnitySimulation
         }
       }
       
-      setOutput({
-        text: formattedOutput,
-        hasError: hasCompilationError,
-        isSuccessful: isActuallySuccessful
-      });
+      if (hasCompilationError) {
+        setOutput({
+          text: formattedOutput,
+          hasError: true,
+          isSuccessful: false
+        });
+      } else {
+        setOutput({
+          text: formattedOutput,
+          hasError: false,
+          isSuccessful: hasUnityOutput
+        });
+      }
       
       // Call the completion handler if provided
       if (onExecutionComplete && isActuallySuccessful) {
@@ -374,19 +382,20 @@ public class UnitySimulation
       
       {/* Main Content: Editor + Preview Split */}
       <Flex 
-        direction={{ base: "column", md: "row" }} 
+        direction="row" 
         h="100%" 
-        width="100%" 
+        w="100%" 
         overflow="hidden"
       >
         {/* Code Editor Panel */}
         <Box
-          width={{ base: "100%", md: "50%" }}
-          borderRight={{ md: "1px solid #333" }}
-          minWidth="0" 
+          w="50%"
+          borderRight="1px solid #333"
+          minW="0"
+          maxW="50%" 
           overflow="hidden"
         >
-          <Box height="400px">
+          <Box h="400px">
             <Editor
               height="100%"
               defaultLanguage="csharp"
@@ -441,8 +450,9 @@ public class UnitySimulation
         
         {/* Preview Panel */}
         <Box
-          width={{ base: "100%", md: "50%" }}
-          minWidth="0"
+          w="50%"
+          minW="0"
+          maxW="50%"
           overflow="hidden"
         >
           {/* Preview Header */}
@@ -457,10 +467,11 @@ public class UnitySimulation
           {/* Output/Preview Area */}
           <Box  
             p={4} 
-            bg="#000"
-            height="400px"
-            overflow="auto"
-            whiteSpace="pre"
+            bg="#000" 
+            h="400px"
+            overflowY="auto"
+            overflowX="auto"
+            whiteSpace="pre" 
             fontFamily="monospace"
           >
             {!output ? (
@@ -500,10 +511,19 @@ public class UnitySimulation
                       Compilation failed. Please fix the errors above.
                     </Box>
                     
-                    <Box color="#ff9999" fontSize="xs">
-                      ⚠️ Note: Your code compiled but didn't produce any Unity debug output. Make sure your class is named "PlayerController" and inherits from MonoBehaviour.
-                    </Box>
+                    {!output.hasError && !output.isSuccessful && (
+                      <Box color="#ff9999" fontSize="xs">
+                        ⚠️ Note: Your code compiled but didn't produce any Unity debug output. Make sure your class is named "PlayerController" and inherits from MonoBehaviour.
+                      </Box>
+                    )}
                   </VStack>
+                )}
+
+                {/* Success explanation */}
+                {output.isSuccessful && (
+                  <Box mt={4} color="#00ff00" fontSize="xs">
+                    ✅ Your code successfully executed with Unity simulation.
+                    </Box>
                 )}
               </Box>
             )}
@@ -512,7 +532,7 @@ public class UnitySimulation
       </Flex>
       
       {/* Active Annotation Highlight */}
-      {activeAnnotation && (
+      {false && activeAnnotation && (
         <MotionBox
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

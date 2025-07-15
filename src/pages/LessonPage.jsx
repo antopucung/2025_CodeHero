@@ -4,6 +4,8 @@ import { Box, Text, VStack, HStack, Button, Progress } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
+import { InteractiveCodeExample } from '../components/learning/InteractiveCodeExample';
+import { ConceptExplainer } from '../components/learning/CodeConcepts';
 import TypingChallenge from '../components/TypingChallenge';
 import CodeEditorPage from './CodeEditorPage';
 
@@ -174,24 +176,44 @@ const LessonPage = () => {
               <Text color="#ccc" lineHeight="1.6">
                 {contentData.content || "This is a text-based lesson. The content would be loaded from the database."}
               </Text>
-              
+
               {contentData.code_example && (
-                <Box
-                  bg="#000"
-                  border="1px solid #444"
-                  borderRadius="4px"
-                  p={4}
-                  w="100%"
-                  fontFamily="'Courier New', monospace"
-                  fontSize="sm"
-                >
-                  <Text color="#666" fontSize="xs" mb={2}>Code Example:</Text>
-                  <Text color="#00ff00" whiteSpace="pre-wrap">
-                    {contentData.code_example}
-                  </Text>
-                </Box>
+                <InteractiveCodeExample
+                  code={contentData.code_example}
+                  language={course?.language || "csharp"}
+                  mode={contentData.interactive ? "playground" : "annotated"}
+                  title={contentData.code_title || "Code Example"}
+                  annotations={[
+                    {
+                      text: "void Start()",
+                      title: "Unity Lifecycle Method",
+                      explanation: "The Start method is called once when the script is enabled before any Update methods are called."
+                    },
+                    {
+                      text: "transform.position",
+                      title: "Transform Property",
+                      explanation: "Gets or sets the position of the GameObject in world space coordinates (X, Y, Z)."
+                    },
+                    {
+                      text: "GetComponent<Rigidbody>()",
+                      title: "Component Access",
+                      explanation: "Retrieves the Rigidbody component attached to the same GameObject."
+                    }
+                  ]}
+                />
               )}
-              
+
+              {contentData.concepts && contentData.concepts.length > 0 && (
+                <VStack spacing={3} align="start" w="100%">
+                  <Text fontSize="md" color="#00ff00" fontWeight="bold" mt={2}>
+                    🧩 Key Concepts
+                  </Text>
+                  {contentData.concepts.map((concept, idx) => (
+                    <ConceptExplainer key={idx} concept={concept} />
+                  ))}
+                </VStack>
+              )}
+
               <Button
                 bg="#00ff00"
                 color="#000"

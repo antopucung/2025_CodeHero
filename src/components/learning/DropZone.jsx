@@ -1,24 +1,26 @@
 // Drop Zone for placing code blocks
 const DropZone = React.forwardRef(({ index, children, isActive, highlightColor = "#4ecdc4" }, ref) => {
   return (
-    <MotionBox
+    <Box
       ref={ref}
-      animate={{
-        backgroundColor: isActive ? `${highlightColor}22` : "transparent",
-        borderColor: isActive ? highlightColor : "#333",
-        borderWidth: isActive ? "2px" : "1px"
-      }}
+      bg={isActive ? `${highlightColor}22` : "transparent"}
       border="1px dashed"
-      borderColor="#333"
+      borderColor={isActive ? highlightColor : "#333"}
+      borderWidth={isActive ? "2px" : "1px"}
       borderRadius="md"
       minH="40px"
       p={2}
       mb={2}
       position="relative"
+      transition="all 0.2s ease"
     >
       {children}
       {isActive && (
-        <Box
+        <motion.div
+          animate={{
+            opacity: [0.3, 0.7, 0.3]
+          }}
+          transition={{ duration: 1.5, repeat: Infinity }}
           position="absolute"
           top={0}
           left={0}
@@ -27,8 +29,10 @@ const DropZone = React.forwardRef(({ index, children, isActive, highlightColor =
           pointerEvents="none"
         />
       )}
-    </MotionBox>
+    </Box>
   );
 });
 
 DropZone.displayName = 'DropZone';
+
+export default DropZone;

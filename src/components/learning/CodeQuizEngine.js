@@ -91,20 +91,30 @@ export class CodeQuizEngine {
   // Add a block to the user solution
   placeBlock(blockId) {
     if (this.state.status !== 'active') return false;
-    
+
+    console.log("Attempting to place block:", blockId);
+    console.log("Current blocks:", this.state.blocks);
+
     // Find block in available blocks
     const blockIndex = this.state.blocks.findIndex(b => b.id === blockId);
-    if (blockIndex === -1) return false;
+    if (blockIndex === -1) {
+      console.log("Block not found in available blocks");
+      return false;
+    }
     
     // Get the block and remove from available blocks
     const block = this.state.blocks[blockIndex];
-    this.state.blocks.splice(blockIndex, 1);
+    const newBlocks = [...this.state.blocks];
+    newBlocks.splice(blockIndex, 1);
+    this.state.blocks = newBlocks;
     
     // Add to user solution
-    this.state.userSolution.push(block);
+    this.state.userSolution = [...this.state.userSolution, block];
+    console.log("Updated userSolution:", this.state.userSolution);
     
     // Check if placement is correct
     const isCorrect = this.checkPlacement(block, this.state.userSolution.length - 1);
+    console.log("Placement correct?", isCorrect);
     
     if (isCorrect) {
       // Increase combo
@@ -360,17 +370,23 @@ export class CodeQuizEngine {
 export const createCodeBlocksFromString = (code, blockType = 'line') => {
   if (!code) return [];
   
-  let blocks = [];
+  const blocks = [];
   let id = 0;
   
   if (blockType === 'line') {
     // Split by lines and create a block for each line
-    blocks = code.split('\n').map((line, index) => ({
-      id: `block-${id++}`,
-      content: line,
-      indentation: getIndentation(line),
-      lineNumber: index + 1
-    }));
+    const lines = code.split('\n');
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
+      if (line.trim() !== '') { // Skip empty lines
+        blocks.push({
+          id: `block-${id++}`,
+          content: line,
+          indentation: getIndentation(line),
+          lineNumber: index + 1
+        });
+      }
+    }
   } else if (blockType === 'statement') {
     // More complex: split by statements
     // This is a simplified implementation
@@ -441,7 +457,8 @@ export const createCodeBlocksFromString = (code, blockType = 'line') => {
     }
   }
   
-  return blocks;
+  // Make sure all blocks have unique IDs
+  return blocks.filter(block => block.content.trim() !== '');
 };
 
 // Helper function to get indentation level

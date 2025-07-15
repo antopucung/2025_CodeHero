@@ -239,15 +239,13 @@ const CommunityPage = () => {
   // Community stats for header
   const stats = [
     { value: showcaseProjects.length, label: 'PROJECTS' },
-    { value: showcaseProjects.reduce((sum, p) => sum + p.likes, 0), label: 'TOTAL LIKES' },
+    { value: showcaseProjects.reduce((sum, p) => sum + p.likes, 0), label: 'TOTAL LIKES' }
+  ];
+
   // Event handlers
   const handleProjectView = (project) => {
     console.log('View project:', project);
     navigate(`/project/${project.id}`);
-  };
-
-  const handleProjectDonate = (project) => {
-    handleProjectDonate(project);
   };
 
   const handleCommissionView = (commission) => {

@@ -240,10 +240,6 @@ const CommunityPage = () => {
   const stats = [
     { value: showcaseProjects.length, label: 'PROJECTS' },
     { value: showcaseProjects.reduce((sum, p) => sum + p.likes, 0), label: 'TOTAL LIKES' },
-    { value: `$${showcaseProjects.reduce((sum, p) => sum + p.donations, 0).toLocaleString()}`, label: 'DONATED' },
-    { value: commissionRequests.length, label: 'OPEN JOBS' }
-  ];
-
   // Event handlers
   const handleProjectView = (project) => {
     console.log('View project:', project);
@@ -252,10 +248,6 @@ const CommunityPage = () => {
 
   const handleProjectDonate = (project) => {
     handleProjectDonate(project);
-  };
-
-  const handleProjectHire = (project) => {
-    console.log('Hire creator:', project.creator);
   };
 
   const handleCommissionView = (commission) => {

@@ -303,24 +303,15 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
           <DragOverlay adjustScale={true}>
             {activeId && activeBlock && (
               <DraggableBlock
+                id={activeBlock.id}
+                block={activeBlock}
                 bg="#333"
                 border="1px solid #4ecdc4"
                 borderRadius="md"
                 p={2}
                 boxShadow="0 0 10px rgba(78, 205, 196, 0.5)"
                 maxW="600px"
-              >
-                <ChakraText
-                  as="div"
-                  fontFamily="monospace"
-                  fontSize="sm"
-                  color="#ccc"
-                  pl={(activeBlock.indentation || 0) / 2 + "px"}
-                  whiteSpace="pre"
-                >
-                  {activeBlock.content}
-                </ChakraText>
-              </DraggableBlock>
+              />
             )}
           </DragOverlay>
         </DndContext>

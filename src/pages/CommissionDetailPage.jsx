@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useCommissionSystem } from '../hooks/useCommissionSystem';
 import { PageLayout, SectionLayout } from '../design/layouts/PageLayout';
 import { Card } from '../design/components/Card';
-import { Text, Heading } from '../design/components/Typography';
+import { CustomText as Text, Heading } from '../design/components/Typography';
 import { Button as CustomButton } from '../design/components/Button';
 import { designSystem } from '../design/system/DesignSystem';
 

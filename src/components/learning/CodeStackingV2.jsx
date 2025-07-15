@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { 
   arrayMove, 
-  SortableContext, 
+  SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy
 } from "@dnd-kit/sortable";
@@ -295,6 +295,7 @@ const CodeStackingV2 = ({ code, language = "javascript", onComplete = () => {} }
                 maxW="600px"
               >
                 <Text
+                  as="div"
                   fontFamily="monospace"
                   fontSize="sm"
                   color="#ccc"

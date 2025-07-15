@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text as ChakraText } from "@chakra-ui/react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -46,7 +46,7 @@ const SortableBlock = ({
       role="listitem"
       aria-label={`Code block: ${block.content.substring(0, 20)}${block.content.length > 20 ? '...' : ''}`}
     >
-      <Text
+      <ChakraText
         fontFamily="monospace"
         fontSize="sm"
         color="#ccc"
@@ -54,7 +54,7 @@ const SortableBlock = ({
         whiteSpace="pre"
       >
         {block.content}
-      </Text>
+      </ChakraText>
     </Box>
   );
 };

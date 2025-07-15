@@ -2,7 +2,7 @@ import React from 'react';
 import { VStack, HStack, Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Card } from '../../design/components/Card';
-import { Text, Heading } from '../../design/components/Typography';
+import { CustomText as Text, Heading } from '../../design/components/Typography';
 import { designSystem } from '../../design/system/DesignSystem';
 
 const MotionBox = motion.div;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Badge, Image } from "@chakra-ui/react";
 import { Card } from '../../design/components/Card';
-import { Text, Heading } from '../../design/components/Typography';
+import { CustomText as Text, Heading } from '../../design/components/Typography';
 import { Button as CustomButton } from '../../design/components/Button';
 import { designSystem } from '../../design/system/DesignSystem';
 

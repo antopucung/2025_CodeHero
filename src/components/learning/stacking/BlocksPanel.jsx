@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, VStack } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack } from "@chakra-ui/react";
 import DraggableBlock from "./DraggableBlock";
 
 /**
@@ -18,9 +18,9 @@ const BlocksPanel = ({ blocks }) => {
       role="region"
       aria-label="Available code blocks"
     >
-      <Text color="#666" mb={3} fontWeight="bold">
+      <ChakraText color="#666" mb={3} fontWeight="bold">
         Available Blocks:
-      </Text>
+      </ChakraText>
       
       <VStack 
         align="stretch" 
@@ -37,9 +37,9 @@ const BlocksPanel = ({ blocks }) => {
         ))}
 
         {blocks.length === 0 && (
-          <Text color="#666" textAlign="center" p={4}>
+          <ChakraText color="#666" textAlign="center" p={4}>
             All blocks placed!
-          </Text>
+          </ChakraText>
         )}
       </VStack>
     </Box>

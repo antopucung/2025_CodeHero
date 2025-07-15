@@ -1,7 +1,7 @@
 import React from 'react';
 import { VStack, HStack } from "@chakra-ui/react";
 import { Card } from '../../design/components/Card';
-import { Text, Heading } from '../../design/components/Typography';
+import { CustomText as Text, Heading } from '../../design/components/Typography';
 import { designSystem } from '../../design/system/DesignSystem';
 
 export const RecentActivity = () => {

@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, HStack, VStack, Badge, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Card } from './Card';
-import { Text } from './Typography';
+import { CustomText as Text } from './Typography';
 import { Button } from './Button';
 import { designSystem } from '../system/DesignSystem';
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text, VStack } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack } from "@chakra-ui/react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import SortableBlock from "./SortableBlock";
 
@@ -24,9 +24,9 @@ const SolutionArea = ({
       role="region"
       aria-label="Solution area"
     >
-      <Text color="#666" mb={3} fontWeight="bold">
+      <ChakraText color="#666" mb={3} fontWeight="bold">
         Your Solution:
-      </Text>
+      </ChakraText>
       
       {/* Drop indicator overlay */}
       {isDragging && (
@@ -45,9 +45,9 @@ const SolutionArea = ({
           alignItems="center"
           justifyContent="center"
         >
-          <Text color="#4ecdc4" fontSize="sm">
+          <ChakraText color="#4ecdc4" fontSize="sm">
             Drop to place block
-          </Text>
+          </ChakraText>
         </Box>
       )}
       
@@ -64,9 +64,9 @@ const SolutionArea = ({
           aria-label="Placed code blocks"
         >
           {blocks.length === 0 ? (
-            <Text color="#666" textAlign="center" py={10}>
+            <ChakraText color="#666" textAlign="center" py={10}>
               {isDragging ? "Drop your first block here" : "Drag blocks here to build your solution"}
-            </Text>
+            </ChakraText>
           ) : (
             blocks.map((block) => (
               <SortableBlock

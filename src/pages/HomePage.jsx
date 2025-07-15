@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Grid, Text, VStack, HStack, Button, Badge } from '@chakra-ui/react';
+import { Box, Grid, Text as ChakraText, VStack, HStack, Button, Badge } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,7 +28,7 @@ const FeatureCard = ({ title, description, icon, color, route, comingSoon = fals
             {title}
           </Text>
         </HStack>
-        <Text color="#ccc">{description}</Text>
+        <ChakraText color="#ccc">{description}</ChakraText>
         {comingSoon ? (
           <Badge bg="#333" color="#ccc">Coming Soon</Badge>
         ) : (
@@ -136,19 +136,19 @@ const HomePage = () => {
             href="#features"
             colorScheme="green"
             size="lg"
-            fontWeight="bold"
-            px={8}
+            </ChakraText>
+            <ChakraText fontSize="2xl" color="#ccc" maxW="800px" mx="auto">
           >
-            Explore Features
+            </ChakraText>
           </Button>
         </MotionBox>
       </Box>
       
       {/* Features section */}
       <Box id="features" py={16} px={8}>
-        <Text fontSize="3xl" fontWeight="bold" color="#00ff00" mb={12} textAlign="center">
+        <ChakraText fontSize="3xl" fontWeight="bold" color="#00ff00" mb={12} textAlign="center">
           Interactive Features
-        </Text>
+        </ChakraText>
         
         <Grid
           templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}

@@ -136,10 +136,8 @@ const HomePage = () => {
             href="#features"
             colorScheme="green"
             size="lg"
-            </ChakraText>
-            <ChakraText fontSize="2xl" color="#ccc" maxW="800px" mx="auto">
           >
-            </ChakraText>
+            Get Started
           </Button>
         </MotionBox>
       </Box>

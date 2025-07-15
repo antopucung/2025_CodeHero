@@ -3,7 +3,7 @@ import React from 'react';
 import { Text as ChakraText, Heading as ChakraHeading } from '@chakra-ui/react';
 import { designSystem } from '../system/DesignSystem';
 
-export const Text = ({ 
+export const CustomText = ({ 
   variant = 'body', 
   size = 'base',
   color = 'primary',

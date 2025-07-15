@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { useGameProgress } from '../hooks/useGameProgress';
 import { PageLayout, SectionLayout, GridLayout } from '../design/layouts/PageLayout';
-import { Text } from '../design/components/Typography';
+import { CustomText } from '../design/components/Typography';
 import { Button } from '../design/components/Button';
 import { PageHeader } from '../design/components/PageHeader';
 import { 
@@ -324,9 +324,9 @@ const CommunityPage = () => {
             <TabPanel p={0} pt={designSystem.spacing[6]}>
               <SectionLayout spacing="loose">
                 <Box display="flex" justifyContent="space-between" alignItems="center" w="100%">
-                  <Text size="xl" color="brand" fontWeight={designSystem.typography.weights.bold}>
+                  <CustomText size="xl" color="brand" fontWeight={designSystem.typography.weights.bold}>
                     Community Project Showcase
-                  </Text>
+                  </CustomText>
                   <Button
                     bg={designSystem.colors.brand.primary}
                     color={designSystem.colors.text.inverse}
@@ -365,12 +365,12 @@ const CommunityPage = () => {
               <SectionLayout spacing="loose">
                 <Box display="flex" justifyContent="space-between" alignItems="start" w="100%">
                   <Box>
-                    <Text size="xl" color="secondary" fontWeight={designSystem.typography.weights.bold}>
+                    <CustomText size="xl" color="secondary" fontWeight={designSystem.typography.weights.bold}>
                       Active Commission Requests
-                    </Text>
-                    <Text size="sm" color="muted">
+                    </CustomText>
+                    <CustomText size="sm" color="muted">
                       {commissionRequests.length} open projects • Total budget: $15,000+
-                    </Text>
+                    </CustomText>
                   </Box>
                   <Button
                     bg={designSystem.colors.brand.secondary}
@@ -425,12 +425,12 @@ const CommunityPage = () => {
             <TabPanel p={0} pt={designSystem.spacing[6]}>
               <SectionLayout spacing="loose">
                 <Box display="flex" justifyContent="space-between" alignItems="center" w="100%">
-                  <Text size="xl" color="accent" fontWeight={designSystem.typography.weights.bold}>
+                  <CustomText size="xl" color="accent" fontWeight={designSystem.typography.weights.bold}>
                     Active Collaborations
-                  </Text>
-                  <Text size="sm" color="muted">
+                  </CustomText>
+                  <CustomText size="sm" color="muted">
                     {activeCollaborations.length} ongoing projects
-                  </Text>
+                  </CustomText>
                 </Box>
 
                 <Box display="flex" flexDirection="column" gap={designSystem.spacing[4]} w="100%">
@@ -449,9 +449,9 @@ const CommunityPage = () => {
             <TabPanel p={0} pt={designSystem.spacing[6]}>
               <SectionLayout spacing="loose">
                 <Box display="flex" justifyContent="space-between" alignItems="center" w="100%">
-                  <Text size="xl" color="error" fontWeight={designSystem.typography.weights.bold}>
+                  <CustomText size="xl" color="error" fontWeight={designSystem.typography.weights.bold}>
                     Creator Directory
-                  </Text>
+                  </CustomText>
                   <Button
                     bg={designSystem.colors.brand.error}
                     color={designSystem.colors.text.inverse}

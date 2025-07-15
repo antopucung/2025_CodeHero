@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, HStack, VStack } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { Heading, Text, Caption } from './Typography';
+import { Heading, CustomText, Caption } from './Typography';
 import { Button } from './Button';
 import { designSystem } from '../system/DesignSystem';
 
@@ -42,9 +42,9 @@ export const PageHeader = ({
           </Heading>
           
           {subtitle && (
-            <Text size="lg" color="secondary">
+            <CustomText size="lg" color="secondary">
               {subtitle}
-            </Text>
+            </CustomText>
           )}
         </MotionBox>
 
@@ -53,13 +53,13 @@ export const PageHeader = ({
           <HStack spacing={designSystem.spacing[6]} justify="center" flexWrap="wrap">
             {stats.map((stat, index) => (
               <VStack key={index} spacing={0}>
-                <Text 
+                <CustomText 
                   size="xl" 
                   color="accent" 
                   fontWeight={designSystem.typography.weights.bold}
                 >
                   {stat.value}
-                </Text>
+                </CustomText>
                 <Caption>{stat.label}</Caption>
               </VStack>
             ))}
@@ -100,9 +100,9 @@ export const SectionHeader = ({
           {title}
         </Heading>
         {subtitle && (
-          <Text size="sm" color="muted">
+          <CustomText size="sm" color="muted">
             {subtitle}
-          </Text>
+          </CustomText>
         )}
       </VStack>
       

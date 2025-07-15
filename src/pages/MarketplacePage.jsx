@@ -8,7 +8,7 @@ import { useUserEnrollment } from '../hooks/useUserEnrollment';
 import { PageLayout, SectionLayout, GridLayout } from '../design/layouts/PageLayout';
 import { PageHeader } from '../design/components/PageHeader';
 import { CourseCard } from '../design/components/Card';
-import { Text } from '../design/components/Typography';
+import { CustomText } from '../design/components/Typography';
 import { Button } from '../design/components/Button';
 import { designSystem } from '../design/system/DesignSystem';
 
@@ -69,9 +69,9 @@ const MarketplacePage = () => {
           >
             ⚡
           </MotionBox>
-          <Text color="brand">
+          <CustomText color="brand">
             Loading Marketplace...
-          </Text>
+          </CustomText>
         </VStack>
       </PageLayout>
     );
@@ -101,9 +101,9 @@ const MarketplacePage = () => {
         {/* Enrolled Courses Quick Access */}
         {enrolledCourses.length > 0 && (
           <VStack spacing={designSystem.spacing[3]}>
-            <Text size="lg" color="secondary" fontWeight="bold">
+            <CustomText size="lg" color="secondary" fontWeight="bold">
               📚 My Courses ({enrolledCourses.length})
-            </Text>
+            </CustomText>
             <HStack spacing={designSystem.spacing[2]} flexWrap="wrap" justify="center">
               {enrolledCourses.slice(0, 4).map((course) => (
                 <Button
@@ -116,7 +116,7 @@ const MarketplacePage = () => {
                 </Button>
               ))}
               {enrolledCourses.length > 4 && (
-                <Text size="xs" color="muted">+{enrolledCourses.length - 4} more</Text>
+                <CustomText size="xs" color="muted">+{enrolledCourses.length - 4} more</CustomText>
               )}
             </HStack>
           </VStack>
@@ -125,12 +125,12 @@ const MarketplacePage = () => {
         {/* Courses Section */}
         <Box>
           <HStack justify="space-between" w="100%">
-            <Text size="xl" color="brand" fontWeight="bold">
+            <CustomText size="xl" color="brand" fontWeight="bold">
               Featured Courses
-            </Text>
-            <Text size="sm" color="muted">
+            </CustomText>
+            <CustomText size="sm" color="muted">
               {courses.length} courses available
-            </Text>
+            </CustomText>
           </HStack>
 
           <GridLayout 
@@ -186,13 +186,13 @@ const MarketplacePage = () => {
           textAlign="center"
         >
           <Box mb={designSystem.spacing[2]}>
-            <Text size="lg" color="accent" fontWeight="bold">
+            <CustomText size="lg" color="accent" fontWeight="bold">
               🚀 More Courses Coming Soon!
-            </Text>
+            </CustomText>
           </Box>
-          <Text size="sm" color="muted">
+          <CustomText size="sm" color="muted">
               Advanced React, Node.js, Machine Learning, Game Development, and more...
-          </Text>
+          </CustomText>
         </MotionBox>
       </SectionLayout>
     </PageLayout>

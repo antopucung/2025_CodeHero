@@ -89,121 +89,70 @@ const UnityCodeEditor = ({
       
       // For Unity C#, we add some wrapper code to make it runnable in isolation
       // since Unity components rely on MonoBehaviour
-      const wrappedCode = `// Unity simulation wrapper
-using System;
+      const wrappedCode = `using System;
 using System.Collections.Generic;
 
-// Simulated Unity environment
-static class UnityEngine 
-{
-  public static class Debug 
-  {
-    public static void Log(object message) 
-    {
-      Console.WriteLine("[Unity Debug]: " + message);
+namespace UnitySimulation {
+  // Unity simulation environment
+  public static class UnityEngine {
+    public static class Debug {
+      public static void Log(string message) {
+        Console.WriteLine("[Unity Debug]: " + message);
+      }
+    }
+    
+    public class Vector3 {
+      public float x, y, z;
+      public static Vector3 up = new Vector3(0, 1, 0);
+      public static Vector3 right = new Vector3(1, 0, 0);
+      
+      public Vector3(float x = 0, float y = 0, float z = 0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+      }
+    }
+    
+    public class MonoBehaviour {}
+    
+    public static class Time {
+      public static float deltaTime = 0.016f; // ~60fps
     }
   }
   
-  public class Vector3 
-  {
-    public float x, y, z;
-    
-    public Vector3(float x = 0, float y = 0, float z = 0) 
-    {
-      this.x = x;
-      this.y = y;
-      this.z = z;
-    }
-    
-    public static Vector3 zero = new Vector3(0, 0, 0);
-    public static Vector3 one = new Vector3(1, 1, 1);
-    public static Vector3 up = new Vector3(0, 1, 0);
-    public static Vector3 down = new Vector3(0, -1, 0);
-    public static Vector3 left = new Vector3(-1, 0, 0);
-    public static Vector3 right = new Vector3(1, 0, 0);
-    public static Vector3 forward = new Vector3(0, 0, 1);
-    public static Vector3 back = new Vector3(0, 0, -1);
-    
-    public override string ToString()
-    {
-      return $"({x}, {y}, {z})";
-    }
-  }
+  // User code starts here
+  ${sourceCode}
   
-  public class MonoBehaviour 
-  {
-    // Empty base class for Unity components
-  }
-  
-  public static class Time 
-  {
-    public static float deltaTime = 0.016f; // ~60fps
-  }
-  
-  public class Transform
-  {
-    public Vector3 position = new Vector3();
-    public Vector3 rotation = new Vector3();
-    public Vector3 scale = new Vector3(1, 1, 1);
-    
-    public void Translate(Vector3 translation)
-    {
-      position.x += translation.x;
-      position.y += translation.y;
-      position.z += translation.z;
-    }
-  }
-}
-
-// User code starts here
-${sourceCode}
-
-// Test execution
-class Program
-{
-  static void Main()
-  {
-    try
-    {
+  // Test execution code
+  public class Program {
+    public static void Main() {
       Console.WriteLine("[Unity Simulation Started]");
-      
-      // Create player instance
-      var player = new PlayerController();
-      
-      // Add simulated transform component
-      var transform = new UnityEngine.Transform();
-      
-      // Use reflection to set the transform field if it exists
-      var transformField = typeof(PlayerController).GetField("transform");
-      if (transformField != null)
-      {
-        transformField.SetValue(player, transform);
-      }
-      
-      // Simulate Start method
+      // Instantiate player controller
       try {
-        Console.WriteLine("[Calling Start method]");
-        player.Start();
-      } catch (Exception e) {
-        Console.WriteLine("Error in Start(): " + e.Message);
-      }
-      
-      // Simulate a few Update calls
-      Console.WriteLine("[Running Update frames...]");
-      for (int i = 0; i < 3; i++) {
+        var player = new PlayerController();
+        
+        // Simulate Start method call
         try {
-          Console.WriteLine("Frame " + (i+1));
-          player.Update();
+          player.Start();
         } catch (Exception e) {
-          Console.WriteLine("Error in Update(): " + e.Message);
+          Console.WriteLine("Error in Start(): " + e.Message);
         }
+        
+        // Simulate a few Update calls
+        Console.WriteLine("[Running Update frames...]");
+        for (int i = 0; i < 3; i++) {
+          try {
+            Console.WriteLine("Frame " + (i+1));
+            player.Update();
+          } catch (Exception e) {
+            Console.WriteLine("Error in Update(): " + e.Message);
+          }
+        }
+        Console.WriteLine("[Unity Simulation Completed]");
       }
-      
-      Console.WriteLine("[Unity Simulation Completed]");
-    }
-    catch (Exception e) {
-      Console.WriteLine("[Error]: " + e.Message);
-      Console.WriteLine(e.StackTrace);
+      catch (Exception e) {
+        Console.WriteLine("Error: " + e.Message);
+      }
     }
   }
 }`;
@@ -214,14 +163,12 @@ class Program
       // Parse and format the output
       let formattedOutput = result.output;
       const hasError = result.stderr ? true : false;
-      const hasCompilationError = formattedOutput.includes("error CS") || result.stderr;
       
       // Format Unity debug logs for better visibility
-      if (!hasCompilationError) {
+      if (!hasError) {
         try {
           formattedOutput = formattedOutput.replace(/\[Unity Debug\]:/g, '🎮 ');
           formattedOutput = formattedOutput.replace(/\[Unity Simulation Started\]/g, '🚀 Unity Simulation Started\n');
-          formattedOutput = formattedOutput.replace(/\[Calling Start method\]/g, '⚡ Calling Start method\n');
           formattedOutput = formattedOutput.replace(/\[Running Update frames\.\.\.\]/g, '\n⏱️ Running Update Frames...\n');
           formattedOutput = formattedOutput.replace(/\[Unity Simulation Completed\]/g, '\n✅ Unity Simulation Completed');
           
@@ -241,14 +188,14 @@ class Program
       
       setOutput({
         text: formattedOutput,
-        hasError: hasCompilationError,
+        hasError: hasError,
         stderr: result.stderr
       });
       
       // Callback if provided
       if (onExecutionComplete) {
         onExecutionComplete({
-          success: !hasCompilationError,
+          success: !hasError,
           output: formattedOutput,
           code: sourceCode
         });
@@ -286,17 +233,17 @@ class Program
     >
       {/* Header */}
       <HStack 
-        bg="#000" 
+        bg="#111" 
         p={3} 
         borderBottom="1px solid #333"
         justify="space-between"
       >
         <HStack>
-          <Text color="#00ff00" fontWeight="bold" fontSize="sm">
+          <Text color="#00ff00" fontWeight="bold" fontSize="sm" whiteSpace="nowrap">
             {title}
           </Text>
-          <Badge colorScheme="green">C#</Badge>
-          <Badge colorScheme="purple">Unity</Badge>
+          <Badge colorScheme="green" fontSize="xs">C#</Badge>
+          <Badge colorScheme="purple" fontSize="xs">Unity</Badge>
         </HStack>
         
         <HStack>
@@ -304,6 +251,7 @@ class Program
             size="xs"
             variant="outline"
             colorScheme="gray"
+            whiteSpace="nowrap"
             onClick={resetCode}
             isDisabled={isExecuting}
           >
@@ -312,6 +260,7 @@ class Program
           <Button
             size="xs"
             colorScheme="green"
+            whiteSpace="nowrap"
             onClick={runCode}
             isLoading={isExecuting}
             loadingText="Running..."
@@ -447,7 +396,7 @@ class Program
                 </Box>
                 
                 {/* Only show "Success" badge when there was no error and execution was successful */}
-                {!output.hasError && output.text.includes("Unity Simulation Completed") && (
+                {!output.hasError && !output.text.includes("error CS") && (
                   <HStack justify="flex-end">
                     <Badge colorScheme="green">
                       Execution Successful

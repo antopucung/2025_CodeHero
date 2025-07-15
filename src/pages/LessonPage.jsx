@@ -179,7 +179,7 @@ const LessonPage = () => {
               </Text>
 
               {contentData.code_example && (
-                course?.language === "csharp" ? (
+                (course?.language === "csharp" && contentData.execution_environment === "unity") ? (
                   <UnityCodeEditor
                     initialCode={contentData.code_example}
                     title={contentData.code_title || "Unity C# Example"}
@@ -213,6 +213,12 @@ const LessonPage = () => {
                     onExecutionComplete={(result) => {
                       if (result.success) {
                         // Could award points or mark progress
+                        handleLessonComplete({
+                          score: 50,
+                          accuracy: 100,
+                          wpm: 0,
+                          executionSuccess: true
+                        });
                       }
                     }}
                   />

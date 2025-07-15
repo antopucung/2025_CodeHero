@@ -330,7 +330,9 @@ public class UnitySimulation
       bg="#111"
       border="1px solid #333"
       borderRadius="md"
-      overflow="hidden"
+      overflow="hidden" 
+      width="100%"
+      maxWidth="100%"
     >
       {/* Header */}
       <HStack 
@@ -371,11 +373,18 @@ public class UnitySimulation
       </HStack>
       
       {/* Main Content: Editor + Preview Split */}
-      <Flex direction={{ base: "column", md: "row" }} h="100%">
+      <Flex 
+        direction={{ base: "column", md: "row" }} 
+        h="100%" 
+        width="100%" 
+        overflow="hidden"
+      >
         {/* Code Editor Panel */}
         <Box
           width={{ base: "100%", md: "50%" }}
           borderRight={{ md: "1px solid #333" }}
+          minWidth="0" 
+          overflow="hidden"
         >
           <Box height="400px">
             <Editor
@@ -433,6 +442,8 @@ public class UnitySimulation
         {/* Preview Panel */}
         <Box
           width={{ base: "100%", md: "50%" }}
+          minWidth="0"
+          overflow="hidden"
         >
           {/* Preview Header */}
           <Box
@@ -444,12 +455,11 @@ public class UnitySimulation
           </Box>
           
           {/* Output/Preview Area */}
-          <Box 
+          <Box  
             p={4} 
             bg="#000"
-            minHeight="400px"
-            overflowX="auto"
-            overflowY="auto"
+            height="400px"
+            overflow="auto"
             whiteSpace="pre"
             fontFamily="monospace"
           >
@@ -475,7 +485,7 @@ public class UnitySimulation
                 {output.text}
                 
                 {/* Show execution status at the bottom */}
-                {!output.hasError && output.isSuccessful && (
+                {output.isSuccessful && (
                   <Box mt={4} textAlign="right">
                     <Badge bg="#043300" color="#00ff00" fontSize="xs" p={1}>
                       Execution Successful
@@ -485,9 +495,15 @@ public class UnitySimulation
                 
                 {/* Show error note if compilation failed */}
                 {output.hasError && (
-                  <Box mt={4} color="#ff6b6b" fontSize="sm">
-                    Compilation failed. Please fix the errors above.
-                  </Box>
+                  <VStack spacing={2} mt={4} align="start">
+                    <Box color="#ff6b6b" fontSize="sm" fontWeight="bold">
+                      Compilation failed. Please fix the errors above.
+                    </Box>
+                    
+                    <Box color="#ff9999" fontSize="xs">
+                      ⚠️ Note: Your code compiled but didn't produce any Unity debug output. Make sure your class is named "PlayerController" and inherits from MonoBehaviour.
+                    </Box>
+                  </VStack>
                 )}
               </Box>
             )}

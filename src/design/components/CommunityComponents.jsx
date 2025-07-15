@@ -54,10 +54,11 @@ export const CommissionCard = ({
         }}
         bg={designSystem.colors.backgrounds.elevated}
         borderColor={designSystem.colors.borders.default}
+        p={designSystem.spacing[6]}
       >
-        <VStack spacing={designSystem.spacing[4]} align="stretch">
+        <VStack spacing={designSystem.spacing[5]} align="stretch">
           <HStack justify="space-between" align="start">
-            <VStack align="start" spacing={designSystem.spacing[1]} flex={1}>
+            <VStack align="start" spacing={designSystem.spacing[2]} flex={1}>
               <Text size="lg" color="secondary" fontWeight={designSystem.typography.weights.bold}>
                 {request.title}
               </Text>
@@ -71,7 +72,7 @@ export const CommissionCard = ({
                 </Text>
               </HStack>
             </VStack>
-            <VStack align="end" spacing={designSystem.spacing[1]}>
+            <VStack align="end" spacing={designSystem.spacing[2]}>
               <Badge bg={getDifficultyColor(request.difficulty)} color={designSystem.colors.text.inverse}>
                 {request.difficulty.toUpperCase()}
               </Badge>
@@ -81,62 +82,82 @@ export const CommissionCard = ({
             </VStack>
           </HStack>
 
-          <Text size="sm" color="secondary" lineHeight="1.6">
-            {request.description}
-          </Text>
+          <Box 
+            bg={designSystem.colors.backgrounds.secondary} 
+            borderRadius={designSystem.radii.md}
+            px={designSystem.spacing[4]}
+            py={designSystem.spacing[3]}
+          >
+            <Text size="sm" color="secondary" lineHeight="1.6">
+              {request.description}
+            </Text>
+          </Box>
 
-          <HStack spacing={designSystem.spacing[1]} flexWrap="wrap">
+          <HStack spacing={designSystem.spacing[2]} flexWrap="wrap" px={designSystem.spacing[1]}>
             {request.tags.map((tag, i) => (
               <Badge 
                 key={i} 
                 bg={designSystem.colors.brand.secondary} 
                 color={designSystem.colors.text.inverse}
+                m={designSystem.spacing[1]}
               >
                 {tag}
               </Badge>
             ))}
           </HStack>
 
-          <HStack justify="space-between" align="center">
-            <VStack align="start" spacing={0}>
-              <Text size="sm" color="muted">Budget</Text>
-              <Text size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
-                {getBudgetRange(request.budget)}
-              </Text>
-            </VStack>
-            <VStack align="center" spacing={0}>
-              <Text size="sm" color="muted">Timeline</Text>
-              <Text size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-                {request.timeline}
-              </Text>
-            </VStack>
-            <VStack align="end" spacing={0}>
-              <Text size="sm" color="muted">Applications</Text>
-              <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
-                {request.applications}
-              </Text>
-            </VStack>
-          </HStack>
+          <Box 
+            bg={designSystem.colors.backgrounds.secondary} 
+            borderRadius={designSystem.radii.md}
+            px={designSystem.spacing[4]}
+            py={designSystem.spacing[5]}
+            mx={designSystem.spacing[1]}
+          >
+            <HStack justify="space-between" align="center" spacing={designSystem.spacing[4]}>
+              <VStack align="start" spacing={designSystem.spacing[1]}>
+                <Text size="sm" color="muted">Budget</Text>
+                <Text size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
+                  {getBudgetRange(request.budget)}
+                </Text>
+              </VStack>
+              <VStack align="center" spacing={designSystem.spacing[1]}>
+                <Text size="sm" color="muted">Timeline</Text>
+                <Text size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
+                  {request.timeline}
+                </Text>
+              </VStack>
+              <VStack align="end" spacing={designSystem.spacing[1]}>
+                <Text size="sm" color="muted">Applications</Text>
+                <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
+                  {request.applications}
+                </Text>
+              </VStack>
+            </HStack>
+          </Box>
 
-          <HStack spacing={designSystem.spacing[2]}>
-            <Button
-              variant="secondary"
-              size="sm"
-              flex={1}
-              onClick={() => onViewDetails?.(request)}
-            >
-              📋 View Details
-            </Button>
-            <Button
-              bg={designSystem.colors.brand.secondary}
-              color={designSystem.colors.text.inverse}
-              size="sm"
-              flex={1}
-              onClick={() => onApply?.(request)}
-            >
-              🚀 Apply Now
-            </Button>
-          </HStack>
+          <Box px={designSystem.spacing[1]} mt={designSystem.spacing[2]}>
+            <HStack spacing={designSystem.spacing[3]}>
+              <Button
+                variant="secondary"
+                size="sm"
+                flex={1}
+                h={designSystem.spacing[12]}
+                onClick={() => onViewDetails?.(request)}
+              >
+                📋 View Details
+              </Button>
+              <Button
+                bg={designSystem.colors.brand.secondary}
+                color={designSystem.colors.text.inverse}
+                size="sm"
+                flex={1}
+                h={designSystem.spacing[12]}
+                onClick={() => onApply?.(request)}
+              >
+                🚀 Apply Now
+              </Button>
+            </HStack>
+          </Box>
         </VStack>
       </Card>
     </MotionBox>

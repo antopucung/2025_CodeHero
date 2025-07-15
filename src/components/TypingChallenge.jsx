@@ -1,6 +1,6 @@
 // Updated Typing Challenge Component - Using new engine
 import React, { useState, useEffect } from "react";
-import { Box, Text, VStack, Button } from "@chakra-ui/react";
+import { Box, Text, VStack, Button, HStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { createTypingEngine } from "../engine/engineFactory";
 import { ConceptualTypingDisplay } from "../engine/components/ConceptualTypingDisplay";
@@ -232,6 +232,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
                 size={fullScreen ? "xl" : "lg"}
               >
                 🚀 BEGIN QUEST 🚀
+              </Button>
             </MotionBox>
           </VStack>
         </TerminalPanel>

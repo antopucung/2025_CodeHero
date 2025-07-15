@@ -128,10 +128,10 @@ export class CodeQuizEngine {
     console.log("User solution after placement:", this.state.userSolution);
     
     // Check if placement is correct
-    const placementIndex = insertIndex >= 0 ? insertIndex : this.state.userSolution.length - 1;
-    console.log(`Checking placement for block ${block.id} at index ${placementIndex}`);
-    console.log(`Expected solution block at this index:`, this.state.solution[placementIndex]);
-    const isCorrect = this.checkPlacement(block, placementIndex);
+    // After placing, check if the block at the inserted position matches the solution
+    const isCorrect = this.state.userSolution[insertIndex].id === this.state.solution[insertIndex].id;
+    console.log(`Checking placement for block ${block.id} at index ${insertIndex}. Is it correct? ${isCorrect}`);
+    console.log(`Expected solution block at this index:`, this.state.solution[insertIndex]);
     console.log("Placement correct?", isCorrect);
     
     if (isCorrect) {
@@ -187,25 +187,20 @@ export class CodeQuizEngine {
       }
     }
     
-    // Check if quiz is complete
-    if (this.state.userSolution.length === this.state.solution.length && this.areAllPlacementsCorrect()) {
-      // Only call complete if all blocks are placed AND they are all correct
-      console.log("All blocks placed correctly, completing quiz");
-      this.complete();
-    }
-    
     return isCorrect;
   }
   
   // Check if all current placements are correct
   areAllPlacementsCorrect() {
-    if (this.state.userSolution.length !== this.state.solution.length) {
-      console.log("User solution length does not match actual solution length.");
+    // Only check if the user has placed the same number of blocks as in the solution
+    if (this.state.userSolution.length !== this.state.solution.length) { 
       return false;
     }
     
     for (let i = 0; i < this.state.userSolution.length; i++) {
-      if (this.state.userSolution[i].id !== this.state.solution[i].id) {
+      // Use strict equality (===) for comparison [2, 3, 4, 5, 6]
+      if (this.state.userSolution[i].id !== this.state.solution[i].id) { 
+        console.log(`Mismatch at index ${i}: User has ${this.state.userSolution[i].id}, Solution has ${this.state.solution[i].id}`);
         return false;
       }
       console.log(`Block ${this.state.userSolution[i].id} at index ${i} is correct.`);
@@ -214,26 +209,10 @@ export class CodeQuizEngine {
     return true;
   }
   
-  // Check if all current placements are correct
-  areAllPlacementsCorrect() {
-    // This function is duplicated, keeping it for now as per instructions. The one above is used.
-    if (this.state.userSolution.length !== this.state.solution.length) {
-      return false;
-    }
-    
-    for (let i = 0; i < this.state.userSolution.length; i++) {
-      if (this.state.userSolution[i].id !== this.state.solution[i].id) {
-        return false;
-      }
-    }
-    
-    return true;
-  }
-  
   // Check if a block is placed correctly
   checkPlacement(block, index) {
     if (index >= this.state.solution.length) return false;
-    return block.id === this.state.solution[index].id;
+++ b/src/components/learning/hooks/useCodeQuizEngine.js
   }
   
   // Complete the quiz
@@ -469,6 +448,12 @@ export const createCodeBlocksFromString = (code, blockType = 'line') => {
             lineNumber: lineNumber - currentBlock.split('\n').length
           });
         }
+      });
+
+      // After attempting to place, check if the quiz is now complete
+      if (quizEngineRef.current.areAllPlacementsCorrect()) {
+        console.log("All blocks are now correctly placed, completing quiz.");
+        quizEngineRef.current.complete();
         
         blocks.push({
           id: `block-${id++}`,

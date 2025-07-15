@@ -178,7 +178,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             >
               LANGUAGE: {challenge.language.toUpperCase()} | 
               DIFFICULTY: {challenge.difficulty.toUpperCase()}
-            </Text>
+            </Box>
             
             {/* Gamification Elements */}
             <MotionBox

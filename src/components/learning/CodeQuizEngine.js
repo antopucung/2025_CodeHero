@@ -212,7 +212,7 @@ export class CodeQuizEngine {
   // Check if a block is placed correctly
   checkPlacement(block, index) {
     if (index >= this.state.solution.length) return false;
-++ b/src/components/learning/hooks/useCodeQuizEngine.js
+    return block.id === this.state.solution[index].id;
   }
   
   // Complete the quiz
@@ -448,12 +448,6 @@ export const createCodeBlocksFromString = (code, blockType = 'line') => {
             lineNumber: lineNumber - currentBlock.split('\n').length
           });
         }
-      });
-
-      // After attempting to place, check if the quiz is now complete
-      if (quizEngineRef.current.areAllPlacementsCorrect()) {
-        console.log("All blocks are now correctly placed, completing quiz.");
-        quizEngineRef.current.complete();
         
         blocks.push({
           id: `block-${id++}`,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Text, Badge, Progress } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCodeQuizEngine } from './hooks/useCodeQuizEngine';
+import { useCodeQuizEngine } from '../../hooks/useCodeQuizEngine';
 import DraggableCodeBlock from './DraggableCodeBlock';
 import DropZone from './DropZone';
 import confetti from 'canvas-confetti';
@@ -84,6 +84,12 @@ const CodeStackingQuiz = ({
 
   // Determine the correct drop zone refs array
   const actualDropZoneRefs = dropZoneRefs.current || [];
+
+  console.log("CodeStackingQuiz rendering", { 
+    status: quizState.status,
+    blocks: quizState.blocks?.length,
+    userSolution: quizState.userSolution?.length
+  });
 
   return (
     <Box position="relative">
@@ -314,6 +320,11 @@ const CodeStackingQuiz = ({
                       language={language}
                     />
                   ))}
+                  {quizState.blocks.length === 0 && (
+                    <Text color="#666" fontSize="sm" textAlign="center" p={4}>
+                      All blocks placed!
+                    </Text>
+                  )}
                 </VStack>
               </Box>
               
@@ -327,17 +338,17 @@ const CodeStackingQuiz = ({
                         <DropZone 
                           key={`dropzone-${index}`}
                           index={index}
-                          ref={el => dropZoneRefs.current[index] = el}
+                          ref={el => actualDropZoneRefs[index] = el}
                           isActive={!!activeDragBlock}
                           highlightColor={gameEffects.streak >= 3 ? "#ffd93d" : "#4ecdc4"}
-                          onDrop={handleDropOnZone}
+                          onDrop={() => handleDropOnZone(index)}
                         >
                           {index < quizState.userSolution.length && (
                             <DraggableCodeBlock
                               key={`solution-${quizState.userSolution[index].id}`}
                               block={quizState.userSolution[index]}
                               isPlaced={true}
-                              isCorrect={true} // Assume correct for simplicity
+                              isCorrect={true}
                               language={language}
                             />
                           )}

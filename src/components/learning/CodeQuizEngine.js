@@ -51,6 +51,16 @@ export class CodeQuizEngine {
   
   // Set up quiz with code blocks
   setup(codeBlocks, solution) {
+    if (!codeBlocks || !Array.isArray(codeBlocks) || codeBlocks.length === 0) {
+      console.error("Invalid code blocks provided to quiz engine", codeBlocks);
+      throw new Error("Invalid code blocks provided to quiz engine");
+    }
+    
+    if (!solution || !Array.isArray(solution) || solution.length === 0) {
+      console.error("Invalid solution provided to quiz engine", solution);
+      throw new Error("Invalid solution provided to quiz engine");
+    }
+    
     this.state.blocks = [...codeBlocks];
     this.state.solution = [...solution];
     this.state.userSolution = [];
@@ -62,15 +72,23 @@ export class CodeQuizEngine {
     this.state.correctPlacements = 0;
     this.state.incorrectPlacements = 0;
     this.state.isComplete = false;
+    this.state.timeRemaining = this.options.timeLimit;
     
     // Shuffle blocks for presentation
     this.shuffleBlocks();
+    
+    console.log("Quiz engine setup complete", {
+      blockCount: this.state.blocks.length,
+      solutionLength: this.state.solution.length,
+      timeLimit: this.options.timeLimit
+    });
     
     return this;
   }
   
   // Start the quiz
   start() {
+    console.log("Starting quiz");
     this.state.startTime = Date.now();
     this.state.status = 'active';
     this.state.timeRemaining = this.options.timeLimit;
@@ -91,12 +109,14 @@ export class CodeQuizEngine {
   // Add a block to the user solution
   placeBlock(blockId, insertIndex = -1) {
     if (this.state.status !== 'active') {
+      console.warn("Cannot place block: quiz is not active", this.state.status);
       return false;
     }
 
     // Find block in available blocks
     const blockIndex = this.state.blocks.findIndex(b => b.id === blockId);
     if (blockIndex === -1) {
+      console.warn("Block not found in available blocks", blockId);
       return false;
     }
     
@@ -198,7 +218,9 @@ export class CodeQuizEngine {
   
   // Check if a block is placed correctly
   checkPlacement(block, index) {
-    if (index >= this.state.solution.length) return false;
+    if (!block || index < 0 || index >= this.state.solution.length) {
+      return false;
+    }
     return block.id === this.state.solution[index].id;
   }
   

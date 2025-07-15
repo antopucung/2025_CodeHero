@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CodeQuizEngine, createCodeBlocksFromString } from '../components/learning/CodeQuizEngine';
-import { DebugHelper } from '../utils/debugHelper';
-import { logError } from '../utils/errorHandler';
 
 /**
  * Custom hook to handle all quiz engine state and logic
@@ -20,7 +18,7 @@ export const useCodeQuizEngine = ({
   // UI state
   const [quizState, setQuizState] = useState(null);
   const [activeDragBlock, setActiveDragBlock] = useState(null);
-  const [isDraggingBlock, setIsDraggingBlock] = useState(false); // New state
+  const [isDraggingBlock, setIsDraggingBlock] = useState(false);
   const [gameEffects, setGameEffects] = useState({
     combo: 1,
     lastAction: null,
@@ -49,11 +47,15 @@ export const useCodeQuizEngine = ({
   
   // Initialize quiz engine
   useEffect(() => {
-    if (!code) return;
+    if (!code) {
+      console.error("No code provided to useCodeQuizEngine");
+      return;
+    }
     
     try {
       // Create code blocks
       const codeBlocks = createCodeBlocksFromString(code, splitType);
+      console.log("Created code blocks:", codeBlocks.length);
       
       // Create quiz engine
       const quizEngine = new CodeQuizEngine({
@@ -68,6 +70,7 @@ export const useCodeQuizEngine = ({
       // Register event handlers
       quizEngine
         .on('start', (state) => {
+          console.log("Quiz started", state.status);
           setQuizState({...state});
           setGameEffects({
             combo: 1,
@@ -85,6 +88,7 @@ export const useCodeQuizEngine = ({
           });
         })
         .on('complete', (result) => {
+          console.log("Quiz completed", result);
           if (onComplete) {
             onComplete({
               score: result.score,
@@ -98,6 +102,7 @@ export const useCodeQuizEngine = ({
           }
         })
         .on('correct', (data) => {
+          console.log("Correct placement", data);
           setGameEffects(prev => {
             const newStreak = prev.streak + 1;
             
@@ -152,6 +157,7 @@ export const useCodeQuizEngine = ({
           });
         })
         .on('incorrect', (data) => {
+          console.log("Incorrect placement", data);
           // Flash screen on error
           setScreenFlash({ 
             active: true, 
@@ -185,6 +191,7 @@ export const useCodeQuizEngine = ({
           }));
         })
         .on('timeout', (result) => {
+          console.log("Quiz timeout", result);
           setGameEffects(prev => ({
             ...prev,
             lastAction: 'timeout',
@@ -212,10 +219,14 @@ export const useCodeQuizEngine = ({
           }
         })
         .on('tick', (data) => {
-          setQuizState(prevState => ({
-            ...prevState,
-            timeRemaining: data.timeRemaining
-          }));
+          setQuizState(prevState => {
+            // Only update if state exists and status is active
+            if (!prevState) return { ...quizEngine.getState() };
+            return {
+              ...prevState,
+              timeRemaining: data.timeRemaining
+            };
+          });
         });
       
       quizEngineRef.current = quizEngine;
@@ -241,14 +252,20 @@ export const useCodeQuizEngine = ({
 
   // Start the quiz
   const handleStart = () => {
+    console.log("handleStart called", quizEngineRef.current?.state?.status);
     if (quizEngineRef.current) {
       setIsPaused(false);
       quizEngineRef.current.start();
+      // Force update of state to ensure component re-renders
+      setQuizState({...quizEngineRef.current.getState()});
+    } else {
+      console.error("Quiz engine not initialized");
     }
   };
 
   // Reset the quiz
   const handleReset = () => {
+    console.log("handleReset called");
     if (quizEngineRef.current) {
       quizEngineRef.current.reset();
       setQuizState(quizEngineRef.current.getState());
@@ -260,29 +277,38 @@ export const useCodeQuizEngine = ({
         streak: 0,
         feedbackMessages: []
       });
+    } else {
+      console.error("Quiz engine not initialized");
     }
   };
 
   // Pause the quiz
   const handlePause = () => {
-    if (quizEngineRef.current && quizState.status === 'active') {
+    console.log("handlePause called");
+    if (quizEngineRef.current && quizState && quizState.status === 'active') {
       quizEngineRef.current.pause();
       setQuizState({ ...quizEngineRef.current.getState() });
       setIsPaused(true);
+    } else {
+      console.error("Cannot pause: quiz is not active", quizState?.status);
     }
   };
 
   // Resume the quiz
   const handleResume = () => {
-    if (quizEngineRef.current && quizState.status === 'paused') {
+    console.log("handleResume called");
+    if (quizEngineRef.current && quizState && quizState.status === 'paused') {
       quizEngineRef.current.resume();
       setQuizState({ ...quizEngineRef.current.getState() });
       setIsPaused(false);
+    } else {
+      console.error("Cannot resume: quiz is not paused", quizState?.status);
     }
   };
 
   // Close/Abort the quiz
   const handleAbort = () => {
+    console.log("handleAbort called");
     // If onClose prop exists (from parent QuizPopup), call it
     if (onComplete) {
       // Call onComplete with a failed result
@@ -298,23 +324,31 @@ export const useCodeQuizEngine = ({
 
   // Handle drag start
   const handleBlockDragStart = (block) => {
+    console.log("Block drag start", block.id);
     setActiveDragBlock(block);
     setIsDraggingBlock(true);
   };
 
   // Handle drag end for a block
   const handleBlockDragEnd = () => {
+    console.log("Block drag end");
     setActiveDragBlock(null);
     setIsDraggingBlock(false);
   };
 
   // Handle drop on a specific drop zone
   const handleDropOnZone = (dropZoneIndex) => {
+    console.log("Drop on zone", dropZoneIndex, activeDragBlock?.id);
     if (!activeDragBlock || !quizEngineRef.current) {
+      console.warn("Cannot drop: no active block or quiz engine");
       return;
     }
+    
     const result = quizEngineRef.current.placeBlock(activeDragBlock.id, dropZoneIndex);
-    setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
+    console.log("Place block result", result);
+    
+    // Force re-render with updated state
+    setQuizState({ ...quizEngineRef.current.getState() }); 
 
     // Trigger a small screen flash for feedback
     setScreenFlash({
@@ -341,16 +375,16 @@ export const useCodeQuizEngine = ({
     patternCelebrations,
     isPaused,
     activeDragBlock, 
-    isDraggingBlock, // Expose new state
+    isDraggingBlock,
     dropZoneRefs,
     handleStart,
     handleReset, 
     handlePause,
     handleResume,
     handleAbort, 
-    handleBlockDragStart, // Expose new handler
-    handleBlockDragEnd,   // Expose new handler
-    handleDropOnZone,     // Expose new handler
+    handleBlockDragStart,
+    handleBlockDragEnd,
+    handleDropOnZone,
     checkPlacement
   };
 };

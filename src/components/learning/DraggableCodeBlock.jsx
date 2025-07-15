@@ -13,6 +13,11 @@ const DraggableCodeBlock = ({
   isCorrect, 
   language = "csharp" 
 }) => {
+  if (!block) {
+    console.error("No block provided to DraggableCodeBlock");
+    return null;
+  }
+  
   const colors = {
     draggable: { bg: "#222", border: "#444", shadow: "0 2px 5px rgba(0, 0, 0, 0.2)" },
     dragging: { bg: "#333", border: "#4ecdc4", shadow: "0 5px 15px rgba(0, 0, 0, 0.3)" },
@@ -31,6 +36,18 @@ const DraggableCodeBlock = ({
 
   // Indentation padding - 8px per level of indentation
   const indentationPadding = `${(block.indentation || 0) / 2}px`;
+  
+  const handleDragStart = () => {
+    if (onDragStart && !isPlaced) {
+      onDragStart(block);
+    }
+  };
+  
+  const handleDragEnd = (event, info) => {
+    if (onDragEnd && !isPlaced) {
+      onDragEnd(block, info);
+    }
+  };
 
   return (
     <MotionBox
@@ -38,12 +55,12 @@ const DraggableCodeBlock = ({
       dragSnapToOrigin
       dragElastic={0.7}
       dragMomentum={false}
-      onDragStart={() => onDragStart(block)}
-      onDragEnd={(event, info) => onDragEnd(block, info)}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       whileHover={{ scale: isPlaced ? 1 : 1.02 }}
       whileDrag={{ 
         scale: 1.05, 
-        zIndex: 1000, // Very high z-index when dragging to appear on top
+        zIndex: 1000,
         boxShadow: "0 10px 20px rgba(0, 0, 0, 0.4)",
         border: "2px solid #4ecdc4"
       }}
@@ -77,7 +94,7 @@ const DraggableCodeBlock = ({
         fontSize="xs"
         color="#666"
       >
-        {block.lineNumber}
+        {block.lineNumber || ''}
       </Text>
       
       {/* Code content with syntax highlighting */}

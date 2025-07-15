@@ -4,7 +4,7 @@ import { Box, VStack, HStack, Button, Badge, Image, Grid, Text as ChakraText } f
 import { motion } from "framer-motion";
 import { PageLayout, SectionLayout } from '../design/layouts/PageLayout';
 import { Card } from '../design/components/Card';
-import { CustomText as Text, Heading } from '../design/components/Typography';
+import { CustomText, Heading } from '../design/components/Typography';
 import { Button as CustomButton } from '../design/components/Button';
 import { DonationModal, CollaborationModal } from '../components/modals/ProjectModals';
 import { designSystem } from '../design/system/DesignSystem';
@@ -122,16 +122,16 @@ const ProjectDetailPage = () => {
                     {project.title}
                   </Heading>
                   <HStack spacing={3}>
-                    <Text color="secondary">by {project.creator}</Text>
+                    <CustomText color="secondary">by {project.creator}</CustomText>
                     <Badge bg={designSystem.colors.status.success} color="white">
                       ⭐ Verified Creator
                     </Badge>
                   </HStack>
                 </VStack>
 
-                <Text color="secondary" lineHeight="1.6">
+                <CustomText color="secondary" lineHeight="1.6">
                   {project.description}
-                </Text>
+                </CustomText>
 
                 <HStack spacing={1} flexWrap="wrap">
                   {project.tags.map((tag, i) => (
@@ -171,9 +171,9 @@ const ProjectDetailPage = () => {
                 </Heading>
                 <VStack spacing={2} align="start">
                   {project.techStack.map((tech, i) => (
-                    <Text key={i} size="sm" color="secondary">
+                    <CustomText key={i} size="sm" color="secondary">
                       • {tech}
-                    </Text>
+                    </CustomText>
                   ))}
                 </VStack>
               </Card>
@@ -184,9 +184,9 @@ const ProjectDetailPage = () => {
                 </Heading>
                 <VStack spacing={2} align="start">
                   {project.features.slice(0, 4).map((feature, i) => (
-                    <Text key={i} size="sm" color="secondary">
+                    <CustomText key={i} size="sm" color="secondary">
                       • {feature}
-                    </Text>
+                    </CustomText>
                   ))}
                 </VStack>
               </Card>
@@ -201,16 +201,16 @@ const ProjectDetailPage = () => {
                 {project.updates.map((update, i) => (
                   <Box key={i} p={4} bg={designSystem.colors.backgrounds.secondary} borderRadius="md">
                     <HStack justify="space-between" mb={2}>
-                      <Text fontWeight="bold" color="secondary">
+                      <CustomText fontWeight="bold" color="secondary">
                         {update.title}
-                      </Text>
-                      <Text size="sm" color="muted">
+                      </CustomText>
+                      <CustomText size="sm" color="muted">
                         {update.date}
-                      </Text>
+                      </CustomText>
                     </HStack>
-                    <Text size="sm" color="secondary">
+                    <CustomText size="sm" color="secondary">
                       {update.content}
-                    </Text>
+                    </CustomText>
                   </Box>
                 ))}
               </VStack>
@@ -229,12 +229,12 @@ const ProjectDetailPage = () => {
                   
                   <VStack spacing={2} align="stretch">
                     <HStack justify="space-between">
-                      <Text size="2xl" color="#FFD700" fontWeight="bold">
+                      <CustomText size="2xl" color="#FFD700" fontWeight="bold">
                         ${project.donations.toLocaleString()}
-                      </Text>
-                      <Text color="muted">
+                      </CustomText>
+                      <CustomText color="muted">
                         of ${project.fundingGoal.toLocaleString()}
-                      </Text>
+                      </CustomText>
                     </HStack>
                     
                     <Box bg={designSystem.colors.backgrounds.secondary} h="12px" borderRadius="6px">
@@ -248,8 +248,8 @@ const ProjectDetailPage = () => {
                     </Box>
                     
                     <HStack justify="space-between" fontSize="sm" color={designSystem.colors.text.muted}>
-                      <Text>{Math.round(fundingProgress)}% funded</Text>
-                      <Text>{daysRemaining} days left</Text>
+                      <CustomText>{Math.round(fundingProgress)}% funded</CustomText>
+                      <CustomText>{daysRemaining} days left</CustomText>
                     </HStack>
                   </VStack>
 
@@ -264,9 +264,9 @@ const ProjectDetailPage = () => {
                   </CustomButton>
 
                   <VStack spacing={2} align="start" fontSize="sm" color={designSystem.colors.text.muted}>
-                    <Text>✓ Secure payment processing</Text>
-                    <Text>✓ Get project updates</Text>
-                    <Text>✓ Support open source development</Text>
+                    <CustomText>✓ Secure payment processing</CustomText>
+                    <CustomText>✓ Get project updates</CustomText>
+                    <CustomText>✓ Support open source development</CustomText>
                   </VStack>
                 </VStack>
               </Card>
@@ -282,7 +282,7 @@ const ProjectDetailPage = () => {
                   
                   <VStack spacing={3} align="stretch">
                     <HStack justify="space-between">
-                      <Text color="secondary">Open Positions</Text>
+                      <CustomText color="secondary">Open Positions</CustomText>
                       <Badge bg={designSystem.colors.brand.primary} color="white">
                         {project.collaborationSlots - project.currentCollaborators} available
                       </Badge>
@@ -290,12 +290,12 @@ const ProjectDetailPage = () => {
 
                     {project.openRoles.map((role, i) => (
                       <Box key={i} p={3} bg={designSystem.colors.backgrounds.secondary} borderRadius="md">
-                        <Text fontWeight="bold" color="brand" mb={1}>
+                        <CustomText fontWeight="bold" color="brand" mb={1}>
                           {role.role}
-                        </Text>
-                        <Text size="sm" color="muted" mb={2}>
+                        </CustomText>
+                        <CustomText size="sm" color="muted" mb={2}>
                           {role.timeCommitment}
-                        </Text>
+                        </CustomText>
                         <HStack spacing={1} flexWrap="wrap">
                           {role.skills.map((skill, j) => (
                             <Badge key={j} bg={designSystem.colors.backgrounds.surface} color="white" size="sm">
@@ -318,9 +318,9 @@ const ProjectDetailPage = () => {
                   </CustomButton>
 
                   <VStack spacing={2} align="start" fontSize="sm" color={designSystem.colors.text.muted}>
-                    <Text>✓ Work with verified creators</Text>
-                    <Text>✓ Build your portfolio</Text>
-                    <Text>✓ Gain real project experience</Text>
+                    <CustomText>✓ Work with verified creators</CustomText>
+                    <CustomText>✓ Build your portfolio</CustomText>
+                    <CustomText>✓ Gain real project experience</CustomText>
                   </VStack>
                 </VStack>
               </Card>
@@ -341,12 +341,12 @@ const ProjectDetailPage = () => {
                     borderRadius="full"
                   />
                   <VStack align="start" spacing={0}>
-                    <Text fontWeight="bold" color="brand">
+                    <CustomText fontWeight="bold" color="brand">
                       {project.creator}
-                    </Text>
-                    <Text size="sm" color="muted">
+                    </CustomText>
+                    <CustomText size="sm" color="muted">
                       Project Creator
-                    </Text>
+                    </CustomText>
                   </VStack>
                 </HStack>
                 
@@ -360,12 +360,12 @@ const ProjectDetailPage = () => {
                       borderRadius="full"
                     />
                     <VStack align="start" spacing={0}>
-                      <Text fontWeight="bold" color="secondary">
+                      <CustomText fontWeight="bold" color="secondary">
                         {collab.name}
-                      </Text>
-                      <Text size="sm" color="muted">
+                      </CustomText>
+                      <CustomText size="sm" color="muted">
                         {collab.role}
-                      </Text>
+                      </CustomText>
                     </VStack>
                   </HStack>
                 ))}

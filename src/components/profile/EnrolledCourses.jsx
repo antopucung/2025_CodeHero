@@ -2,7 +2,7 @@ import React from 'react';
 import { VStack, HStack, Badge, Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Card } from '../../design/components/Card';
-import { CustomText as Text, Heading } from '../../design/components/Typography';
+import { CustomText, Heading } from '../../design/components/Typography';
 import { Button as CustomButton } from '../../design/components/Button';
 import { designSystem } from '../../design/system/DesignSystem';
 
@@ -50,25 +50,25 @@ export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNa
               <Box p={designSystem.spacing[4]}>
               <VStack align="start" spacing={designSystem.spacing[3]}>
                 <HStack justify="space-between" w="100%" spacing={designSystem.spacing[2]}>
-                  <Text color="brand" fontWeight={designSystem.typography.weights.bold}>
+                  <CustomText color="brand" fontWeight={designSystem.typography.weights.bold}>
                     {course.title}
-                  </Text>
+                  </CustomText>
                   <Badge bg={designSystem.colors.brand.secondary} color={designSystem.colors.text.inverse}>
                     {course.language.toUpperCase()}
                   </Badge>
                 </HStack>
-                <Text size="sm" color="muted" mt={designSystem.spacing[1]} style={{ 
+                <CustomText size="sm" color="muted" mt={designSystem.spacing[1]} style={{ 
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
                   WebkitBoxOrient: 'vertical',
                   overflow: 'hidden'
                 }}>
                   {course.description}
-                </Text>
+                </CustomText>
                 <HStack spacing={designSystem.spacing[4]} fontSize="xs" color={designSystem.colors.text.muted} mt={designSystem.spacing[2]}>
-                  <Text>📚 {course.lessons_count} lessons</Text>
-                  <Text>⏱️ {course.duration_hours}h</Text>
-                  <Text>⭐ {course.rating}</Text>
+                  <CustomText>📚 {course.lessons_count} lessons</CustomText>
+                  <CustomText>⏱️ {course.duration_hours}h</CustomText>
+                  <CustomText>⭐ {course.rating}</CustomText>
                 </HStack>
               </VStack>
               </Box>
@@ -76,15 +76,15 @@ export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNa
           ))}
           
           {enrolledCourses.length > 3 && (
-            <Text size="sm" color="muted" textAlign="center" py={designSystem.spacing[2]}>
+            <CustomText size="sm" color="muted" textAlign="center" py={designSystem.spacing[2]}>
               +{enrolledCourses.length - 3} more courses
-            </Text>
+            </CustomText>
           )}
         </VStack>
       ) : (
         <VStack spacing={designSystem.spacing[5]} textAlign="center" py={designSystem.spacing[8]}>
-          <Text size="lg">📚</Text>
-          <Text color="muted">No courses enrolled yet</Text>
+          <CustomText size="lg">📚</CustomText>
+          <CustomText color="muted">No courses enrolled yet</CustomText>
           <Box pt={designSystem.spacing[2]}>
             <CustomButton 
               variant="primary" 

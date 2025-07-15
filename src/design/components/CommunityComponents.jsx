@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, HStack, VStack, Badge, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { Card } from './Card';
-import { CustomText as Text } from './Typography';
+import { CustomText } from './Typography';
 import { Button } from './Button';
 import { designSystem } from '../system/DesignSystem';
 
@@ -59,17 +59,17 @@ export const CommissionCard = ({
         <VStack spacing={designSystem.spacing[5]} align="stretch">
           <HStack justify="space-between" align="start">
             <VStack align="start" spacing={designSystem.spacing[2]} flex={1}>
-              <Text size="lg" color="secondary" fontWeight={designSystem.typography.weights.bold}>
+              <CustomText size="lg" color="secondary" fontWeight={designSystem.typography.weights.bold}>
                 {request.title}
-              </Text>
+              </CustomText>
               <HStack spacing={designSystem.spacing[2]}>
-                <Text size="sm" color="muted">
+                <CustomText size="sm" color="muted">
                   by {request.client}
-                </Text>
-                <Text color={designSystem.colors.text.muted}>•</Text>
-                <Text size="sm" color="muted">
+                </CustomText>
+                <CustomText color={designSystem.colors.text.muted}>•</CustomText>
+                <CustomText size="sm" color="muted">
                   {request.posted}
-                </Text>
+                </CustomText>
               </HStack>
             </VStack>
             <VStack align="end" spacing={designSystem.spacing[2]}>
@@ -88,9 +88,9 @@ export const CommissionCard = ({
             px={designSystem.spacing[4]}
             py={designSystem.spacing[3]}
           >
-            <Text size="sm" color="secondary" lineHeight="1.6">
+            <CustomText size="sm" color="secondary" lineHeight="1.6">
               {request.description}
-            </Text>
+            </CustomText>
           </Box>
 
           <HStack spacing={designSystem.spacing[2]} flexWrap="wrap" px={designSystem.spacing[1]}>
@@ -115,22 +115,22 @@ export const CommissionCard = ({
           >
             <HStack justify="space-between" align="center" spacing={designSystem.spacing[4]}>
               <VStack align="start" spacing={designSystem.spacing[1]}>
-                <Text size="sm" color="muted">Budget</Text>
-                <Text size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
+                <CustomText size="sm" color="muted">Budget</CustomText>
+                <CustomText size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
                   {getBudgetRange(request.budget)}
-                </Text>
+                </CustomText>
               </VStack>
               <VStack align="center" spacing={designSystem.spacing[1]}>
-                <Text size="sm" color="muted">Timeline</Text>
-                <Text size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
+                <CustomText size="sm" color="muted">Timeline</CustomText>
+                <CustomText size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
                   {request.timeline}
-                </Text>
+                </CustomText>
               </VStack>
               <VStack align="end" spacing={designSystem.spacing[1]}>
-                <Text size="sm" color="muted">Applications</Text>
-                <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
+                <CustomText size="sm" color="muted">Applications</CustomText>
+                <CustomText size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
                   {request.applications}
-                </Text>
+                </CustomText>
               </VStack>
             </HStack>
           </Box>
@@ -185,17 +185,17 @@ export const CollaborationCard = ({
         <VStack spacing={designSystem.spacing[5]} align="stretch">
           <HStack justify="space-between" align="start">
             <VStack align="start" spacing={designSystem.spacing[2]}>
-              <Text size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
+              <CustomText size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
                 {collab.title}
-              </Text>
+              </CustomText>
               <HStack spacing={designSystem.spacing[2]}>
-                <Text size="sm" color="brand">
+                <CustomText size="sm" color="brand">
                   {collab.creator}
-                </Text>
-                <Text color={designSystem.colors.text.muted}>•</Text>
-                <Text size="sm" color="muted">
+                </CustomText>
+                <CustomText color={designSystem.colors.text.muted}>•</CustomText>
+                <CustomText size="sm" color="muted">
                   {collab.client}
-                </Text>
+                </CustomText>
               </HStack>
             </VStack>
             <Badge bg={designSystem.colors.brand.accent} color={designSystem.colors.text.inverse}>
@@ -211,7 +211,7 @@ export const CollaborationCard = ({
           >
             <HStack spacing={designSystem.spacing[4]}>
               <VStack align="start" spacing={designSystem.spacing[1]} flex={1}>
-                <Text size="sm" color="muted" mb={designSystem.spacing[1]}>Progress</Text>
+                <CustomText size="sm" color="muted" mb={designSystem.spacing[1]}>Progress</CustomText>
                 <HStack w="100%" spacing={designSystem.spacing[2]}>
                   <Box 
                     flex={1} 
@@ -227,22 +227,22 @@ export const CollaborationCard = ({
                       transition="width 0.3s"
                     />
                   </Box>
-                  <Text size="sm" color="accent" fontWeight={designSystem.typography.weights.bold}>
+                  <CustomText size="sm" color="accent" fontWeight={designSystem.typography.weights.bold}>
                     {collab.progress}%
-                  </Text>
+                  </CustomText>
                 </HStack>
               </VStack>
               <VStack align="center" spacing={designSystem.spacing[1]}>
-                <Text size="sm" color="muted" mb={designSystem.spacing[1]}>Budget</Text>
-                <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
+                <CustomText size="sm" color="muted" mb={designSystem.spacing[1]}>Budget</CustomText>
+                <CustomText size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
                   ${collab.budget.toLocaleString()}
-                </Text>
+                </CustomText>
               </VStack>
               <VStack align="end" spacing={designSystem.spacing[1]}>
-                <Text size="sm" color="muted" mb={designSystem.spacing[1]}>Deadline</Text>
-                <Text size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
+                <CustomText size="sm" color="muted" mb={designSystem.spacing[1]}>Deadline</CustomText>
+                <CustomText size="sm" color="secondary" fontWeight={designSystem.typography.weights.bold}>
                   {collab.deadline}
-                </Text>
+                </CustomText>
               </VStack>
             </HStack>
           </Box>
@@ -253,9 +253,9 @@ export const CollaborationCard = ({
             px={designSystem.spacing[2]}
           >
             <HStack justify="space-between" align="center" spacing={designSystem.spacing[2]}>
-              <Text size="xs" color="muted">
+              <CustomText size="xs" color="muted">
                 Last update: {collab.lastUpdate}
-              </Text>
+              </CustomText>
               <HStack spacing={designSystem.spacing[3]}>
                 <Button variant="secondary" size="sm">
                   💬 Chat
@@ -325,16 +325,16 @@ export const CreatorCard = ({
           
           <Box px={designSystem.spacing[3]}>
             <VStack spacing={designSystem.spacing[3]}>
-              <Text size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
+              <CustomText size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
                 {creator.name}
-              </Text>
+              </CustomText>
               <HStack spacing={designSystem.spacing[3]}>
-                <Text size="sm" color="accent">
+                <CustomText size="sm" color="accent">
                   ⭐ {creator.rating}
-                </Text>
-                <Text size="sm" color="secondary">
+                </CustomText>
+                <CustomText size="sm" color="secondary">
                   {creator.completedProjects} projects
-                </Text>
+                </CustomText>
               </HStack>
               <Box 
                 bg={designSystem.colors.backgrounds.secondary} 
@@ -342,9 +342,9 @@ export const CreatorCard = ({
                 px={designSystem.spacing[3]}
                 py={designSystem.spacing[1]}
               >
-                <Text size="sm" color="muted">
+                <CustomText size="sm" color="muted">
                   {creator.hourlyRate}/hour
-                </Text>
+                </CustomText>
               </Box>
             </VStack>
           </Box>
@@ -506,12 +506,12 @@ export const EnhancedProjectCard = ({
           >
             <VStack spacing={designSystem.spacing[1]} align="stretch">
               <HStack justify="space-between">
-                <Text size="xs" color="#FFD700" fontWeight="bold">
+                <CustomText size="xs" color="#FFD700" fontWeight="bold">
                   ${currentFunding.toLocaleString()}
-                </Text>
-                <Text size="xs" color="white">
+                </CustomText>
+                <CustomText size="xs" color="white">
                   of ${fundingGoal.toLocaleString()}
-                </Text>
+                </CustomText>
               </HStack>
               <Box bg="rgba(255,255,255,0.2)" h="4px" borderRadius="2px">
                 <Box 
@@ -537,12 +537,12 @@ export const EnhancedProjectCard = ({
             p={designSystem.spacing[2]}
           >
             <HStack justify="space-between">
-              <Text size="xs" color="#4ECDC4" fontWeight="bold">
+              <CustomText size="xs" color="#4ECDC4" fontWeight="bold">
                 {collaborationSlots - filledSlots} slots open
-              </Text>
-              <Text size="xs" color="white">
+              </CustomText>
+              <CustomText size="xs" color="white">
                 {filledSlots}/{collaborationSlots} filled
-              </Text>
+              </CustomText>
             </HStack>
           </Box>
         )}
@@ -557,33 +557,33 @@ export const EnhancedProjectCard = ({
         p={designSystem.spacing[4]}
       >
         <VStack align="start" spacing={designSystem.spacing[2]}>
-          <Text
+          <CustomText
             fontSize={designSystem.typography.sizes.lg}
             fontWeight={designSystem.typography.weights.bold}
             color={designSystem.colors.brand.primary}
             noOfLines={2}
           >
             {project.title}
-          </Text>
+          </CustomText>
           
           <HStack spacing={designSystem.spacing[2]}>
-            <Text size="sm" color="secondary">
+            <CustomText size="sm" color="secondary">
               by {project.creator}
-            </Text>
+            </CustomText>
             <Badge bg={designSystem.colors.status.success} color="white">
               ⭐ Verified
             </Badge>
           </HStack>
         </VStack>
 
-        <Text
+        <CustomText
           fontSize={designSystem.typography.sizes.sm}
           color={designSystem.colors.text.secondary}
           noOfLines={3}
           flex={1}
         >
           {project.description}
-        </Text>
+        </CustomText>
 
         {/* Tags */}
         <HStack spacing={designSystem.spacing[1]} flexWrap="wrap">
@@ -690,9 +690,9 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
       borderColor={designSystem.colors.borders.default}
       p={designSystem.spacing[6]}
     >
-      <Text size="md" color="brand" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[4]}>
+      <CustomText size="md" color="brand" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[4]}>
         🌟 Featured Creators
-      </Text>
+      </CustomText>
       <VStack spacing={designSystem.spacing[4]} align="stretch"> 
         {creators.map((creator) => (
           <Box
@@ -718,9 +718,9 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
               />
               <VStack align="start" spacing={designSystem.spacing[3]} flex={1}>
                 <HStack justify="space-between" w="100%" mb={designSystem.spacing[1]}>
-                  <Text size="sm" color="brand" fontWeight={designSystem.typography.weights.bold}>
+                  <CustomText size="sm" color="brand" fontWeight={designSystem.typography.weights.bold}>
                     {creator.name}
-                  </Text>
+                  </CustomText>
                   <Badge 
                     bg={creator.available ? designSystem.colors.status.success : designSystem.colors.status.warning} 
                     color={designSystem.colors.text.inverse}
@@ -728,9 +728,9 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
                     {creator.available ? 'AVAILABLE' : 'BUSY'}
                   </Badge>
                 </HStack>
-                <Text size="xs" color="muted">
+                <CustomText size="xs" color="muted">
                   ⭐ {creator.rating} • {creator.completedProjects} projects
-                </Text>
+                </CustomText>
                 <Box 
                   bg={designSystem.colors.backgrounds.surface} 
                   borderRadius={designSystem.radii.sm}
@@ -738,9 +738,9 @@ export const FeaturedCreatorsSidebar = ({ creators, onCreatorClick }) => {
                   py={designSystem.spacing[1]}
                   my={designSystem.spacing[1]}
                 >
-                <Text size="xs" color="secondary">
+                <CustomText size="xs" color="secondary">
                   {creator.hourlyRate}/hr
-                </Text>
+                </CustomText>
                 </Box>
                 <HStack spacing={designSystem.spacing[2]} flexWrap="wrap">
                   {creator.specialties.slice(0, 2).map((skill, i) => (
@@ -772,15 +772,15 @@ export const TipsCard = ({ title, tips, icon }) => {
       borderColor={designSystem.colors.borders.default}
       p={designSystem.spacing[6]}
     >
-      <Text size="md" color="accent" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[3]}>
+      <CustomText size="md" color="accent" fontWeight={designSystem.typography.weights.bold} mb={designSystem.spacing[3]}>
         {icon} {title}
-      </Text>
+      </CustomText>
       <VStack spacing={designSystem.spacing[2]} align="start">
         {tips.map((tip, index) => (
           <Box key={index} px={designSystem.spacing[2]}>
-          <Text key={index} size="xs" color="secondary">
+          <CustomText key={index} size="xs" color="secondary">
             {tip}
-          </Text>
+          </CustomText>
           </Box>
         ))}
       </VStack>

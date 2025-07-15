@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, VStack, HStack, Badge } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Card } from '../../design/components/Card';
-import { CustomText as Text, Heading } from '../../design/components/Typography';
+import { CustomText, Heading } from '../../design/components/Typography';
 import { designSystem } from '../../design/system/DesignSystem';
 
 const MotionBox = motion.div;
@@ -43,16 +43,16 @@ export const LanguageProgress = ({ languageProgress }) => {
             <Box px={designSystem.spacing[2]}>
             <HStack justify="space-between" mb={designSystem.spacing[3]}>
               <HStack spacing={designSystem.spacing[2]}>
-                <Text fontWeight={designSystem.typography.weights.bold} color="secondary">
+                <CustomText fontWeight={designSystem.typography.weights.bold} color="secondary">
                   {lang.language.toUpperCase()}
-                </Text>
+                </CustomText>
                 <Badge bg={lang.color} color={designSystem.colors.text.inverse}>
                   Level {lang.level}
                 </Badge>
               </HStack>
-              <Text size="sm" color="muted">
+              <CustomText size="sm" color="muted">
                 {lang.xp} XP
-              </Text>
+              </CustomText>
             </HStack>
             <Box
               bg={designSystem.colors.backgrounds.secondary}

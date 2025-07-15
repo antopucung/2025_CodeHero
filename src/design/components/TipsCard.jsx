@@ -1,4 +1,8 @@
-export const TipsCard = ({ title, tips, icon }) => {
+import { Card } from './Card';
+import { CustomText, Heading } from './Typography';
+import { designSystem } from '../system/DesignSystem';
+
+export const TipsCard = ({ title, tips, onTipClick }) => {
   return (
     <Card variant="default"
           bg={designSystem.colors.backgrounds.elevated}
@@ -9,8 +13,11 @@ export const TipsCard = ({ title, tips, icon }) => {
       </CustomText>
       <VStack spacing={designSystem.spacing[3]} align="start" px={designSystem.spacing[2]}>
         {tips.map((tip, index) => (
-          <Box key={index} pl={designSystem.spacing[2]} pb={designSystem.spacing[1]}>
-            <CustomText as Text size="sm" color="secondary">
+          <Box key={index} pl={designSystem.spacing[2]} pb={designSystem.spacing[1]}
+            onClick={() => onTipClick?.(tip)}
+            _hover={{ bg: designSystem.colors.backgrounds.elevated }}
+          >
+            <CustomText size="sm" color="secondary">
               {tip}
             </CustomText>
           </Box>

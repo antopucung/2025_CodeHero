@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Badge, Image } from "@chakra-ui/react";
 import { Card } from '../../design/components/Card';
-import { CustomText as Text, Heading } from '../../design/components/Typography';
+import { CustomText, Heading } from '../../design/components/Typography';
 import { Button as CustomButton } from '../../design/components/Button';
 import { designSystem } from '../../design/system/DesignSystem';
 
@@ -37,14 +37,15 @@ export const ProfileCard = ({ userData, progress }) => {
             {userData.name}
           </Heading>
           <Text color="secondary">{userData.username}</Text>
-          <Text size="sm" color="muted">{userData.email}</Text>
-          <Text size="sm" color="muted">Joined {userData.joinDate}</Text>
+          <CustomText color="secondary">{userData.username}</CustomText>
+          <CustomText size="sm" color="muted">{userData.email}</CustomText>
+          <CustomText size="sm" color="muted">Joined {userData.joinDate}</CustomText>
         </VStack>
 
         <Box px={designSystem.spacing[4]} py={designSystem.spacing[2]}>
-          <Text size="sm" color="secondary" textAlign="center" lineHeight="1.5">
+          <CustomText size="sm" color="secondary" textAlign="center" lineHeight="1.5">
             {userData.bio}
-          </Text>
+          </CustomText>
         </Box>
 
         <HStack spacing={designSystem.spacing[4]} w="100%" px={designSystem.spacing[3]}>

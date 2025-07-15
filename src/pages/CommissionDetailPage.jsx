@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useCommissionSystem } from '../hooks/useCommissionSystem';
 import { PageLayout, SectionLayout } from '../design/layouts/PageLayout';
 import { Card } from '../design/components/Card';
-import { CustomText as Text, Heading } from '../design/components/Typography';
+import { CustomText, Heading } from '../design/components/Typography';
 import { Button as CustomButton } from '../design/components/Button';
 import { designSystem } from '../design/system/DesignSystem';
 
@@ -100,9 +100,9 @@ const CommissionDetailPage = () => {
                     {commission.title}
                   </Heading>
                   <HStack spacing={3}>
-                    <Text color="muted">by {commission.client}</Text>
-                    <Text color="muted">•</Text>
-                    <Text color="muted">{commission.posted}</Text>
+                    <CustomText color="muted">by {commission.client}</CustomText>
+                    <CustomText color="muted">•</CustomText>
+                    <CustomText color="muted">{commission.posted}</CustomText>
                   </HStack>
                 </VStack>
                 <VStack align="end" spacing={2}>
@@ -117,22 +117,22 @@ const CommissionDetailPage = () => {
 
               <HStack spacing={6}>
                 <VStack align="start" spacing={0}>
-                  <Text color="muted">Budget Range</Text>
-                  <Text size="xl" color="accent" fontWeight="bold">
+                  <CustomText color="muted">Budget Range</CustomText>
+                  <CustomText size="xl" color="accent" fontWeight="bold">
                     ${commission.budget?.min?.toLocaleString()} - ${commission.budget?.max?.toLocaleString()}
-                  </Text>
+                  </CustomText>
                 </VStack>
                 <VStack align="start" spacing={0}>
-                  <Text color="muted">Timeline</Text>
-                  <Text size="lg" color="secondary" fontWeight="bold">
+                  <CustomText color="muted">Timeline</CustomText>
+                  <CustomText size="lg" color="secondary" fontWeight="bold">
                     {commission.timeline}
-                  </Text>
+                  </CustomText>
                 </VStack>
                 <VStack align="start" spacing={0}>
-                  <Text color="muted">Applications</Text>
-                  <Text size="lg" color="brand" fontWeight="bold">
+                  <CustomText color="muted">Applications</CustomText>
+                  <CustomText size="lg" color="brand" fontWeight="bold">
                     {commission.applications}
-                  </Text>
+                  </CustomText>
                 </VStack>
               </HStack>
 
@@ -152,9 +152,9 @@ const CommissionDetailPage = () => {
               <Heading level={2} size="lg" color="brand">
                 📋 Project Description
               </Heading>
-              <Text color="secondary" lineHeight="1.6">
+              <CustomText color="secondary" lineHeight="1.6">
                 {commission.description}
-              </Text>
+              </CustomText>
             </VStack>
           </Card>
 
@@ -185,7 +185,7 @@ const CommissionDetailPage = () => {
                 >
                   <VStack spacing={4} align="stretch">
                     <VStack align="start" spacing={2}>
-                      <Text color="secondary" fontWeight="bold">Project Proposal *</Text>
+                      <CustomText color="secondary" fontWeight="bold">Project Proposal *</CustomText>
                       <Textarea
                         placeholder="Describe your approach to this project, your relevant experience, and why you're the right fit..."
                         value={applicationData.proposal}
@@ -204,7 +204,7 @@ const CommissionDetailPage = () => {
 
                     <HStack spacing={4}>
                       <VStack align="start" spacing={2} flex={1}>
-                        <Text color="secondary" fontWeight="bold">Your Budget Estimate</Text>
+                        <CustomText color="secondary" fontWeight="bold">Your Budget Estimate</CustomText>
                         <Input
                           placeholder="$2,500"
                           value={applicationData.estimatedBudget}
@@ -216,7 +216,7 @@ const CommissionDetailPage = () => {
                         />
                       </VStack>
                       <VStack align="start" spacing={2} flex={1}>
-                        <Text color="secondary" fontWeight="bold">Estimated Timeline</Text>
+                        <CustomText color="secondary" fontWeight="bold">Estimated Timeline</CustomText>
                         <Select
                           value={applicationData.timeline}
                           onChange={(e) => setApplicationData(prev => ({ ...prev, timeline: e.target.value }))}
@@ -236,7 +236,7 @@ const CommissionDetailPage = () => {
                     </HStack>
 
                     <VStack align="start" spacing={2}>
-                      <Text color="secondary" fontWeight="bold">Relevant Experience</Text>
+                      <CustomText color="secondary" fontWeight="bold">Relevant Experience</CustomText>
                       <Textarea
                         placeholder="Describe your relevant experience with similar projects, technologies used, etc."
                         value={applicationData.experience}
@@ -271,12 +271,12 @@ const CommissionDetailPage = () => {
 
               {!showApplicationForm && applications.length > 0 && (
                 <VStack spacing={3} align="stretch">
-                  <Text color="muted">
+                  <CustomText color="muted">
                     {applications.length} application{applications.length !== 1 ? 's' : ''} received
-                  </Text>
-                  <Text size="sm" color="muted">
+                  </CustomText>
+                  <CustomText size="sm" color="muted">
                     💡 Tip: Submit a detailed proposal with relevant examples to stand out
-                  </Text>
+                  </CustomText>
                 </VStack>
               )}
             </VStack>
@@ -289,11 +289,11 @@ const CommissionDetailPage = () => {
                 💡 Tips for a Strong Application
               </Heading>
               <VStack spacing={2} align="start" fontSize="sm" color={designSystem.colors.text.secondary}>
-                <Text>✓ Be specific about your approach and methodology</Text>
-                <Text>✓ Include links to relevant portfolio projects</Text>
-                <Text>✓ Provide realistic timeline and budget estimates</Text>
-                <Text>✓ Explain your communication and project management style</Text>
-                <Text>✓ Ask clarifying questions about requirements</Text>
+                <CustomText>✓ Be specific about your approach and methodology</CustomText>
+                <CustomText>✓ Include links to relevant portfolio projects</CustomText>
+                <CustomText>✓ Provide realistic timeline and budget estimates</CustomText>
+                <CustomText>✓ Explain your communication and project management style</CustomText>
+                <CustomText>✓ Ask clarifying questions about requirements</CustomText>
               </VStack>
             </VStack>
           </Card>

@@ -2,7 +2,7 @@ import React from 'react';
 import { VStack, HStack, Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Card } from '../../design/components/Card';
-import { CustomText as Text, Heading } from '../../design/components/Typography';
+import { CustomText, Heading } from '../../design/components/Typography';
 import { designSystem } from '../../design/system/DesignSystem';
 
 const MotionBox = motion.div;
@@ -29,18 +29,18 @@ export const AchievementsSection = ({ achievements }) => {
               }}
             >
               <HStack spacing={designSystem.spacing[3]} px={designSystem.spacing[1]}>
-                <Text size="lg" lineHeight="1">🏆</Text>
-                <Text color="brand" fontWeight={designSystem.typography.weights.bold}>
+                <CustomText size="lg" lineHeight="1">🏆</CustomText>
+                <CustomText color="brand" fontWeight={designSystem.typography.weights.bold}>
                   {achievement.replace('_', ' ').toUpperCase()}
-                </Text>
+                </CustomText>
               </HStack>
             </MotionBox>
           ))
         ) : (
           <Box p={designSystem.spacing[4]} textAlign="center">
-            <Text color="muted">
+            <CustomText color="muted">
               Complete challenges to unlock achievements!
-            </Text>
+            </CustomText>
           </Box>
         )}
       </VStack>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { VStack, HStack } from "@chakra-ui/react";
 import { Card } from '../../design/components/Card';
-import { CustomText as Text, Heading } from '../../design/components/Typography';
+import { CustomText, Heading } from '../../design/components/Typography';
 import { designSystem } from '../../design/system/DesignSystem';
 
 export const RecentActivity = () => {
@@ -38,10 +38,10 @@ export const RecentActivity = () => {
             bg={designSystem.colors.backgrounds.secondary} 
             borderRadius={designSystem.radii.md}
           >
-            <Text fontSize={designSystem.typography.sizes.lg} lineHeight="1">{activity.icon}</Text>
+            <CustomText fontSize={designSystem.typography.sizes.lg} lineHeight="1">{activity.icon}</CustomText>
             <VStack align="start" spacing={0} flex={1}>
-              <Text size="sm" color="secondary">{activity.title}</Text>
-              <Text size="xs" color="muted" mt={designSystem.spacing[1]}>{activity.time}</Text>
+              <CustomText size="sm" color="secondary">{activity.title}</CustomText>
+              <CustomText size="xs" color="muted" mt={designSystem.spacing[1]}>{activity.time}</CustomText>
             </VStack>
           </HStack>
         ))}

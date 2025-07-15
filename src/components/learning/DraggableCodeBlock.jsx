@@ -5,6 +5,7 @@
        dragSnapToOrigin
        onDragStart={() => onDragStart(block)}
    )
+   )
 -      onDragEnd={() => onDragEnd(block)}
 +      onDragEnd={(event, info) => onDragEnd(block, info)}
        whileHover={{ scale: isPlaced ? 1 : 1.02 }}

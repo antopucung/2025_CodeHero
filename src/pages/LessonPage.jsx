@@ -129,13 +129,32 @@ const LessonPage = () => {
   const fetchLessonData = async () => {
     try {
       setLoading(true);
-      
-      // Fetch course details
-      const { data: courseData, error: courseError } = await supabase
-        .from('courses')
-        .select('*')
-        .eq('id', courseId)
-        .single();
+
+      let courseData;
+      let courseError;
+
+      // Check if courseId is a UUID or a slug
+      if (courseId && courseId.length === 36 && courseId.includes('-')) {
+        // Query by ID (UUID)
+        const response = await supabase
+          .from('courses')
+          .select('*')
+          .eq('id', courseId)
+          .single();
+        
+        courseData = response.data;
+        courseError = response.error;
+      } else {
+        // Query by slug
+        const response = await supabase
+          .from('courses')
+          .select('*')
+          .eq('slug', courseId)
+          .single();
+        
+        courseData = response.data;
+        courseError = response.error;
+      }
       
       if (courseError) throw courseError;
       
@@ -152,7 +171,7 @@ const LessonPage = () => {
       const { data: allLessonsData, error: allLessonsError } = await supabase
         .from('lessons')
         .select('*')
-        .eq('course_id', courseId)
+        .eq('course_id', courseData.id) // Use the course ID from the fetched course
         .order('order_index');
       
       if (allLessonsError) throw allLessonsError;
@@ -167,10 +186,10 @@ const LessonPage = () => {
       setQuizRequired(hasCodeExample || hasQuizData);
       
       // Check if lesson is already completed
-      setLessonCompleted(progress.completedLessons.includes(lessonId));
+      setLessonCompleted(progress.completedLessons?.includes(lessonId));
       
       // Allow navigation if already completed
-      if (progress.completedLessons.includes(lessonId)) {
+      if (progress.completedLessons?.includes(lessonId)) {
         setNextEnabled(true);
         setQuizCompleted(true);
       }

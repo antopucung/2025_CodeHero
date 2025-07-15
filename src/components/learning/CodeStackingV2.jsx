@@ -2,106 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, VStack, HStack, Text, Button, Progress, Grid, Badge, useToast } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CodeStackingEngine, createCodeBlocks } from './CodeStackingEngine';
+import DraggableCodeBlock from './DraggableCodeBlock';
+import DropZone from './DropZone';
 
 const MotionBox = motion(Box);
-
-// Component for a draggable code block
-const DraggableBlock = ({ block, onDragStart, onDragEnd, isDragging, isPlaced = false, language = "javascript" }) => {
-  return (
-    <MotionBox
-      drag={!isPlaced}
-      dragSnapToOrigin
-      dragConstraints={{ top: 0, left: 0, right: 0, bottom: 0 }}
-      dragElastic={0.3}
-      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-      onDragStart={() => onDragStart && onDragStart(block)}
-      onDragEnd={() => onDragEnd && onDragEnd()}
-      whileHover={{ scale: isPlaced ? 1 : 1.02 }}
-      whileDrag={{ 
-        scale: 1.05, 
-        zIndex: 1000,
-        boxShadow: "0 10px 20px rgba(0, 0, 0, 0.4)",
-        border: "2px solid #4ecdc4"
-      }}
-      animate={{
-        boxShadow: isDragging 
-          ? "0 10px 20px rgba(0, 0, 0, 0.4)" 
-          : isPlaced 
-            ? "0 4px 12px rgba(0, 255, 0, 0.2)"
-            : "0 2px 5px rgba(0, 0, 0, 0.2)",
-        borderColor: isDragging 
-          ? "#4ecdc4" 
-          : isPlaced 
-            ? "#00ff00" 
-            : "#444"
-      }}
-      transition={{ duration: 0.3 }}
-      bg={isPlaced ? "#001800" : "#222"}
-      border="1px solid"
-      borderRadius="md"
-      p={2}
-      my={1}
-      cursor={isPlaced ? "default" : "grab"}
-      position="relative"
-      zIndex={isDragging ? 1000 : 1}
-    >
-      <Text
-        fontSize="xs"
-        color="#666"
-        position="absolute"
-        left="-25px"
-        top="50%"
-        transform="translateY(-50%)"
-      >
-        {block.lineNumber}
-      </Text>
-      <Text 
-        fontFamily="monospace" 
-        fontSize="sm" 
-        color={isPlaced ? "#00ff00" : "#ccc"}
-        pl={`${block.indentation}px`}
-        whiteSpace="pre"
-      >
-        {block.content}
-      </Text>
-    </MotionBox>
-  );
-};
-
-// Component for a drop zone
-const DropZone = ({ children, isActive, onDrop, index }) => {
-  return (
-    <MotionBox
-      animate={{ 
-        backgroundColor: isActive ? "rgba(78, 205, 196, 0.1)" : "transparent",
-        borderColor: isActive ? "#4ecdc4" : "transparent"
-      }}
-      transition={{ duration: 0.2 }}
-      minHeight="40px"
-      border="2px dashed transparent"
-      borderRadius="md"
-      m={1}
-      position="relative"
-      onClick={() => isActive && onDrop && onDrop(index)}
-      cursor={isActive ? "pointer" : "default"}
-    >
-      {children}
-      {isActive && !children && (
-        <Text
-          position="absolute"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          color="#4ecdc4"
-          fontSize="sm"
-          pointerEvents="none"
-        >
-          Drop here
-        </Text>
-      )}
-    </MotionBox>
-  );
-};
 
 // Main CodeStackingV2 component
 const CodeStackingV2 = ({
@@ -384,7 +288,7 @@ const CodeStackingV2 = ({
               <Text color="#666" mb={3}>Available Blocks:</Text>
               <VStack align="stretch" spacing={1}>
                 {quizState.blocks?.map((block) => (
-                  <DraggableBlock
+                  <DraggableCodeBlock
                     key={block.id}
                     block={block}
                     onDragStart={handleDragStart}
@@ -415,9 +319,10 @@ const CodeStackingV2 = ({
                 
                 {quizState.userSolution?.map((block, index) => (
                   <React.Fragment key={block.id}>
-                    <DraggableBlock
+                    <DraggableCodeBlock
                       block={block}
                       isPlaced={true}
+                      isCorrect={true}
                       language={language}
                     />
                     <DropZone 

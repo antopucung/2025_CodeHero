@@ -64,8 +64,18 @@ const DropZone = forwardRef(({
   onDrop,
   ...props 
 }, ref) => {
-  const handleDrop = () => {
+  const handleDragOver = (e) => {
+    // Prevent default to allow drop
+    if (isActive) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+  
+  const handleDrop = (e) => {
     if (onDrop && isActive) {
+      e.preventDefault();
+      e.stopPropagation();
       onDrop(index);
     }
   };
@@ -82,7 +92,9 @@ const DropZone = forwardRef(({
       display="flex"
       alignItems="center"
       justifyContent={!children ? "center" : "flex-start"}
-      onClick={handleDrop}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      onClick={handleDrop} /* Keep onClick as fallback */
       cursor={isActive ? "pointer" : "default"}
       transition="all 0.2s ease"
       _hover={{

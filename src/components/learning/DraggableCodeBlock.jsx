@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
 
-const DraggableCodeBlock = ({ 
+const DraggableCodeBlock = ({
   block, 
   onDragStart, 
   onDragEnd, 
@@ -37,8 +37,13 @@ const DraggableCodeBlock = ({
   // Indentation padding - 8px per level of indentation
   const indentationPadding = `${(block.indentation || 0) / 2}px`;
   
-  const handleDragStart = () => {
+  const handleDragStart = (event) => {
     if (onDragStart && !isPlaced) {
+      // Set dataTransfer to make this work across browsers
+      if (event.dataTransfer) {
+        event.dataTransfer.setData('text/plain', block.id);
+        event.dataTransfer.effectAllowed = 'move';
+      }
       onDragStart(block);
     }
   };
@@ -52,6 +57,7 @@ const DraggableCodeBlock = ({
   return (
     <MotionBox
       drag={!isPlaced}
+      draggable={!isPlaced}
       dragSnapToOrigin
       dragElastic={0.7}
       dragMomentum={false}

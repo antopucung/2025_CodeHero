@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Box, HStack, Button, useToast } from "@chakra-ui/react";
+import { Box, HStack, Button, useToast, Text as ChakraText } from "@chakra-ui/react";
 import {
   DndContext,
   closestCenter,

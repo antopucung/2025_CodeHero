@@ -12,6 +12,8 @@ import { createPulseAnimation } from "../design/tokens/animations";
 
 const MotionBox = motion(Box);
 
+const MotionBox = motion(Box);
+
 const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel, fullScreen = false }) => {
   const [engine] = useState(() => createTypingEngine({ 
     minimalistMode: true,
@@ -174,10 +176,8 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             <Box 
               fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
               color={colorPsychology.speedColors.best.primary}
-              textAlign="center"
-            >
-              LANGUAGE: {challenge.language.toUpperCase()} | 
-              DIFFICULTY: {challenge.difficulty.toUpperCase()}
+              textAlign="center">
+              LANGUAGE: {challenge.language.toUpperCase()} | DIFFICULTY: {challenge.difficulty.toUpperCase()}
             </Box>
             
             {/* Gamification Elements */}
@@ -214,8 +214,7 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
             
             <MotionBox
               whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
+              whileTap={{ scale: 0.95 }}>
               <Button
                 bg={colors.terminal.bg}
                 color={colors.primary[500]}
@@ -233,7 +232,6 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
                 size={fullScreen ? "xl" : "lg"}
               >
                 🚀 BEGIN QUEST 🚀
-              </Button>
             </MotionBox>
           </VStack>
         </TerminalPanel>
@@ -298,22 +296,22 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
         <HStack justify="space-between" mt={1}>
           <Text 
             fontSize="xs"
-            color={colors.terminal.textSecondary}
-          >
+            color={colors.terminal.textSecondary}>
             {Math.round(engine.getProgress())}% Complete
           </Text>
-          
-          {gameStats.bonusPoints > 0 && (
-            <Text fontSize="xs" color="#ffaa00" fontWeight="bold">
-              Bonus: +{gameStats.bonusPoints} pts
-            </Text>
-          )}
-          
-          {gameStats.powerLevel > 1 && (
-            <Text fontSize="xs" color="#ff6b6b" fontWeight="bold">
-              POWER LVL {gameStats.powerLevel}
-            </Text>
-          )}
+          <HStack spacing={2}>
+            {gameStats.bonusPoints > 0 && (
+              <Text fontSize="xs" color="#ffaa00" fontWeight="bold">
+                Bonus: +{gameStats.bonusPoints} pts
+              </Text>
+            )}
+            
+            {gameStats.powerLevel > 1 && (
+              <Text fontSize="xs" color="#ff6b6b" fontWeight="bold">
+                POWER LVL {gameStats.powerLevel}
+              </Text>
+            )}
+          </HStack>
         </HStack>
       </Box>
       

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Flex, Heading, Button, Spacer, HStack } from '@chakra-ui/react';
+import { Box, Flex, Text, HStack, Button, Spacer } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 
 function Header() {
@@ -7,21 +7,17 @@ function Header() {
 
   const navLinks = [
     { to: '/', label: 'Home' },
-    { to: '/quiz-gallery', label: 'Quiz Gallery' },
-    { to: '/typing-challenge', label: 'Typing Challenge' },
-    { to: '/code-editor', label: 'Code Editor' },
-    { to: '/hybrid-mode', label: 'Hybrid Mode' },
-    { to: '/community', label: 'Community' },
     { to: '/marketplace', label: 'Marketplace' },
+    { to: '/community', label: 'Community' },
     { to: '/profile', label: 'Profile' }
   ];
 
   return (
-    <Box bg="white" boxShadow="sm" px={4} py={3}>
+    <Box bg="#000000" borderBottom="1px solid #333" px={4} py={3}>
       <Flex alignItems="center" maxW="container.xl" mx="auto">
-        <Heading as="h1" size="lg" color="blue.600">
-          CodeQuiz Engine
-        </Heading>
+        <Text fontSize="xl" fontWeight="bold" color="#00ff00">
+          Terminal IDE
+        </Text>
         
         <Spacer />
         
@@ -32,8 +28,11 @@ function Header() {
               as={RouterLink}
               to={link.to}
               variant={location.pathname === link.to ? "solid" : "ghost"}
-              colorScheme="blue"
+              colorScheme="green"
               size="sm"
+              bg={location.pathname === link.to ? "#003300" : "transparent"}
+              color={location.pathname === link.to ? "#00ff00" : "#ccc"}
+              _hover={{ color: "#00ff00", bg: "#112211" }}
             >
               {link.label}
             </Button>

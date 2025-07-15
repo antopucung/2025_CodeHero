@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Text, VStack, HStack, Button, Progress, useToast } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack, HStack, Button, Progress, useToast } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
 import { useDisclosure } from "@chakra-ui/react";
@@ -503,13 +503,13 @@ public class Player : MonoBehaviour
             maxW="800px"
             mx="auto"
           >
-            <Text fontSize="lg" color="#00ff00" fontWeight="bold" mb={4}>
+            <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold" mb={4}>
               📖 {lesson.title}
-            </Text>
+            </ChakraText>
             <VStack spacing={4} align="start">
-              <Text color="#ccc" lineHeight="1.6">
+              <ChakraText color="#ccc" lineHeight="1.6">
                 {contentData.content || "This is a text-based lesson. The content would be loaded from the database."}
-              </Text>
+              </ChakraText>
 
               {contentData.code_example && (
                   <InteractiveCodeExample
@@ -558,9 +558,9 @@ public class Player : MonoBehaviour
 
               {contentData.concepts && contentData.concepts.length > 0 && (
                 <VStack spacing={3} align="start" w="100%">
-                  <Text fontSize="md" color="#00ff00" fontWeight="bold" mt={2}>
+                  <ChakraText fontSize="md" color="#00ff00" fontWeight="bold" mt={2}>
                     🧩 Key Concepts
-                  </Text>
+                  </ChakraText>
                   {contentData.concepts.map((concept, idx) => (
                     <ConceptExplainer key={idx} concept={concept} />
                   ))}
@@ -580,9 +580,9 @@ public class Player : MonoBehaviour
 
               {contentData.extra_concepts && contentData.extra_concepts.length > 0 && (
                 <VStack spacing={3} align="start" w="100%">
-                  <Text fontSize="md" color="#00ff00" fontWeight="bold" mt={2}>
+                  <ChakraText fontSize="md" color="#00ff00" fontWeight="bold" mt={2}>
                     🧩 Key Concepts
-                  </Text>
+                  </ChakraText>
                   {contentData.concepts.map((concept, idx) => (
                     <ConceptExplainer key={idx} concept={concept} />
                   ))}
@@ -638,12 +638,12 @@ public class Player : MonoBehaviour
                 w="100%"
                 flexShrink={0}
               >
-                <Text fontSize="lg" color="#00ff00" fontWeight="bold" mb={2}>
+                <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold" mb={2}>
                   💻 {lesson.title}
-                </Text>
-                <Text color="#ccc" fontSize="sm">
+                </ChakraText>
+                <ChakraText color="#ccc" fontSize="sm">
                   {contentData.instructions || "Complete the coding exercise below. Test your code to verify it works correctly."}
-                </Text>
+                </ChakraText>
               </Box>
               
               <Box flex={1} w="100%">
@@ -671,9 +671,9 @@ public class Player : MonoBehaviour
             maxW="800px"
             mx="auto"
           >
-            <Text fontSize="lg" color="#00ff00" fontWeight="bold" mb={4}>
+            <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold" mb={4}>
               🎥 {lesson.title}
-            </Text>
+            </ChakraText>
             <Box
               bg="#000"
               border="1px solid #444"
@@ -683,8 +683,8 @@ public class Player : MonoBehaviour
               color="#666"
               mb={4}
             >
-              <Text mb={2}>Video Player</Text>
-              <Text fontSize="sm">Video URL: {contentData.video_url || "No video URL specified"}</Text>
+              <ChakraText mb={2}>Video Player</ChakraText>
+              <ChakraText fontSize="sm">Video URL: {contentData.video_url || "No video URL specified"}</ChakraText>
             </Box>
             <Button
               bg="#00ff00"
@@ -708,12 +708,12 @@ public class Player : MonoBehaviour
             maxW="800px"
             mx="auto"
           >
-            <Text fontSize="lg" color="#00ff00" fontWeight="bold" mb={4}>
+            <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold" mb={4}>
               📝 {lesson.title}
-            </Text>
-            <Text color="#ccc" mb={4}>
+            </ChakraText>
+            <ChakraText color="#ccc" mb={4}>
               Quiz functionality will be implemented here.
-            </Text>
+            </ChakraText>
             <Button
               bg="#00ff00"
               color="#000"
@@ -729,7 +729,7 @@ public class Player : MonoBehaviour
       default:
         return (
           <Box textAlign="center" p={8}>
-            <Text color="#ff6b6b">Unknown lesson type: {lesson.content_type}</Text>
+            <ChakraText color="#ff6b6b">Unknown lesson type: {lesson.content_type}</ChakraText>
           </Box>
         );
     }
@@ -747,9 +747,9 @@ public class Player : MonoBehaviour
           >
             ⚡
           </MotionBox>
-          <Text color="#00ff00" fontFamily="'Courier New', monospace">
+          <ChakraText color="#00ff00" fontFamily="'Courier New', monospace">
             Loading Lesson...
-          </Text>
+          </ChakraText>
         </VStack>
       </Box>
     );
@@ -784,17 +784,17 @@ public class Player : MonoBehaviour
                 ← {course?.title}
               </Button>
               
-              <Text color="#666" fontSize="sm">
+              <ChakraText color="#666" fontSize="sm">
                 Lesson {currentLessonIndex + 1} of {allLessons.length}
-              </Text>
+              </ChakraText>
             </HStack>
 
             <HStack spacing={4}>
               <VStack spacing={0} align="end">
-                <Text fontSize="sm" color="#666">Course Progress</Text>
-                <Text fontSize="sm" color="#ffd93d" fontWeight="bold">
+                <ChakraText fontSize="sm" color="#666">Course Progress</ChakraText>
+                <ChakraText fontSize="sm" color="#ffd93d" fontWeight="bold">
                   {calculateCourseProgress()}% Complete
-                </Text>
+                </ChakraText>
               </VStack>
               
               <Box w="150px">
@@ -857,15 +857,15 @@ public class Player : MonoBehaviour
                     repeat: Infinity
                   }}
                 >
-                  <Text fontSize="xl" color="#ffaa00" fontWeight="bold" mb={2}>
+                  <ChakraText fontSize="xl" color="#ffaa00" fontWeight="bold" mb={2}>
                     🏆 Achievement Unlocked!
-                  </Text>
-                  <Text fontSize="md" color="#00ff00" fontWeight="bold">
+                  </ChakraText>
+                  <ChakraText fontSize="md" color="#00ff00" fontWeight="bold">
                     {gameAchievements[0].title}
-                  </Text>
-                  <Text fontSize="sm" color="#ccc" mt={1}>
+                  </ChakraText>
+                  <ChakraText fontSize="sm" color="#ccc" mt={1}>
                     {gameAchievements[0].description}
-                  </Text>
+                  </ChakraText>
                 </MotionBox>
               </MotionBox>
             )}
@@ -959,18 +959,18 @@ public class Player : MonoBehaviour
                     repeat: Infinity
                   }}
                 >
-                  <Text fontSize="4xl" color="#00ff00" fontWeight="bold" mb={4}>
+                  <ChakraText fontSize="4xl" color="#00ff00" fontWeight="bold" mb={4}>
                     🎉 LEVEL UP! 🎉
-                  </Text>
-                  <Text fontSize="xl" color="#ffaa00" mb={6}>
+                  </ChakraText>
+                  <ChakraText fontSize="xl" color="#ffaa00" mb={6}>
                     Course Completed!
-                  </Text>
-                  <Text fontSize="md" color="#ccc">
+                  </ChakraText>
+                  <ChakraText fontSize="md" color="#ccc">
                     You've mastered the fundamentals of {course?.language === 'csharp' ? 'C# in Unity' : course?.language}!
-                  </Text>
-                  <Text fontSize="sm" color="#ccc" mt={4}>
+                  </ChakraText>
+                  <ChakraText fontSize="sm" color="#ccc" mt={4}>
                     Click anywhere to continue
-                  </Text>
+                  </ChakraText>
                 </MotionBox>
               </MotionBox>
             )}
@@ -1074,7 +1074,7 @@ public class Player : MonoBehaviour
               left="50%"
               transform="translateX(-50%)"
             >
-              <Text color="#ffd93d" fontSize="sm">👉 Quiz required to proceed to next lesson</Text>
+              <ChakraText color="#ffd93d" fontSize="sm">👉 Quiz required to proceed to next lesson</ChakraText>
             </MotionBox>
           )}
         </HStack>

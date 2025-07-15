@@ -1,4 +1,4 @@
-import { Box, Button, HStack, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, HStack, Text as ChakraText, VStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 
 const MotionBox = motion(Box);
@@ -27,9 +27,9 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
 
   return (
     <Box bg="#111" border="1px solid #333" p={compact ? 2 : 3} h="100%" overflow="hidden">
-      <Text fontSize="xs" color="#666" mb={compact ? 1 : 3} fontFamily="'Courier New', monospace">
+      <ChakraText fontSize="xs" color="#666" mb={compact ? 1 : 3} fontFamily="'Courier New', monospace">
         │ GAME MODE SELECTION
-      </Text>
+      </ChakraText>
       
       <HStack spacing={compact ? 1 : 2} flexWrap="nowrap" h="calc(100% - 20px)">
         {modes.map((mode) => (
@@ -59,13 +59,13 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
               w="100%"
             >
               <VStack spacing={1}>
-                <Text fontSize={compact ? "sm" : "md"}>{mode.icon}</Text>
-                <Text fontSize={compact ? "xs" : "xs"} fontWeight="bold">
+                <ChakraText fontSize={compact ? "sm" : "md"}>{mode.icon}</ChakraText>
+                <ChakraText fontSize={compact ? "xs" : "xs"} fontWeight="bold">
                   {compact ? mode.name.split(' ')[0] : mode.name}
-                </Text>
-                {!compact && <Text fontSize="xs" color="#888" textAlign="center" noOfLines={2}>
+                </ChakraText>
+                {!compact && <ChakraText fontSize="xs" color="#888" textAlign="center" noOfLines={2}>
                   {mode.description}
-                </Text>}
+                </ChakraText>}
               </VStack>
             </Button>
           </MotionBox>
@@ -81,13 +81,13 @@ const GameModeSelector = ({ currentMode, onModeChange, language, compact = false
           bg="#000"
           border="1px solid #333"
         >
-          <Text fontSize="xs" color="#ffaa00" mb={1}>
+          <ChakraText fontSize="xs" color="#ffaa00" mb={1}>
             💡 TYPING MODE ACTIVE - COMBO SYSTEM ENABLED
-          </Text>
-          {!compact && <Text fontSize="xs" color="#666" noOfLines={2}>
+          </ChakraText>
+          {!compact && <ChakraText fontSize="xs" color="#666" noOfLines={2}>
             Build combos by typing fast and accurately! Higher combos = more points and better effects.
             Current language: {language.toUpperCase()}
-          </Text>}
+          </ChakraText>}
         </MotionBox>
       )}
 

@@ -1,6 +1,6 @@
 // Updated Typing Challenge Component - Using new engine
 import React, { useState, useEffect } from "react";
-import { Box, Text, VStack, Button, HStack } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack, Button, HStack } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { createTypingEngine } from "../engine/engineFactory";
 import { ConceptualTypingDisplay } from "../engine/components/ConceptualTypingDisplay";
@@ -163,13 +163,13 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               {challenge.title}
             </Box>
             
-            <Text 
+           <ChakraText 
               fontSize={fullScreen ? typography.sizes.lg : typography.sizes.base} 
               color={colorPsychology.environment.text.secondary}
               textAlign="center"
             >
               {challenge.description}
-            </Text>
+           </ChakraText>
             
             <Box 
               fontSize={fullScreen ? typography.sizes.base : typography.sizes.xs} 
@@ -191,21 +191,21 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               maxW="450px"
               mx="auto"
             >
-              <Text color="#00ff00" fontSize="sm" mb={2} fontWeight="bold" textAlign="center">
+              <ChakraText color="#00ff00" fontSize="sm" mb={2} fontWeight="bold" textAlign="center">
                 🎮 CODING QUEST OBJECTIVES
-              </Text>
+              </ChakraText>
               <VStack spacing={2} align="start" fontSize="xs" color="#00cc00">
                 <Box>
-                  <Text>✅ Type code accurately to gain XP</Text>
+                  <ChakraText>✅ Type code accurately to gain XP</ChakraText>
                 </Box>
                 <Box>
-                  <Text>✅ Build combos for multiplier bonuses</Text>
+                  <ChakraText>✅ Build combos for multiplier bonuses</ChakraText>
                 </Box>
                 <Box>
-                  <Text>✅ Achieve 100% accuracy for achievements</Text>
+                  <ChakraText>✅ Achieve 100% accuracy for achievements</ChakraText>
                 </Box>
                 <Box>
-                  <Text>✅ Maintain streaks to unlock special powers</Text>
+                  <ChakraText>✅ Maintain streaks to unlock special powers</ChakraText>
                 </Box>
               </VStack>
             </MotionBox>

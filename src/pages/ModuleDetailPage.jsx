@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Text, VStack, HStack, Button, Grid, GridItem, Badge, Image, Divider } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack, HStack, Button, Grid, GridItem, Badge, Image, Divider } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
@@ -147,9 +147,9 @@ const ModuleDetailPage = () => {
     return (
       <Box w="100%" h="100%" display="flex" alignItems="center" justifyContent="center" bg="#000">
         <VStack spacing={4}>
-          <Text color="#ff6b6b" fontSize="xl" fontFamily="'Courier New', monospace">
+          <ChakraText color="#ff6b6b" fontSize="xl" fontFamily="'Courier New', monospace">
             ❌ Course Not Found
-          </Text>
+          </ChakraText>
           <Button 
             bg="#00ff00" 
             color="#000" 
@@ -193,27 +193,27 @@ const ModuleDetailPage = () => {
                 </Badge>
               </HStack>
 
-              <Text fontSize="3xl" fontWeight="bold" color="#00ff00">
+              <ChakraText fontSize="3xl" fontWeight="bold" color="#00ff00">
                 {course.title}
-              </Text>
+              </ChakraText>
 
-              <Text fontSize="lg" color="#ccc" maxW="600px">
+              <ChakraText fontSize="lg" color="#ccc" maxW="600px">
                 {course.description}
-              </Text>
+              </ChakraText>
 
               <HStack spacing={6} fontSize="sm" color="#666">
-                <Text>👨‍🏫 {course.instructor_name}</Text>
-                <Text>📚 {course.lessons_count} lessons</Text>
-                <Text>⏱️ {course.duration_hours} hours</Text>
-                <Text>⭐ {course.rating}</Text>
-                <Text>👥 {course.students_count} students</Text>
+                <ChakraText>👨‍🏫 {course.instructor_name}</ChakraText>
+                <ChakraText>📚 {course.lessons_count} lessons</ChakraText>
+                <ChakraText>⏱️ {course.duration_hours} hours</ChakraText>
+                <ChakraText>⭐ {course.rating}</ChakraText>
+                <ChakraText>👥 {course.students_count} students</ChakraText>
               </HStack>
             </VStack>
 
             <VStack spacing={4} align="end">
-              <Text fontSize="2xl" color="#ffd93d" fontWeight="bold">
+              <ChakraText fontSize="2xl" color="#ffd93d" fontWeight="bold">
                 ${course.price}
-              </Text>
+              </ChakraText>
               
               {enrolled ? (
                 <VStack spacing={2}>
@@ -231,9 +231,9 @@ const ModuleDetailPage = () => {
                   
                   {progress.completedLessons.length > 0 && (
                     <VStack spacing={1}>
-                      <Text fontSize="sm" color="#ffd93d">
+                      <ChakraText fontSize="sm" color="#ffd93d">
                         {getCompletionPercentage(course.id).toFixed(0)}% Complete
-                      </Text>
+                      </ChakraText>
                       <Box w="200px" h="4px" bg="#333" borderRadius="2px">
                         <Box 
                           w={`${getCompletionPercentage(course.id).toFixed(0)}%`} 
@@ -275,12 +275,12 @@ const ModuleDetailPage = () => {
                   textAlign="center"
                   boxShadow="0 0 15px #00ff0066"
                 >
-                  <Text color="#00ff00" fontSize="sm" fontWeight="bold">
+                  <ChakraText color="#00ff00" fontSize="sm" fontWeight="bold">
                     🎮 Quest Started! Your adventure begins now.
-                  </Text>
-                  <Text color="#ccc" fontSize="xs" mt={1}>
+                  </ChakraText>
+                  <ChakraText color="#ccc" fontSize="xs" mt={1}>
                     Click 'Start Learning' to begin your journey
-                  </Text>
+                  </ChakraText>
                 </MotionBox>
               )}
             </VStack>
@@ -292,12 +292,12 @@ const ModuleDetailPage = () => {
       <Box flex={1} overflow="auto" p={6} bg="linear-gradient(135deg, #000 0%, #111 50%, #000 100%)">
         <VStack spacing={6} maxW="1200px" mx="auto">
           <HStack justify="space-between" w="100%">
-            <Text fontSize="xl" color="#00ff00" fontWeight="bold">
+            <ChakraText fontSize="xl" color="#00ff00" fontWeight="bold">
               Course Curriculum
-            </Text>
-            <Text fontSize="sm" color="#666">
+            </ChakraText>
+            <ChakraText fontSize="sm" color="#666">
               {lessons.length} lessons • Interactive Learning
-            </Text>
+            </ChakraText>
           </HStack>
 
           {/* Lessons List */}
@@ -366,34 +366,34 @@ const ModuleDetailPage = () => {
                             )}
                           </HStack>
                           
-                          <Text fontSize="sm" color="#666">
+                          <ChakraText fontSize="sm" color="#666">
                             {lesson.content_type === 'typing_challenge' && "Interactive Typing Challenge"}
                             {lesson.content_type === 'code_exercise' && "Hands-on Coding Exercise"}
                             {lesson.content_type === 'text' && "Theory & Explanation"}
                             {lesson.content_type === 'video' && "Video Lesson"}
                             {lesson.content_type === 'quiz' && "Knowledge Assessment"}
-                          </Text>
+                          </ChakraText>
                         </VStack>
                       </HStack>
 
                       <HStack spacing={2}>
                         {lesson.duration_minutes && (
-                          <Text fontSize="sm" color="#666">
+                          <ChakraText fontSize="sm" color="#666">
                             {lesson.duration_minutes} min
-                          </Text>
+                          </ChakraText>
                         )}
                         
                         {!enrolled && index > 0 && (
-                          <Text fontSize="sm" color="#ff6b6b">
+                          <ChakraText fontSize="sm" color="#ff6b6b">
                             🔒 Enroll to Access
-                          </Text>
+                          </ChakraText>
                         )}
                       </HStack>
                     </HStack>
                   </Box>
-                </MotionBox>
+            <ChakraText color="#00ff00" fontFamily="'Courier New', monospace">
               );
-            })}
+            </ChakraText>
           </VStack>
 
           {/* Course Info */}
@@ -404,15 +404,15 @@ const ModuleDetailPage = () => {
             p={6}
             w="100%"
           >
-            <Text fontSize="lg" color="#00ff00" fontWeight="bold" mb={3}>
+            <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold" mb={3}>
               🎯 What You'll Learn
-            </Text>
+            </ChakraText>
             <VStack spacing={2} align="start" fontSize="sm" color="#ccc">
-              <Text>✓ Master {course.language} fundamentals and advanced concepts</Text>
-              <Text>✓ Build real-world projects with hands-on exercises</Text>
-              <Text>✓ Improve typing speed with gamified challenges</Text>
-              <Text>✓ Practice code writing in an integrated IDE environment</Text>
-              <Text>✓ Earn achievements and track your learning progress</Text>
+              <ChakraText>✓ Master {course.language} fundamentals and advanced concepts</ChakraText>
+              <ChakraText>✓ Build real-world projects with hands-on exercises</ChakraText>
+              <ChakraText>✓ Improve typing speed with gamified challenges</ChakraText>
+              <ChakraText>✓ Practice code writing in an integrated IDE environment</ChakraText>
+              <ChakraText>✓ Earn achievements and track your learning progress</ChakraText>
             </VStack>
           </Box>
         </VStack>

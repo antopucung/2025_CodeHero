@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Text, VStack, HStack, Button } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack, HStack, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import HybridMode from "../components/HybridMode";
 import GameStats from "../components/GameStats";
@@ -55,12 +55,12 @@ const HybridModePage = () => {
       >
         <HStack justify="space-between" align="center" h="100%">
           <VStack align="start" spacing={0}>
-            <Text fontSize="lg" color="#00ff00" fontWeight="bold">
+           <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold">
               🚀 Hybrid Mode
-            </Text>
-            <Text fontSize="xs" color="#666">
+           </ChakraText>
+           <ChakraText fontSize="xs" color="#666">
               Type code then execute for complete learning
-            </Text>
+           </ChakraText>
           </VStack>
           
           <Box w={{ base: "200px", md: "250px" }} h="100%">
@@ -98,19 +98,19 @@ const HybridModePage = () => {
                 transition={{ duration: 2, repeat: Infinity }}
                 textAlign="center"
               >
-                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="#ff6b6b" mb={3}>
+                <ChakraText fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="#ff6b6b" mb={3}>
                   🚀 Hybrid Learning
-                </Text>
-                <Text fontSize={{ base: "sm", md: "md" }} color="#666" mb={6}>
+                </ChakraText>
+                <ChakraText fontSize={{ base: "sm", md: "md" }} color="#666" mb={6}>
                   Type code with gamification, then execute!
-                </Text>
+                </ChakraText>
               </MotionBox>
 
               {/* Language Selection */}
               <VStack spacing={3} w="100%">
-                <Text fontSize="md" color="#00ff00" fontWeight="bold">
+                <ChakraText fontSize="md" color="#00ff00" fontWeight="bold">
                   Language
-                </Text>
+                </ChakraText>
                 <HStack spacing={2} flexWrap="wrap" justify="center">
                   {languages.map((lang) => (
                     <MotionBox
@@ -145,9 +145,9 @@ const HybridModePage = () => {
 
               {/* Difficulty Selection */}
               <VStack spacing={3} w="100%">
-                <Text fontSize="md" color="#00ff00" fontWeight="bold">
+                <ChakraText fontSize="md" color="#00ff00" fontWeight="bold">
                   Difficulty
-                </Text>
+                </ChakraText>
                 <HStack spacing={2} flexWrap="wrap" justify="center">
                   {difficulties.map((diff) => (
                     <MotionBox

@@ -6,7 +6,7 @@ import {
   MenuItem,
   MenuList,
   Text,
-} from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList, Text as ChakraText } from "@chakra-ui/react";
 import { LANGUAGE_VERSIONS } from "../constants";
 
 const languages = Object.entries(LANGUAGE_VERSIONS);
@@ -15,9 +15,9 @@ const ACTIVE_COLOR = "#00ff00";
 const LanguageSelector = ({ language, onSelect }) => {
   return (
     <Box mb={4}>
-      <Text mb={2} fontSize="xs" color="#666" fontFamily="'Courier New', monospace">
+      <ChakraText mb={2} fontSize="xs" color="#666" fontFamily="'Courier New', monospace">
         ├─ COMPILER/INTERPRETER:
-      </Text>
+      </ChakraText>
       <Menu isLazy>
         <MenuButton 
           as={Button}
@@ -48,9 +48,9 @@ const LanguageSelector = ({ language, onSelect }) => {
             >
               {lang.toUpperCase()}
               &nbsp;
-              <Text as="span" color="#666" fontSize="xs">
+              <ChakraText as="span" color="#666" fontSize="xs">
                 ({version})
-              </Text>
+              </ChakraText>
             </MenuItem>
           ))}
         </MenuList>

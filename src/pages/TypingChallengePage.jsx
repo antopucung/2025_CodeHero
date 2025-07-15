@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Text, VStack, HStack, Button } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack, HStack, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import TypingChallenge from "../components/TypingChallenge";
 import GameStats from "../components/GameStats";
@@ -49,12 +49,12 @@ const TypingChallengePage = () => {
       >
         <HStack justify="space-between" align="center" h="100%">
           <VStack align="start" spacing={0}>
-            <Text fontSize="lg" color="#00ff00" fontWeight="bold">
+           <ChakraText fontSize="lg" color="#00ff00" fontWeight="bold">
               🎯 Typing Challenge
-            </Text>
-            <Text fontSize="xs" color="#666">
+           </ChakraText>
+           <ChakraText fontSize="xs" color="#666">
               Gamified typing with combos and achievements
-            </Text>
+           </ChakraText>
           </VStack>
           
           <Box w={{ base: "200px", md: "250px" }} h="100%">
@@ -92,19 +92,19 @@ const TypingChallengePage = () => {
                 transition={{ duration: 2, repeat: Infinity }}
                 textAlign="center"
               >
-                <Text fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="#ffd93d" mb={3}>
+                <ChakraText fontSize={{ base: "2xl", md: "3xl" }} fontWeight="bold" color="#ffd93d" mb={3}>
                   🎯 Ready to Type?
-                </Text>
-                <Text fontSize={{ base: "sm", md: "md" }} color="#666" mb={6}>
+                </ChakraText>
+                <ChakraText fontSize={{ base: "sm", md: "md" }} color="#666" mb={6}>
                   Choose your challenge settings
-                </Text>
+                </ChakraText>
               </MotionBox>
 
               {/* Language Selection */}
               <VStack spacing={3} w="100%">
-                <Text fontSize="md" color="#00ff00" fontWeight="bold">
+                <ChakraText fontSize="md" color="#00ff00" fontWeight="bold">
                   Language
-                </Text>
+                </ChakraText>
                 <HStack spacing={2} flexWrap="wrap" justify="center">
                   {languages.map((lang) => (
                     <MotionBox

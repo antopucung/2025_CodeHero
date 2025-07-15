@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Box, Text, VStack, HStack, Button } from "@chakra-ui/react";
+import { Box, Text as ChakraText, VStack, HStack, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Editor } from "@monaco-editor/react";
 import { executeCode } from "../api";
@@ -84,19 +84,19 @@ const HybridMode = ({ challenge, language, onComplete, isActive = false, current
         >
           <GradientWaveBackground isActive={true} intensity={0.3} combo={1} />
           
-          <Text fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
+          <ChakraText fontSize="xs" color="#666" mb={2} fontFamily="'Courier New', monospace">
             │ HYBRID MODE - PHASE 1: TYPING CHALLENGE
-          </Text>
+          </ChakraText>
           
           <PulseAnimation isActive={true} color="#ffd93d" intensity={1}>
-            <Text fontSize="sm" color="#ffd93d" fontWeight="bold" mb={2}>
+            <ChakraText fontSize="sm" color="#ffd93d" fontWeight="bold" mb={2}>
               🎯 Type the code accurately to unlock execution phase!
-            </Text>
+            </ChakraText>
           </PulseAnimation>
           
-          <Text fontSize="xs" color="#888">
+          <ChakraText fontSize="xs" color="#888">
             Build combos and maintain accuracy. Once completed, you'll execute the code!
-          </Text>
+          </ChakraText>
         </MotionBox>
         
         <TypingChallenge

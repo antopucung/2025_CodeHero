@@ -1,6 +1,6 @@
 // Game Stats Component - Clean stats display
 import React from 'react';
-import { Box, Text, HStack, VStack, Progress } from '@chakra-ui/react';
+import { Box, Text as ChakraText, HStack, VStack, Progress } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { TerminalPanel } from '../../design/components/TerminalPanel';
 import { colors, getComboColor } from '../../design/tokens/colors';
@@ -33,9 +33,9 @@ export const GameStats = ({ engine }) => {
           >
             LEVEL {state.level || 1}
           </MotionText>
-          <Text fontSize={typography.sizes.xs} color={colors.terminal.textSecondary}>
+          <ChakraText fontSize={typography.sizes.xs} color={colors.terminal.textSecondary}>
             {state.xp || 0}/{xpForNextLevel} XP
-          </Text>
+          </ChakraText>
         </HStack>
         
         <Progress
@@ -54,7 +54,7 @@ export const GameStats = ({ engine }) => {
         {/* Live Stats */}
         <HStack justify="space-between" fontSize={typography.sizes.xs}>
           <VStack spacing={0} align="start">
-            <Text color={colors.terminal.textSecondary}>WPM</Text>
+            <ChakraText color={colors.terminal.textSecondary}>WPM</ChakraText>
             <MotionText
               fontSize={typography.sizes.base}
               fontWeight={typography.weights.bold}
@@ -69,7 +69,7 @@ export const GameStats = ({ engine }) => {
           </VStack>
           
           <VStack spacing={0} align="center">
-            <Text color={colors.terminal.textSecondary}>ACCURACY</Text>
+            <ChakraText color={colors.terminal.textSecondary}>ACCURACY</ChakraText>
             <MotionText
               fontSize={typography.sizes.base}
               fontWeight={typography.weights.bold}

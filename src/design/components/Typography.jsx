@@ -75,13 +75,13 @@ export const Heading = ({
 };
 
 export const Caption = ({ children, ...props }) => (
-  <Text variant="caption" size="xs" color="muted" {...props}>
+  <CustomText variant="caption" size="xs" color="muted" {...props}>
     {children}
-  </Text>
+  </CustomText>
 );
 
 export const Code = ({ children, ...props }) => (
-  <Text variant="code" size="sm" {...props}>
+  <CustomText variant="code" size="sm" {...props}>
     {children}
-  </Text>
+  </CustomText>
 );

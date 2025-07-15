@@ -1,5 +1,5 @@
 export const TipsCard = ({ title, tips, icon }) => {
-   return (
+  return (
     <Card variant="default"
           bg={designSystem.colors.backgrounds.elevated}
           borderColor={designSystem.colors.borders.default}

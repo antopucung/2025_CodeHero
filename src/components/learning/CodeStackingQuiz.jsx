@@ -1,37 +1,413 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Box, VStack, HStack, Text, Button, Badge, Progress, Flex } from "@chakra-ui/react";
-import { motion, AnimatePresence } from "framer-motion";
-import { createCodeBlocksFromString } from './CodeQuizEngine';
-import { useCodeQuizEngine } from './hooks/useCodeQuizEngine';
-import { QuizHeader } from './quiz-components/QuizHeader';
-import { QuizControls } from './quiz-components/QuizControls';
-import { QuizFeedback } from './quiz-components/QuizFeedback';
-import { QuizResults } from './quiz-components/QuizResults';
-import { AvailableBlocks } from './quiz-components/AvailableBlocks';
-import { SolutionArea } from './quiz-components/SolutionArea';
-import { QuizStartScreen } from './quiz-components/QuizStartScreen';
-import confetti from 'canvas-confetti';
+import React from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { CodeQuizEngine, createCodeBlocksFromString } from '../CodeQuizEngine';
 
-const MotionBox = motion(Box);
-
-// Main Quiz Component
-const CodeStackingQuiz = ({ 
-  code, 
-  language = "csharp",
+/**
+ * Custom hook to handle all quiz engine state and logic
+ */
+export const useCodeQuizEngine = ({
+  code,
+  splitType = "line",
+  difficulty = "medium",
   timeLimit = 120,
-  title = "Arrange the Code",
-  description = "Drag the code blocks to arrange them in the correct order",
-  onComplete,
-  splitType = "line", // "line" or "statement"
-  difficulty = "medium", // "easy", "medium", "hard" 
-  juiciness = "high", // "low", "medium", "high" - visual effects level
-  totalBlocks = 0 // Optional - used for completion metrics
+  juiciness = "high",
+  onComplete
 }) => {
-  const {
+  // Quiz engine reference
+  const quizEngineRef = useRef(null);
+  
+  // UI state
+  const [quizState, setQuizState] = useState(null);
+  const [activeDragBlock, setActiveDragBlock] = useState(null);
+  const [gameEffects, setGameEffects] = useState({
+    combo: 1,
+    lastAction: null,
+    comboText: "",
+    pointsText: "",
+    streak: 0,
+    feedbackMessages: []
+  });
+  
+  // Visual effects state
+  const [errorPositions, setErrorPositions] = useState(new Set());
+  const [screenFlash, setScreenFlash] = useState({ active: false, type: 'success', intensity: 1 });
+  const [streakStatus, setStreakStatus] = useState({ active: false, count: 0 });
+  const [patternCelebrations, setPatternCelebrations] = useState([]);
+  const [isPaused, setIsPaused] = useState(false);
+  
+  // Refs for drop zones
+  const dropZoneRefs = useRef([]);
+  
+  // Configure difficulty settings
+  const difficultySettings = {
+    easy: { timeLimit: 180, basePoints: 50, penalty: 0.05 },
+    medium: { timeLimit: 120, basePoints: 100, penalty: 0.1 },
+    hard: { timeLimit: 90, basePoints: 150, penalty: 0.15 }
+  };
+  
+  // Initialize quiz engine
+  useEffect(() => {
+    if (!code) return;
+    
+    try {
+      console.log("Initializing quiz with code:", code);
+      
+      // Create code blocks
+      const codeBlocks = createCodeBlocksFromString(code, splitType);
+      console.log("Created code blocks:", codeBlocks);
+      
+      // Create quiz engine
+      const quizEngine = new CodeQuizEngine({
+        timeLimit: difficultySettings[difficulty]?.timeLimit || timeLimit,
+        basePoints: difficultySettings[difficulty]?.basePoints || 100,
+        penalty: difficultySettings[difficulty]?.penalty || 0.1
+      });
+      
+      // Set up quiz with code blocks
+      quizEngine.setup(codeBlocks, [...codeBlocks]);
+      console.log("Quiz engine setup complete");
+      
+      // Register event handlers
+      quizEngine
+        .on('start', (state) => {
+          console.log("Quiz started:", state);
+          setQuizState({...state});
+          setGameEffects({
+            combo: 1,
+            lastAction: 'start',
+            comboText: "",
+            pointsText: "",
+            streak: 0,
+            feedbackMessages: [
+              {
+                id: Date.now(),
+                text: "Quiz Started!",
+                type: "info"
+              }
+            ]
+          });
+        })
+        .on('complete', (result) => {
+          console.log("Quiz completed:", result);
+          if (onComplete) {
+            onComplete({
+              score: result.score,
+              maxCombo: result.maxCombo,
+              timeElapsed: result.timeElapsed,
+              correctPlacements: result.correctPlacements,
+              incorrectPlacements: result.incorrectPlacements,
+              success: true,
+              totalBlocks: quizEngine.state.solution.length
+            });
+          }
+        })
+        .on('correct', (data) => {
+          console.log("Correct placement:", data);
+          setGameEffects(prev => {
+            const newStreak = prev.streak + 1;
+            
+            // Update streak status for visual effects
+            if (newStreak >= 3 && !streakStatus.active) {
+              setStreakStatus({ active: true, count: newStreak });
+              
+              // Clear streak after animation time
+              setTimeout(() => {
+                setStreakStatus({ active: false, count: 0 });
+              }, 3000);
+            } else if (newStreak >= 3) {
+              setStreakStatus(prev => ({ ...prev, count: newStreak }));
+            }
+            
+            let comboText = "";
+            if (data.combo >= 2.5) comboText = "INCREDIBLE!";
+            else if (data.combo >= 2.0) comboText = "AWESOME!";
+            else if (data.combo >= 1.5) comboText = "GREAT!";
+            else if (newStreak >= 3) comboText = "STREAK!";
+            
+            if (data.combo >= 2) {
+              // Flash screen on high combo
+              setScreenFlash({ 
+                active: true, 
+                type: 'success', 
+                intensity: Math.min(data.combo / 2, 1) 
+              });
+              
+              // Reset flash
+              setTimeout(() => {
+                setScreenFlash({ active: false, type: 'success', intensity: 0 });
+              }, 300);
+            }
+            
+            return {
+              ...prev,
+              combo: data.combo,
+              lastAction: 'correct',
+              comboText,
+              pointsText: `+${data.points}`,
+              streak: newStreak,
+              feedbackMessages: [
+                ...prev.feedbackMessages,
+                {
+                  id: Date.now(),
+                  text: `Correct! +${data.points} points`,
+                  type: "success"
+                }
+              ].slice(-5) // Keep only last 5 messages
+            };
+          });
+        })
+        .on('incorrect', (data) => {
+          console.log("Incorrect placement:", data);
+          // Flash screen on error
+          setScreenFlash({ 
+            active: true, 
+            type: 'error', 
+            intensity: 0.8 
+          });
+          
+          // Reset flash
+          setTimeout(() => {
+            setScreenFlash({ active: false, type: 'error', intensity: 0 });
+          }, 300);
+          
+          // Reset streak status
+          setStreakStatus({ active: false, count: 0 });
+          
+          setGameEffects(prev => ({
+            ...prev,
+            combo: 1,
+            lastAction: 'incorrect',
+            comboText: "OOPS!",
+            pointsText: `-${data.penalty}`,
+            streak: 0,
+            feedbackMessages: [
+              ...prev.feedbackMessages,
+              {
+                id: Date.now(),
+                text: `Incorrect! -${data.penalty} points`,
+                type: "error"
+              }
+            ].slice(-5)
+          }));
+        })
+        .on('timeout', (result) => {
+          console.log("Quiz timeout:", result);
+          setGameEffects(prev => ({
+            ...prev,
+            lastAction: 'timeout',
+            feedbackMessages: [
+              ...prev.feedbackMessages,
+              {
+                id: Date.now(),
+                text: "Time's up!",
+                type: "warning"
+              }
+            ].slice(-5)
+          }));
+          
+          // Call onComplete with failure
+          if (onComplete) {
+            onComplete({
+              score: result.score,
+              maxCombo: 1,
+              timeElapsed: result.timeElapsed,
+              correctPlacements: result.correctPlacements,
+              incorrectPlacements: result.incorrectPlacements,
+              success: false,
+              totalBlocks: quizEngine.state.solution.length
+            });
+          }
+        })
+        .on('tick', (data) => {
+          setQuizState(prevState => ({
+            ...prevState,
+            timeRemaining: data.timeRemaining
+          }));
+        });
+      
+      quizEngineRef.current = quizEngine;
+      setQuizState(quizEngine.getState());
+      
+      // Initialize drop zone refs
+      if (quizEngine.state.solution) {
+        // Create a ref for each potential drop position (solution length + 1)
+        const numDropZones = quizEngine.state.solution.length + 1;
+        console.log("Creating", numDropZones, "drop zone refs");
+        dropZoneRefs.current = Array(numDropZones).fill().map(() => React.createRef());
+      }
+    } catch (error) {
+      console.error("Error initializing quiz engine:", error);
+    }
+    
+    return () => {
+      // Clean up
+      if (quizEngineRef.current) {
+        quizEngineRef.current.destroy();
+      }
+    };
+  }, [code, splitType, difficulty, timeLimit, onComplete]);
+
+  // Start the quiz
+  const handleStart = () => {
+    if (quizEngineRef.current) {
+      console.log("Starting quiz");
+      setIsPaused(false);
+      quizEngineRef.current.start();
+    }
+  };
+
+  // Reset the quiz
+  const handleReset = () => {
+    if (quizEngineRef.current) {
+      console.log("Resetting quiz");
+      quizEngineRef.current.reset();
+      setQuizState(quizEngineRef.current.getState());
+      setGameEffects({
+        combo: 1,
+        lastAction: null,
+        comboText: "",
+        pointsText: "",
+        streak: 0,
+        feedbackMessages: []
+      });
+    }
+  };
+
+  // Pause the quiz
+  const handlePause = () => {
+    if (quizEngineRef.current && quizState.status === 'active') {
+      console.log("Pausing quiz");
+      quizEngineRef.current.pause();
+      setQuizState({ ...quizEngineRef.current.getState() });
+      setIsPaused(true);
+    }
+  };
+
+  // Resume the quiz
+  const handleResume = () => {
+    if (quizEngineRef.current && quizState.status === 'paused') {
+      console.log("Resuming quiz");
+      quizEngineRef.current.resume();
+      setQuizState({ ...quizEngineRef.current.getState() });
+      setIsPaused(false);
+    }
+  };
+
+  // Close/Abort the quiz
+  const handleAbort = () => {
+    console.log("Aborting quiz");
+    // If onClose prop exists (from parent QuizPopup), call it
+    if (onComplete) {
+      // Call onComplete with a failed result
+      onComplete({
+        score: quizState?.score || 0,
+        maxCombo: quizState?.maxComboReached || 1,
+        correctPlacements: quizState?.correctPlacements || 0,
+        success: false,
+        totalBlocks: quizState?.solution?.length || 0
+      });
+    }
+  };
+
+  // Handle drag start
+  const handleBlockDragStart = (block) => {
+    console.log("Drag started:", block.id);
+    setActiveDragBlock(block);
+  };
+
+  // Handle drag end
+  const handleBlockDragEnd = (block, info) => {
+    console.log("Drag ended:", block.id, info);
+    if (!activeDragBlock || !quizEngineRef.current) {
+      console.log("Missing required data for drag end");
+      setActiveDragBlock(null);
+      return;
+    }
+    
+    // Get the drop point coordinates
+    const dropPoint = info?.point ? { x: info.point.x, y: info.point.y } : null; // Use clientX/Y from pointer info
+    console.log("Drag ended. Drop point:", dropPoint);
+    
+    if (dropPoint) {
+      // Check each dropzone to see if the point is within its bounds
+      let droppedInZone = false;
+      
+      // Add visual feedback when dropped
+      setScreenFlash({ active: true, type: 'info', intensity: 0.3 });
+      setTimeout(() => {
+        setScreenFlash({ active: false, type: 'info', intensity: 0 }); // Reset flash
+      }, 200);
+      
+      dropZoneRefs.current.forEach((ref, index) => {
+        if (!ref || !ref.current) {
+          // This drop zone might not be rendered yet or is empty
+          // console.log("Missing ref for dropzone", index);
+          return;
+        }
+        
+        const rect = ref.current.getBoundingClientRect();
+        console.log(`Checking dropzone ${index}:`, rect);
+        
+        // Check if drop point is within this dropzone
+        if (
+          // Check if the drop point is within the horizontal bounds of the drop zone
+          dropPoint.x >= rect.left && 
+          dropPoint.x <= rect.right && 
+          // Check if the drop point is within the vertical bounds of the drop zone
+          // We give a bit of leeway vertically to make dropping easier
+          dropPoint.y >= rect.top && 
+          dropPoint.y <= rect.bottom
+        ) {
+          console.log("Dropped in zone", index);
+          // Place the block at this index
+          const result = quizEngineRef.current.placeBlock(activeDragBlock.id, index);
+          console.log("Place block result:", result);
+          setQuizState({ ...quizEngineRef.current.getState() }); // Force re-render with updated state
+          droppedInZone = true;
+        }
+      });
+      
+      if (!droppedInZone) {
+        console.log("Not dropped in any zone");
+        setGameEffects(prev => ({
+          ...prev,
+          feedbackMessages: [
+            ...prev.feedbackMessages,
+            {
+              id: Date.now(),
+              text: "Block not placed in a drop zone",
+              type: "warning"
+            }
+          ].slice(-5)
+        }));
+      } else {
+        // Trigger a small screen flash for feedback
+        setScreenFlash({ 
+          active: true, 
+          type: 'info', 
+          intensity: 0.3 
+        });
+        
+        setTimeout(() => {
+          setScreenFlash({ active: false, type: 'info', intensity: 0 });
+        }, 300);
+      }
+    }
+    
+    setActiveDragBlock(null);
+  };
+  
+  // Check placement of a block
+  const checkPlacement = (block, index) => {
+    return quizEngineRef.current?.checkPlacement(block, index) || false;
+  };
+
+  return {
     quizState,
     gameEffects,
     screenFlash,
     streakStatus,
+    patternCelebrations,
     isPaused,
     activeDragBlock,
     dropZoneRefs,
@@ -40,189 +416,8 @@ const CodeStackingQuiz = ({
     handlePause,
     handleResume,
     handleAbort,
-    handleDragStart,
-    handleDragEnd
-  } = useCodeQuizEngine({
-    code,
-    splitType,
-    difficulty,
-    timeLimit,
-    juiciness,
-    onComplete
-  });
-
-  // Configure difficulty settings
-  const difficultySettings = {
-    easy: { timeLimit: 180, basePoints: 50, penalty: 0.05 },
-    medium: { timeLimit: 120, basePoints: 100, penalty: 0.1 },
-    hard: { timeLimit: 90, basePoints: 150, penalty: 0.15 }
+    handleBlockDragStart,
+    handleBlockDragEnd,
+    checkPlacement
   };
-  
-  // Format remaining time
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-  
-  // Visual effect controls based on juiciness setting
-  const effectsIntensity = {
-    low: { scale: 0.3, speed: 0.7, particles: false, sounds: false },
-    medium: { scale: 0.7, speed: 1.0, particles: true, sounds: false },
-    high: { scale: 1.0, speed: 1.3, particles: true, sounds: true }
-  };
-  
-  const effects = effectsIntensity[juiciness] || effectsIntensity.medium;
-
-  // If no quiz state or code, show loading
-  if (!quizState || !code) {
-    return (
-      <Box textAlign="center" p={10}>
-        <Text color="#666">Loading quiz...</Text>
-      </Box>
-    );
-  }
-
-  return (
-    <Box position="relative">
-      {/* Feedback elements */}
-      <QuizFeedback 
-        screenFlash={screenFlash}
-        streakStatus={streakStatus}
-        gameEffects={gameEffects}
-        effects={effects}
-      />
-
-      <MotionBox
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        bg="#111"
-        border="1px solid #333"
-        borderRadius="md"
-        overflow="visible" // Important to allow dragging outside of container
-        maxW="1000px"
-        mx="auto"
-        position="relative"
-      >
-        {/* Quiz Header */}
-        <QuizHeader 
-          title={title}
-          description={description}
-          quizState={quizState}
-          formatTime={formatTime}
-          timeLimit={timeLimit}
-        />
-        
-        {/* Quiz Controls */}
-        <QuizControls 
-          quizState={quizState}
-          isPaused={isPaused}
-          handleStart={handleStart}
-          handlePause={handlePause}
-          handleResume={handleResume}
-          handleReset={handleReset}
-          handleAbort={handleAbort}
-        />
-        
-        {/* Quiz content */}
-        <Box 
-          p={4} 
-          position="relative" 
-          overflow="visible" 
-          maxH="600px"
-        >
-          {quizState.status === 'waiting' && (
-            <QuizStartScreen
-              title={title}
-              description={description}
-              timeLimit={timeLimit}
-              difficulty={difficulty}
-              formatTime={formatTime}
-              handleStart={handleStart}
-            />
-          )}
-
-          {(quizState.status === 'active' || quizState.status === 'paused') && (
-            <HStack
-              align="start"
-              spacing={6}
-              h="550px"
-              overflow="visible"
-              position="relative"
-              opacity={quizState.status === 'paused' ? 0.7 : 1}
-            >
-              {/* Available blocks area */}
-              <AvailableBlocks
-                blocks={quizState.blocks}
-                activeDragBlock={activeDragBlock}
-                handleDragStart={handleDragStart}
-                handleDragEnd={handleDragEnd}
-                language={language}
-              />
-              
-              {/* Solution area */}
-              <SolutionArea
-                userSolution={quizState.userSolution}
-                dropZoneRefs={dropZoneRefs}
-                activeDragBlock={activeDragBlock}
-                gameEffects={gameEffects}
-                language={language}
-                quizState={quizState}
-              />
-            </HStack>
-          )}
-          
-          {/* Overlays */}
-          {quizState.status === 'paused' && (
-            <Box
-              position="absolute"
-              top={0}
-              left={0}
-              right={0}
-              bottom={0}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              bg="rgba(0, 0, 0, 0.7)"
-              zIndex={50}
-            >
-              <VStack spacing={4}>
-                <Text color="#00ff00" fontSize="2xl" fontWeight="bold">
-                  PAUSED
-                </Text>
-                <Button
-                  size="lg"
-                  colorScheme="blue"
-                  onClick={handleResume}
-                >
-                  Resume Quiz
-                </Button>
-              </VStack>
-            </Box>
-          )}
-          
-          {/* Quiz completion overlay */}
-          {quizState.status === 'completed' && (
-            <QuizResults
-              type="complete"
-              quizState={quizState}
-              handleReset={handleReset}
-            />
-          )}
-          
-          {/* Quiz failure overlay */}
-          {quizState.status === 'failed' && (
-            <QuizResults
-              type="failed"
-              quizState={quizState}
-              handleReset={handleReset}
-            />
-          )}
-        </Box>
-      </MotionBox>
-    </Box>
-  );
 };
-
-export default CodeStackingQuiz;

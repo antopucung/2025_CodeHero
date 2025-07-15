@@ -314,7 +314,6 @@ const TypingChallenge = ({ challenge, onComplete, isActive = false, currentLevel
               POWER LVL {gameStats.powerLevel}
             </Text>
           )}
-        </Text>
         </HStack>
       </Box>
       

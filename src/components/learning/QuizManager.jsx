@@ -20,7 +20,13 @@ const QuizManager = ({ quizData, onComplete, juiciness = 'high' }) => {
     case 'code-stacking':
       return (
         <CodeStackingQuiz
-          quizData={quizData}
+          code={quizData.code}
+          language={quizData.language || "csharp"}
+          timeLimit={quizData.timeLimit || 120}
+          title={quizData.title || "Arrange the Code"}
+          description={quizData.description || "Drag the code blocks to arrange them in the correct order"}
+          splitType={quizData.splitType || "line"}
+          difficulty={quizData.difficulty || "medium"}
           onComplete={onComplete}
           juiciness={juiciness}
         />

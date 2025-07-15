@@ -1,5 +1,5 @@
 import React from 'react';
-import { VStack, HStack, Badge } from "@chakra-ui/react";
+import { VStack, HStack, Badge, Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { Card } from '../../design/components/Card';
 import { Text, Heading } from '../../design/components/Typography';

@@ -36,7 +36,6 @@ export const ProfileCard = ({ userData, progress }) => {
           <Heading level={2} size="xl" color="brand">
             {userData.name}
           </Heading>
-          <Text color="secondary">{userData.username}</Text>
           <CustomText color="secondary">{userData.username}</CustomText>
           <CustomText size="sm" color="muted">{userData.email}</CustomText>
           <CustomText size="sm" color="muted">Joined {userData.joinDate}</CustomText>

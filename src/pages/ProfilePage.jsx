@@ -1,10 +1,12 @@
 import React from 'react';
 import { Grid, Tabs, TabList, TabPanels, Tab, TabPanel, Box } from "@chakra-ui/react";
+import { VStack } from "@chakra-ui/react";
 import { useNavigate } from 'react-router-dom';
 import { useProgressionSystem } from '../hooks/useProgressionSystem';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
 import { PageLayout, SectionLayout } from '../design/layouts/PageLayout';
 import { PageHeader } from '../design/components/PageHeader';
+import { CustomText } from '../design/components/Typography';
 import { ProgressionDashboard } from '../components/progression/ProgressionDashboard';
 import { ProfileCard } from '../components/profile/ProfileCard';
 import { AchievementsSection } from '../components/profile/AchievementsSection';

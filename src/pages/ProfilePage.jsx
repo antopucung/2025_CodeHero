@@ -17,7 +17,7 @@ import { designSystem } from '../design/system/DesignSystem';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { profile, achievements, loading, user } = useProgressionSystem();
+  const { profile, achievements, certifications, loading, user } = useProgressionSystem();
   const { getEnrolledCourses, getAllAchievements } = useUserEnrollment();
   const [enrolledCourses, setEnrolledCourses] = React.useState([]);
   const [courseAchievements, setCourseAchievements] = React.useState([]);

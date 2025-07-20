@@ -1,10 +1,13 @@
 import React from 'react';
-import { VStack, HStack } from "@chakra-ui/react";
-import { Card } from '../../design/components/Card';
-import { CustomText, Heading } from '../../design/components/Typography';
-import { designSystem } from '../../design/system/DesignSystem';
+import {
+  Card,
+  Stack,
+  SectionTitle,
+  BodyText,
+  Caption
+} from '../../design/components/StandardizedComponents';
 
-export const RecentActivity = () => {
+export function RecentActivity() {
   const activities = [
     {
       icon: '🎯',
@@ -24,28 +27,29 @@ export const RecentActivity = () => {
   ];
 
   return (
-    <Card variant="elevated" p={designSystem.spacing[6]}>
-      <Heading level={3} size="lg" color="accent" mb={designSystem.spacing[4]}>
+    <Card animated>
+      <SectionTitle>
         📈 Recent Activity
-      </Heading>
-      <VStack spacing={designSystem.spacing[4]} align="stretch">
+      </SectionTitle>
+      <Stack>
         {activities.map((activity, index) => (
-          <HStack 
+          <Stack
             key={index}
-            spacing={designSystem.spacing[4]} 
-            p={designSystem.spacing[3]} 
-            px={designSystem.spacing[4]}
-            bg={designSystem.colors.backgrounds.secondary} 
-            borderRadius={designSystem.radii.md}
+            horizontal
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.05)',
+              padding: '12px',
+              borderRadius: '8px'
+            }}
           >
-            <CustomText fontSize={designSystem.typography.sizes.lg} lineHeight="1">{activity.icon}</CustomText>
-            <VStack align="start" spacing={0} flex={1}>
-              <CustomText size="sm" color="secondary">{activity.title}</CustomText>
-              <CustomText size="xs" color="muted" mt={designSystem.spacing[1]}>{activity.time}</CustomText>
-            </VStack>
-          </HStack>
+            <BodyText fontSize="lg">{activity.icon}</BodyText>
+            <Stack flex={1}>
+              <BodyText>{activity.title}</BodyText>
+              <Caption>{activity.time}</Caption>
+            </Stack>
+          </Stack>
         ))}
-      </VStack>
+      </Stack>
     </Card>
   );
-};
+}

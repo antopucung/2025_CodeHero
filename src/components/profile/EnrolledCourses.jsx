@@ -1,103 +1,65 @@
 import React from 'react';
-import { VStack, HStack, Badge, Box } from "@chakra-ui/react";
-import { motion } from "framer-motion";
-import { Card } from '../../design/components/Card';
-import { CustomText, Heading } from '../../design/components/Typography';
-import { Button as CustomButton } from '../../design/components/Button';
-import { designSystem } from '../../design/system/DesignSystem';
+import {
+  Card,
+  Stack,
+  Grid,
+  SectionTitle,
+  BodyText,
+  CourseCard,
+  StandardButton
+} from '../../design/components/StandardizedComponents';
 
-const MotionBox = motion.div;
-
-export const EnrolledCourses = ({ enrolledCourses, onNavigateToMarketplace, onNavigateToCourse }) => {
+export function EnrolledCourses({ enrolledCourses, onNavigateToMarketplace, onNavigateToCourse }) {
   // Ensure enrolledCourses is always an array
   const safeCourses = Array.isArray(enrolledCourses) ? enrolledCourses : [];
   
   return (
-    <Card variant="elevated" p={designSystem.spacing[6]}>
-      <HStack justify="space-between" mb={designSystem.spacing[4]}>
-        <Heading level={3} size="lg" color="secondary">
+    <Card animated>
+      <Stack horizontal>
+        <SectionTitle flex={1}>
           📚 My Courses
-        </Heading>
-        <CustomButton 
+        </SectionTitle>
+        <StandardButton 
           variant="primary" 
-          size="sm"
+          animated
           onClick={onNavigateToMarketplace}
         >
           + Browse More
-        </CustomButton>
-      </HStack>
+        </StandardButton>
+      </Stack>
       
       {safeCourses.length > 0 ? (
-        <VStack spacing={designSystem.spacing[4]} align="stretch">
+        <Stack>
           {safeCourses.slice(0, 3).map((course, index) => (
-            <MotionBox
+            <CourseCard
               key={course.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              style={{
-                background: designSystem.colors.backgrounds.secondary,
-                padding: 0,
-                borderRadius: designSystem.radii.md,
-                border: `1px solid ${designSystem.colors.borders.default}`,
-                cursor: 'pointer'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.borderColor = designSystem.colors.brand.primary;
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.borderColor = designSystem.colors.borders.default;
-              }}
-              onClick={() => onNavigateToCourse && onNavigateToCourse(course.slug)}
-            >
-              <Box p={designSystem.spacing[4]}>
-              <VStack align="start" spacing={designSystem.spacing[3]}>
-                <HStack justify="space-between" w="100%" spacing={designSystem.spacing[2]}>
-                  <CustomText color="brand" fontWeight={designSystem.typography.weights.bold}>
-                    {course?.title ?? 'Course Title'}
-                  </CustomText>
-                  <Badge bg={designSystem.colors.brand.secondary} color={designSystem.colors.text.inverse}>
-                    {(course?.language ?? 'CODE').toUpperCase()}
-                  </Badge>
-                </HStack>
-                <CustomText size="sm" color="muted" mt={designSystem.spacing[1]} style={{ 
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden'
-                }}>
-                  {course?.description ?? 'Course description'}
-                </CustomText>
-                <HStack spacing={designSystem.spacing[4]} fontSize="xs" color={designSystem.colors.text.muted} mt={designSystem.spacing[2]}>
-                  <CustomText>📚 {course?.lessons_count ?? 0} lessons</CustomText>
-                  <CustomText>⏱️ {course?.duration_hours ?? 0}h</CustomText>
-                  <CustomText>⭐ {course?.rating ?? 0}</CustomText>
-                </HStack>
-              </VStack>
-              </Box>
-            </MotionBox>
+              course={course}
+              animated
+              onNavigate={(course) => onNavigateToCourse?.(course.slug)}
+            />
           ))}
           
           {safeCourses.length > 3 && (
-            <CustomText size="sm" color="muted" textAlign="center" py={designSystem.spacing[2]}>
+            <BodyText textAlign="center">
               +{safeCourses.length - 3} more courses
-            </CustomText>
+            </BodyText>
           )}
-        </VStack>
+        </Stack>
       ) : (
-        <VStack spacing={designSystem.spacing[5]} textAlign="center" py={designSystem.spacing[8]}>
-          <CustomText size="lg">📚</CustomText>
-          <CustomText color="muted">No courses enrolled yet</CustomText>
-          <Box pt={designSystem.spacing[2]}>
-            <CustomButton 
+        <Stack>
+          <BodyText textAlign="center">📚</BodyText>
+          <BodyText textAlign="center">No courses enrolled yet</BodyText>
+          <Stack horizontal justify="center">
+            <StandardButton 
               variant="primary" 
+              animated
               onClick={() => onNavigateToMarketplace && onNavigateToMarketplace()}
             >
               Explore Marketplace
-            </CustomButton>
-          </Box>
-        </VStack>
+            </StandardButton>
+          </Stack>
+        </Stack>
       )}
     </Card>
   );
-};
+}

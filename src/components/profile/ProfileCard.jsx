@@ -1,11 +1,16 @@
 import React from 'react';
-import { Box, VStack, HStack, Badge, Image } from "@chakra-ui/react";
-import { Card } from '../../design/components/Card';
-import { CustomText, Heading } from '../../design/components/Typography';
-import { Button as CustomButton } from '../../design/components/Button';
-import { designSystem } from '../../design/system/DesignSystem';
+import { Image } from "@chakra-ui/react";
+import {
+  Card,
+  Stack,
+  PageTitle,
+  BodyText,
+  Caption,
+  StatusBadge,
+  StandardButton
+} from '../../design/components/StandardizedComponents';
 
-export const ProfileCard = ({ userData, progress }) => {
+export function ProfileCard({ userData, progress }) {
   // Provide safe fallbacks for all data
   const safeUserData = userData || {
     name: 'User',
@@ -19,9 +24,9 @@ export const ProfileCard = ({ userData, progress }) => {
   const safeProgress = progress || { overall_level: 1 };
   
   return (
-    <Card variant="elevated" p={designSystem.spacing[6]}>  
-      <VStack spacing={designSystem.spacing[5]} align="center">
-        <Box position="relative">
+    <Card animated hover>
+      <Stack>
+        <Stack horizontal justify="center">
           <Image
             src={safeUserData.avatar}
             alt={safeUserData.name}
@@ -29,45 +34,36 @@ export const ProfileCard = ({ userData, progress }) => {
             h="120px"
             borderRadius="full"
             objectFit="cover"
-            border={`4px solid ${designSystem.colors.brand.primary}`}
+            border="4px solid #00ff00"
           />
-          <Badge 
-            position="absolute"
-            bottom="0"
-            right="0"
-            bg={designSystem.colors.status.success} 
-            color={designSystem.colors.text.inverse}
-            borderRadius="full"
-            p={2}
-          >
-            LV.{safeProgress?.overall_level ?? safeProgress?.level ?? 1}
-          </Badge>
-        </Box>
+        </Stack>
         
-        <VStack spacing={designSystem.spacing[3]} textAlign="center" px={designSystem.spacing[3]}>
-          <Heading level={2} size="xl" color="brand">
-            {safeUserData.name}
-          </Heading>
-          <CustomText color="secondary">{safeUserData.username}</CustomText>
-          <CustomText size="sm" color="muted">{safeUserData.email}</CustomText>
-          <CustomText size="sm" color="muted">Joined {safeUserData.joinDate}</CustomText>
-        </VStack>
+        <StatusBadge variant="success">
+          LV.{safeProgress?.overall_level ?? safeProgress?.level ?? 1}
+        </StatusBadge>
+        
+        <Stack>
+          <PageTitle textAlign="center">{safeUserData.name}</PageTitle>
+          <BodyText textAlign="center">{safeUserData.username}</BodyText>
+          <Caption textAlign="center">{safeUserData.email}</Caption>
+          <Caption textAlign="center">Joined {safeUserData.joinDate}</Caption>
+        </Stack>
 
-        <Box px={designSystem.spacing[4]} py={designSystem.spacing[2]}>
-          <CustomText size="sm" color="secondary" textAlign="center" lineHeight="1.5">
+        <Stack>
+          <BodyText textAlign="center">
             {safeUserData.bio}
-          </CustomText>
-        </Box>
+          </BodyText>
+        </Stack>
 
-        <HStack spacing={designSystem.spacing[4]} w="100%" px={designSystem.spacing[3]}>
-          <CustomButton variant="primary" size="sm" flex={1}>
+        <Stack horizontal>
+          <StandardButton variant="primary" animated flex={1}>
             🔗 Portfolio
-          </CustomButton>
-          <CustomButton variant="secondary" size="sm" flex={1}>
+          </StandardButton>
+          <StandardButton variant="secondary" animated flex={1}>
             📧 GitHub
-          </CustomButton>
-        </HStack>
-      </VStack>
+          </StandardButton>
+        </Stack>
+      </Stack>
     </Card>
   );
-};
+}

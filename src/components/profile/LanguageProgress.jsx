@@ -1,13 +1,15 @@
 import React from 'react';
-import { Box, VStack, HStack, Badge } from "@chakra-ui/react";
-import { motion } from "framer-motion";
-import { Card } from '../../design/components/Card';
-import { CustomText, Heading } from '../../design/components/Typography';
-import { designSystem } from '../../design/system/DesignSystem';
+import {
+  Card,
+  Stack,
+  SectionTitle,
+  BodyText,
+  Caption,
+  StatusBadge,
+  ProgressBar
+} from '../../design/components/StandardizedComponents';
 
-const MotionBox = motion.div;
-
-export const LanguageProgress = ({ languageProgress }) => {
+export function LanguageProgress({ languageProgress }) {
   function getLanguageColor(language) {
     const colors = {
       javascript: '#F7DF1E',
@@ -17,7 +19,7 @@ export const LanguageProgress = ({ languageProgress }) => {
       csharp: '#239120',
       php: '#777BB4'
     };
-    return colors[language] || designSystem.colors.brand.primary;
+    return colors[language] || '#00ff00';
   }
 
   const progressData = Object.entries(languageProgress || {}).map(([lang, data]) => ({
@@ -30,63 +32,48 @@ export const LanguageProgress = ({ languageProgress }) => {
   // If no language progress data, show placeholder
   if (progressData.length === 0) {
     return (
-      <Card variant="elevated" p={designSystem.spacing[6]}>
-        <Heading level={3} size="lg" color="brand" mb={designSystem.spacing[4]}>
+      <Card animated>
+        <SectionTitle>
           📊 Language Progress
-        </Heading>
-        <Box p={designSystem.spacing[4]} textAlign="center">
-          <CustomText color="muted">
+        </SectionTitle>
+        <Stack>
+          <BodyText textAlign="center">
             Start coding challenges to track language progress!
-          </CustomText>
-        </Box>
+          </BodyText>
+        </Stack>
       </Card>
     );
   }
   return (
-    <Card variant="elevated" p={designSystem.spacing[6]}>
-      <Heading level={3} size="lg" color="brand" mb={designSystem.spacing[4]}>
+    <Card animated>
+      <SectionTitle>
         📊 Language Progress
-      </Heading>
-      <VStack spacing={designSystem.spacing[5]} align="stretch">
+      </SectionTitle>
+      <Stack>
         {progressData.map((lang, index) => (
-          <MotionBox
-            key={lang.language}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <Box px={designSystem.spacing[2]}>
-            <HStack justify="space-between" mb={designSystem.spacing[3]}>
-              <HStack spacing={designSystem.spacing[2]}>
-                <CustomText fontWeight={designSystem.typography.weights.bold} color="secondary">
+          <Stack key={lang.language}>
+            <Stack horizontal>
+              <Stack horizontal flex={1}>
+                <BodyText fontWeight="bold">
                   {lang.language.toUpperCase()}
-                </CustomText>
-                <Badge bg={lang.color} color={designSystem.colors.text.inverse}>
+                </BodyText>
+                <StatusBadge 
+                  style={{ backgroundColor: lang.color, color: '#000' }}
+                >
                   Level {lang.level}
-                </Badge>
-              </HStack>
-              <CustomText size="sm" color="muted">
+                </StatusBadge>
+              </Stack>
+              <Caption>
                 {Math.min(((lang.xp ?? 0) / ((lang.level ?? 1) * 50)) * 100, 100).toFixed(0)}% Complete
-              </CustomText>
-            </HStack>
-            <Box
-              bg={designSystem.colors.backgrounds.secondary}
-              h="8px"
-              borderRadius={designSystem.radii.base}
-              overflow="hidden"
-              mx={designSystem.spacing[1]}
-            >
-              <Box
-                bg={lang.color}
-                h="100%"
-                w={`${Math.min(((lang.xp ?? 0) / ((lang.level ?? 1) * 50)) * 100, 100)}%`}
-                transition="width 0.3s"
-              />
-            </Box>
-            </Box>
-          </MotionBox>
+              </Caption>
+            </Stack>
+            <ProgressBar 
+              value={Math.min(((lang.xp ?? 0) / ((lang.level ?? 1) * 50)) * 100, 100)}
+              animated
+            />
+          </Stack>
         ))}
-      </VStack>
+      </Stack>
     </Card>
   );
-};
+}

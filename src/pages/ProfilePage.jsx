@@ -1,21 +1,25 @@
 import React from 'react';
-import { Grid, Tabs, TabList, TabPanels, Tab, TabPanel, Box } from "@chakra-ui/react";
-import { VStack } from "@chakra-ui/react";
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { useNavigate } from 'react-router-dom';
 import { useProgressionSystem } from '../hooks/useProgressionSystem';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
-import { PageLayout, SectionLayout } from '../design/layouts/PageLayout';
-import { PageHeader } from '../design/components/PageHeader';
-import { CustomText } from '../design/components/Typography';
+import {
+  ProfilePageLayout,
+  TwoColumnLayout,
+  Section,
+  Stack,
+  PageTitle,
+  BodyText,
+  StatusBadge
+} from '../design/components/StandardizedComponents';
 import { ProgressionDashboard } from '../components/progression/ProgressionDashboard';
 import { ProfileCard } from '../components/profile/ProfileCard';
 import { AchievementsSection } from '../components/profile/AchievementsSection';
 import { LanguageProgress } from '../components/profile/LanguageProgress';
 import { EnrolledCourses } from '../components/profile/EnrolledCourses';
 import { RecentActivity } from '../components/profile/RecentActivity';
-import { designSystem } from '../design/system/DesignSystem';
 
-const ProfilePage = () => {
+function ProfilePage() {
   const navigate = useNavigate();
   const { 
     profile, 
@@ -195,9 +199,24 @@ const ProfilePage = () => {
 
   // Prepare stats with safe fallbacks
   const stats = [
-    { value: displayProfile?.overall_level || 1, label: 'LEVEL' },
-    { value: displayProfile?.total_challenges_completed || 0, label: 'CHALLENGES' },
-    { value: displayProfile?.achievements?.length || displayAchievements?.length || 0, label: 'ACHIEVEMENTS' }
+    { 
+      value: displayProfile?.overall_level || 1, 
+      label: 'LEVEL',
+      icon: '📈',
+      color: '#00ff00'
+    },
+    { 
+      value: displayProfile?.total_challenges_completed || 0, 
+      label: 'CHALLENGES',
+      icon: '🎯',
+      color: '#ffd93d'
+    },
+    { 
+      value: displayProfile?.achievements?.length || displayAchievements?.length || 0, 
+      label: 'ACHIEVEMENTS',
+      icon: '🏆',
+      color: '#ff6b6b'
+    }
   ];
 
   // Functions for navigation
@@ -212,84 +231,62 @@ const ProfilePage = () => {
   // Show error state if there's an error and user is authenticated
   if (error && user) {
     return (
-      <PageLayout background="primary">
-        <SectionLayout spacing="default">
-          <Box 
-            bg={designSystem.colors.backgrounds.secondary}
-            p={designSystem.spacing[8]}
-            borderRadius="md"
-            textAlign="center"
-            maxW="600px"
-            mx="auto"
-          >
-            <CustomText size="lg" color="error" mb={designSystem.spacing[4]}>
+      <ProfilePageLayout title="Profile Error">
+        <Section>
+          <Stack>
+            <PageTitle color="#ff6b6b">
               ⚠️ Profile Error
-            </CustomText>
-            <CustomText color="muted" mb={designSystem.spacing[4]}>
+            </PageTitle>
+            <BodyText>
               There was an error loading your profile data: {error}
-            </CustomText>
-            <CustomText size="sm" color="secondary">
+            </BodyText>
+            <BodyText>
               Please try refreshing the page or contact support if the issue persists.
-            </CustomText>
-          </Box>
-        </SectionLayout>
-      </PageLayout>
+            </BodyText>
+          </Stack>
+        </Section>
+      </ProfilePageLayout>
     );
   }
   return (
-    <PageLayout background="primary">
+    <ProfilePageLayout 
+      title="👤 User Profile"
+      subtitle="Track Your Coding Journey & Achievements"
+      stats={stats}
+    >
       {!profile && !loading && (
-        <Box 
-          bg="rgba(255, 217, 61, 0.1)" 
-          border="1px solid #ffd93d" 
-          borderRadius="md" 
-          p={4} 
-          mb={6}
-          textAlign="center"
-        >
-          <CustomText color="#ffd93d" fontWeight="bold">
+        <Section>
+          <StatusBadge variant="warning">
             🎮 Demo Mode - This is a preview of the profile system. Log in to track your real progress!
-          </CustomText>
-        </Box>
+          </StatusBadge>
+        </Section>
       )}
-      <PageHeader
-        title="👤 User Profile"
-        subtitle="Track Your Coding Journey & Achievements"
-        stats={stats}
-      />
       
-      <SectionLayout spacing="default">
+      <Section>
         {/* Show loading state only when actually loading and user is authenticated */}
         {loading && user && (
-          <Box p={designSystem.spacing[8]} textAlign="center">
-            <CustomText color="muted">Loading your progress...</CustomText>
-          </Box>
+          <Stack>
+            <BodyText textAlign="center">Loading your progress...</BodyText>
+          </Stack>
         )}
         
         {/* Show login prompt when not authenticated and not loading */}
         {!loading && !user && (
-          <Box 
-            bg={designSystem.colors.backgrounds.secondary}
-            p={designSystem.spacing[8]}
-            borderRadius="md"
-            textAlign="center"
-            maxW="600px"
-            mx="auto"
-          >
-            <CustomText size="lg" color="secondary" mb={designSystem.spacing[4]}>
-              🔐 Login Required
-            </CustomText>
-            <CustomText color="muted" mb={designSystem.spacing[4]}>
-              Please log in to view your personalized profile and track your learning progress.
-            </CustomText>
-            <VStack spacing={designSystem.spacing[2]} align="start">
-              <CustomText size="sm" color="secondary">With an account you can:</CustomText>
-              <CustomText size="sm" color="muted">📊 Track XP and level progression</CustomText>
-              <CustomText size="sm" color="muted">🏆 Unlock achievements and badges</CustomText>
-              <CustomText size="sm" color="muted">📜 Earn professional certifications</CustomText>
-              <CustomText size="sm" color="muted">📈 View detailed learning analytics</CustomText>
-            </VStack>
-          </Box>
+          <Section>
+            <Stack>
+              <PageTitle>🔐 Login Required</PageTitle>
+              <BodyText>
+                Please log in to view your personalized profile and track your learning progress.
+              </BodyText>
+              <Stack>
+                <BodyText>With an account you can:</BodyText>
+                <BodyText>📊 Track XP and level progression</BodyText>
+                <BodyText>🏆 Unlock achievements and badges</BodyText>
+                <BodyText>📜 Earn professional certifications</BodyText>
+                <BodyText>📈 View detailed learning analytics</BodyText>
+              </Stack>
+            </Stack>
+          </Section>
         )}
         
         {/* Show profile content when not loading */}
@@ -313,13 +310,8 @@ const ProfilePage = () => {
             </TabPanel>
             
             <TabPanel p={0} pt={6}>
-              <Grid 
-                templateColumns={{ base: "1fr", lg: "1fr 2fr" }} 
-                gap={designSystem.spacing[6]} 
-                w="100%"
-              >
-                {/* Left Column - Profile Info */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
+              <TwoColumnLayout
+                leftContent={<>
                   {displayProfile && <ProfileCard userData={userData} progress={displayProfile} />}
                   <AchievementsSection 
                     achievements={[
@@ -327,10 +319,8 @@ const ProfilePage = () => {
                       ...(courseAchievements || []).map(a => typeof a === 'string' ? a.replace('_', ' ') : a)
                     ]} 
                   />
-                </div>
-      
-                {/* Right Column - Progress & Courses */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
+                </>}
+                rightContent={<>
                   <LanguageProgress languageProgress={displayProfile?.language_progress || {}} />
                   <EnrolledCourses 
                     enrolledCourses={displayEnrolledCourses}
@@ -338,8 +328,8 @@ const ProfilePage = () => {
                     onNavigateToCourse={handleNavigateToCourse}
                   />
                   <RecentActivity />
-                </div>
-              </Grid>
+                </>}
+              />
             </TabPanel>
             
             <TabPanel p={0} pt={6}>
@@ -352,9 +342,9 @@ const ProfilePage = () => {
           </TabPanels>
         </Tabs>
         )}
-      </SectionLayout>
-    </PageLayout>
+      </Section>
+    </ProfilePageLayout>
   );
-};
+}
 
 export default ProfilePage;

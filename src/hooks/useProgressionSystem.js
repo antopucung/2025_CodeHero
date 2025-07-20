@@ -28,8 +28,14 @@ export const useProgressionSystem = () => {
         if (error) throw error;
         setUser(user);
       } catch (err) {
-        console.error('Error getting user:', err);
-        setError(err.message);
+       // Handle auth session missing as normal state (user not authenticated)
+       if (err.message === 'Auth session missing!') {
+         setUser(null);
+         setError(null);
+       } else {
+         console.error('Error getting user:', err);
+         setError(err.message);
+       }
       }
     };
     

@@ -996,4 +996,12 @@ export const ProgressionDashboard = ({
   );
 };
 
+// Global XP notification system
+if (typeof window !== 'undefined') {
+  window.showXPGain = (amount) => {
+    const event = new CustomEvent('xpGained', { detail: { amount } });
+    window.dispatchEvent(event);
+  };
+}
+
 export default ProgressionDashboard;

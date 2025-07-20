@@ -176,6 +176,11 @@ export const useProgressionSystem = () => {
       const result = await XPService.awardXP(user.id, category, activity, options);
       
       if (result.success) {
+        // Show real-time XP notification
+        if (typeof window !== 'undefined' && window.showXPGain) {
+          window.showXPGain(result.newXP - (profile?.total_xp || 0));
+        }
+        
         // Reload progression data to reflect changes
         await loadProgressionData();
         

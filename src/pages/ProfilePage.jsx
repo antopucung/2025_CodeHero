@@ -17,7 +17,15 @@ import { designSystem } from '../design/system/DesignSystem';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { profile, achievements, certifications, loading, user } = useProgressionSystem();
+  const { 
+    profile, 
+    achievements, 
+    certifications, 
+    xpHistory,
+    loading, 
+    error,
+    user 
+  } = useProgressionSystem();
   const { getEnrolledCourses, getAllAchievements } = useUserEnrollment();
   const [enrolledCourses, setEnrolledCourses] = React.useState([]);
   const [courseAchievements, setCourseAchievements] = React.useState([]);
@@ -77,6 +85,44 @@ const ProfilePage = () => {
     }
   ];
 
+  const mockCertifications = [
+    {
+      id: 1,
+      certificate_number: 'TI-2024-001',
+      status: 'active',
+      issued_at: '2024-01-15T10:00:00Z',
+      expires_at: '2025-01-15T10:00:00Z',
+      certification_types: {
+        title: 'JavaScript Fundamentals',
+        description: 'Demonstrates proficiency in JavaScript programming'
+      }
+    }
+  ];
+
+  const mockXpHistory = [
+    {
+      id: 1,
+      xp_amount: 150,
+      transaction_type: 'earned',
+      source_activity: 'lesson_completion',
+      description: 'Completed Unity C# lesson',
+      created_at: '2024-01-20T14:30:00Z',
+      xp_categories: {
+        category_name: 'lesson_completion'
+      }
+    },
+    {
+      id: 2,
+      xp_amount: 200,
+      transaction_type: 'earned',
+      source_activity: 'typing_challenge',
+      description: 'Perfect typing challenge completion',
+      created_at: '2024-01-20T13:15:00Z',
+      xp_categories: {
+        category_name: 'typing_challenge'
+      }
+    }
+  ];
   const mockEnrolledCourses = [
     {
       id: 1,
@@ -103,12 +149,20 @@ const ProfilePage = () => {
   React.useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
-        const courses = await getEnrolledCourses();
-        setEnrolledCourses(courses);
+        if (user) {
+          const courses = await getEnrolledCourses();
+          setEnrolledCourses(courses || []);
+        } else {
+          setEnrolledCourses(mockEnrolledCourses);
+        }
         
         // Get achievements from courses
-        const achievements = getAllAchievements();
-        setCourseAchievements(achievements);
+        if (user) {
+          const achievements = getAllAchievements();
+          setCourseAchievements(achievements || []);
+        } else {
+          setCourseAchievements(['speed_demon', 'perfectionist']);
+        }
       } catch (error) {
         console.error('Error fetching enrolled courses:', error);
         // Use mock data if fetching fails
@@ -117,7 +171,7 @@ const ProfilePage = () => {
       }
     };
     fetchEnrolledCourses();
-  }, []);
+  }, [user, getEnrolledCourses, getAllAchievements]);
 
   // Mock user data - in a real app this would come from authentication
   const userData = {
@@ -134,7 +188,9 @@ const ProfilePage = () => {
 
   // Use actual data if available, otherwise use mock data for demo
   const displayProfile = profile || mockProfile;
-  const displayAchievements = achievements.length > 0 ? achievements : mockAchievements;
+  const displayAchievements = (achievements && achievements.length > 0) ? achievements : mockAchievements;
+  const displayCertifications = (certifications && certifications.length > 0) ? certifications : mockCertifications;
+  const displayXpHistory = (xpHistory && xpHistory.length > 0) ? xpHistory : mockXpHistory;
   const displayEnrolledCourses = enrolledCourses.length > 0 ? enrolledCourses : mockEnrolledCourses;
 
   // Prepare stats with safe fallbacks
@@ -153,9 +209,36 @@ const ProfilePage = () => {
     navigate(`/modules/${courseSlug}`);
   };
 
+  // Show error state if there's an error and user is authenticated
+  if (error && user) {
+    return (
+      <PageLayout background="primary">
+        <SectionLayout spacing="default">
+          <Box 
+            bg={designSystem.colors.backgrounds.secondary}
+            p={designSystem.spacing[8]}
+            borderRadius="md"
+            textAlign="center"
+            maxW="600px"
+            mx="auto"
+          >
+            <CustomText size="lg" color="error" mb={designSystem.spacing[4]}>
+              ⚠️ Profile Error
+            </CustomText>
+            <CustomText color="muted" mb={designSystem.spacing[4]}>
+              There was an error loading your profile data: {error}
+            </CustomText>
+            <CustomText size="sm" color="secondary">
+              Please try refreshing the page or contact support if the issue persists.
+            </CustomText>
+          </Box>
+        </SectionLayout>
+      </PageLayout>
+    );
+  }
   return (
     <PageLayout background="primary">
-      {!profile && (
+      {!profile && !loading && (
         <Box 
           bg="rgba(255, 217, 61, 0.1)" 
           border="1px solid #ffd93d" 
@@ -210,7 +293,7 @@ const ProfilePage = () => {
         )}
         
         {/* Show profile content when not loading */}
-        {!loading && (
+        {(!loading || !user) && (
         <Tabs variant="soft-rounded" colorScheme="green">
           <TabList>
             <Tab>📊 Progression</Tab>
@@ -223,8 +306,8 @@ const ProfilePage = () => {
               <ProgressionDashboard 
                 profile={displayProfile}
                 achievements={displayAchievements}
-                certifications={certifications}
-                xpHistory={xpHistory}
+                certifications={displayCertifications}
+                xpHistory={displayXpHistory}
                 isDemo={!profile}
               />
             </TabPanel>
@@ -237,11 +320,11 @@ const ProfilePage = () => {
               >
                 {/* Left Column - Profile Info */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
-                  <ProfileCard userData={userData} progress={displayProfile} />
+                  {displayProfile && <ProfileCard userData={userData} progress={displayProfile} />}
                   <AchievementsSection 
                     achievements={[
                       ...(displayAchievements?.map(a => a.achievement_definitions?.title || a.achievement_key) || []), 
-                      ...courseAchievements.map(a => a.replace('_', ' '))
+                      ...(courseAchievements || []).map(a => typeof a === 'string' ? a.replace('_', ' ') : a)
                     ]} 
                   />
                 </div>

@@ -8,14 +8,17 @@ import { designSystem } from '../../design/system/DesignSystem';
 const MotionBox = motion.div;
 
 export const AchievementsSection = ({ achievements }) => {
+  // Ensure achievements is always an array
+  const safeAchievements = Array.isArray(achievements) ? achievements : [];
+  
   return (
     <Card variant="elevated" p={designSystem.spacing[6]}>  
       <Heading level={3} size="lg" color="accent" mb={designSystem.spacing[4]}>
         🏆 Achievements
       </Heading>
       <VStack spacing={designSystem.spacing[3]} align="stretch">
-        {achievements.length > 0 ? (
-          achievements.map((achievement, index) => (
+        {safeAchievements.length > 0 ? (
+          safeAchievements.map((achievement, index) => (
             <MotionBox
               key={index}
               initial={{ opacity: 0, x: -20 }}
@@ -31,7 +34,10 @@ export const AchievementsSection = ({ achievements }) => {
               <HStack spacing={designSystem.spacing[3]} px={designSystem.spacing[1]}>
                 <CustomText size="lg" lineHeight="1">🏆</CustomText>
                 <CustomText color="brand" fontWeight={designSystem.typography.weights.bold}>
-                  {achievement.replace('_', ' ').toUpperCase()}
+                  {typeof achievement === 'string' 
+                    ? achievement.replace('_', ' ').toUpperCase()
+                    : (achievement?.title || 'Achievement').toUpperCase()
+                  }
                 </CustomText>
               </HStack>
             </MotionBox>

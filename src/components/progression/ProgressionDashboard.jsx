@@ -13,10 +13,20 @@ const MotionBox = motion(Box);
 
 // Individual components for the dashboard
 const LevelProgressCard = ({ profile }) => {
-  if (!profile) return null;
+  if (!profile) {
+    return (
+      <Card variant="elevated" p={designSystem.spacing[6]}>
+        <VStack spacing={designSystem.spacing[4]} align="stretch">
+          <CustomText color="muted" textAlign="center">
+            Loading level progress...
+          </CustomText>
+        </VStack>
+      </Card>
+    );
+  }
   
-  const xpToNext = profile.xp_to_next_level || 100;
-  const currentXp = profile.total_xp || 0;
+  const xpToNext = profile?.xp_to_next_level ?? 100;
+  const currentXp = profile?.total_xp ?? 0;
   const levelProgress = xpToNext > 0 
     ? ((currentXp % (currentXp + xpToNext)) / (currentXp + xpToNext)) * 100
     : 100;
@@ -26,20 +36,20 @@ const LevelProgressCard = ({ profile }) => {
       <VStack spacing={designSystem.spacing[4]} align="stretch">
         <HStack justify="space-between">
           <Heading level={3} size="lg" color="brand">
-            Level {profile.overall_level || 1}
+            Level {profile?.overall_level ?? 1}
           </Heading>
           <Badge bg={designSystem.colors.brand.primary} color={designSystem.colors.text.inverse}>
-            {(profile.total_xp || 0).toLocaleString()} XP
+            {(profile?.total_xp ?? 0).toLocaleString()} XP
           </Badge>
         </HStack>
         
         <VStack spacing={designSystem.spacing[2]} align="stretch">
           <HStack justify="space-between">
             <CustomText size="sm" color="muted">
-              Progress to Level {(profile.overall_level || 1) + 1}
+              Progress to Level {(profile?.overall_level ?? 1) + 1}
             </CustomText>
             <CustomText size="sm" color="secondary">
-              {profile.xp_to_next_level || 100} XP remaining
+              {profile?.xp_to_next_level ?? 100} XP remaining
             </CustomText>
           </HStack>
           
@@ -55,13 +65,13 @@ const LevelProgressCard = ({ profile }) => {
         <Grid templateColumns="repeat(2, 1fr)" gap={designSystem.spacing[4]}>
           <VStack spacing={0}>
             <CustomText size="xl" color="accent" fontWeight={designSystem.typography.weights.bold}>
-              {profile.total_challenges_completed || 0}
+              {profile?.total_challenges_completed ?? 0}
             </CustomText>
             <CustomText size="xs" color="muted">Challenges</CustomText>
           </VStack>
           <VStack spacing={0}>
             <CustomText size="xl" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-              {profile.total_lessons_completed || 0}
+              {profile?.total_lessons_completed ?? 0}
             </CustomText>
             <CustomText size="xs" color="muted">Lessons</CustomText>
           </VStack>
@@ -72,7 +82,17 @@ const LevelProgressCard = ({ profile }) => {
 };
 
 const StatsOverviewCard = ({ profile }) => {
-  if (!profile) return null;
+  if (!profile) {
+    return (
+      <Card variant="elevated" p={designSystem.spacing[6]}>
+        <VStack spacing={designSystem.spacing[4]} align="stretch">
+          <CustomText color="muted" textAlign="center">
+            Loading performance stats...
+          </CustomText>
+        </VStack>
+      </Card>
+    );
+  }
   
   return (
     <Card variant="elevated" p={designSystem.spacing[6]}>
@@ -84,51 +104,51 @@ const StatsOverviewCard = ({ profile }) => {
         <Grid templateColumns="repeat(2, 1fr)" gap={designSystem.spacing[4]}>
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="brand" fontWeight={designSystem.typography.weights.bold}>
-              {profile.best_wpm || 0}
+              {profile?.best_wpm ?? 0}
             </CustomText>
             <CustomText size="sm" color="muted">Best WPM</CustomText>
           </VStack>
           
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="accent" fontWeight={designSystem.typography.weights.bold}>
-              {profile.best_accuracy || 0}%
+              {profile?.best_accuracy ?? 0}%
             </CustomText>
             <CustomText size="sm" color="muted">Best Accuracy</CustomText>
           </VStack>
           
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-              {profile.streak_days || 0}
+              {profile?.streak_days ?? 0}
             </CustomText>
             <CustomText size="sm" color="muted">Current Streak</CustomText>
           </VStack>
           
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="error" fontWeight={designSystem.typography.weights.bold}>
-              {profile.longest_streak || 0}
+              {profile?.longest_streak ?? 0}
             </CustomText>
             <CustomText size="sm" color="muted">Longest Streak</CustomText>
           </VStack>
         </Grid>
         
-        {(profile.community_contributions || 0) > 0 && (
+        {(profile?.community_contributions ?? 0) > 0 && (
           <Box mt={designSystem.spacing[4]} pt={designSystem.spacing[4]} borderTop={`1px solid ${designSystem.colors.borders.default}`}>
             <Grid templateColumns="repeat(3, 1fr)" gap={designSystem.spacing[3]}>
               <VStack spacing={0}>
                 <CustomText size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
-                  {profile.community_contributions || 0}
+                  {profile?.community_contributions ?? 0}
                 </CustomText>
                 <CustomText size="xs" color="muted">Community</CustomText>
               </VStack>
               <VStack spacing={0}>
                 <CustomText size="lg" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-                  {profile.mentorship_hours || 0}
+                  {profile?.mentorship_hours ?? 0}
                 </CustomText>
                 <CustomText size="xs" color="muted">Mentoring</CustomText>
               </VStack>
               <VStack spacing={0}>
                 <CustomText size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
-                  {profile.total_projects_created || 0}
+                  {profile?.total_projects_created ?? 0}
                 </CustomText>
                 <CustomText size="xs" color="muted">Projects</CustomText>
               </VStack>

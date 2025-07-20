@@ -67,26 +67,28 @@ export const useProgressionSystem = () => {
       
       if (profileError && profileError.code === 'PGRST116') {
         // Profile doesn't exist, create it
+        const newProfileData = { 
+          user_id: user.id,
+          overall_level: 1,
+          total_xp: 0,
+          xp_to_next_level: 100,
+          best_wpm: 0,
+          best_accuracy: 0,
+          total_challenges_completed: 0,
+          total_lessons_completed: 0,
+          streak_days: 0,
+          longest_streak: 0,
+          community_contributions: 0,
+          mentorship_hours: 0,
+          total_projects_created: 0,
+          language_progress: {},
+          profile_visibility: 'public',
+          last_activity_date: new Date().toISOString().split('T')[0]
+        };
+        
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
-          .insert({ 
-            user_id: user.id,
-            overall_level: 1,
-            total_xp: 0,
-            xp_to_next_level: 100,
-            best_wpm: 0,
-            best_accuracy: 0,
-            total_challenges_completed: 0,
-            total_lessons_completed: 0,
-            streak_days: 0,
-            longest_streak: 0,
-            community_contributions: 0,
-            mentorship_hours: 0,
-            total_projects_created: 0,
-            language_progress: {},
-            profile_visibility: 'public',
-            last_activity_date: new Date().toISOString().split('T')[0]
-          })
+          .insert(newProfileData)
           .select()
           .single();
         
@@ -112,7 +114,10 @@ export const useProgressionSystem = () => {
         setUser(null);
         setError(null);
       } else {
-        console.error('Error getting user:', err);
+      // Don't set error for auth session missing - this is normal for unauthenticated users
+      if (error.message !== 'Auth session missing!') {
+        setError(error.message);
+      }
         setError(err.message);
       }
     } finally {

@@ -6,13 +6,25 @@ import { Button as CustomButton } from '../../design/components/Button';
 import { designSystem } from '../../design/system/DesignSystem';
 
 export const ProfileCard = ({ userData, progress }) => {
+  // Provide safe fallbacks for all data
+  const safeUserData = userData || {
+    name: 'User',
+    username: '@user',
+    email: 'user@example.com',
+    joinDate: 'Recently',
+    avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop',
+    bio: 'Learning to code!'
+  };
+  
+  const safeProgress = progress || { overall_level: 1 };
+  
   return (
     <Card variant="elevated" p={designSystem.spacing[6]}>  
       <VStack spacing={designSystem.spacing[5]} align="center">
         <Box position="relative">
           <Image
-            src={userData.avatar}
-            alt={userData.name}
+            src={safeUserData.avatar}
+            alt={safeUserData.name}
             w="120px"
             h="120px"
             borderRadius="full"
@@ -28,22 +40,22 @@ export const ProfileCard = ({ userData, progress }) => {
             borderRadius="full"
             p={2}
           >
-            LV.{progress?.overall_level || progress?.level || 1}
+            LV.{safeProgress?.overall_level ?? safeProgress?.level ?? 1}
           </Badge>
         </Box>
         
         <VStack spacing={designSystem.spacing[3]} textAlign="center" px={designSystem.spacing[3]}>
           <Heading level={2} size="xl" color="brand">
-            {userData.name}
+            {safeUserData.name}
           </Heading>
-          <CustomText color="secondary">{userData.username}</CustomText>
-          <CustomText size="sm" color="muted">{userData.email}</CustomText>
-          <CustomText size="sm" color="muted">Joined {userData.joinDate}</CustomText>
+          <CustomText color="secondary">{safeUserData.username}</CustomText>
+          <CustomText size="sm" color="muted">{safeUserData.email}</CustomText>
+          <CustomText size="sm" color="muted">Joined {safeUserData.joinDate}</CustomText>
         </VStack>
 
         <Box px={designSystem.spacing[4]} py={designSystem.spacing[2]}>
           <CustomText size="sm" color="secondary" textAlign="center" lineHeight="1.5">
-            {userData.bio}
+            {safeUserData.bio}
           </CustomText>
         </Box>
 

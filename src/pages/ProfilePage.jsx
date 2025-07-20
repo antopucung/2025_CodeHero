@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import { Grid, Tabs, TabList, TabPanels, Tab, TabPanel, Box } from "@chakra-ui/react";
 import { useNavigate } from 'react-router-dom';
 import { useProgressionSystem } from '../hooks/useProgressionSystem';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
@@ -20,6 +20,84 @@ const ProfilePage = () => {
   const [enrolledCourses, setEnrolledCourses] = React.useState([]);
   const [courseAchievements, setCourseAchievements] = React.useState([]);
 
+  // Mock data for demo when user is not logged in
+  const mockProfile = {
+    overall_level: 7,
+    total_xp: 3250,
+    xp_to_next_level: 750,
+    best_wpm: 67,
+    best_accuracy: 98,
+    total_challenges_completed: 42,
+    total_lessons_completed: 28,
+    streak_days: 12,
+    longest_streak: 28,
+    community_contributions: 15,
+    mentorship_hours: 8,
+    total_projects_created: 3,
+    language_progress: {
+      javascript: { level: 5, xp: 450 },
+      typescript: { level: 3, xp: 180 },
+      python: { level: 4, xp: 320 },
+      csharp: { level: 6, xp: 520 }
+    }
+  };
+
+  const mockAchievements = [
+    {
+      id: 1,
+      achievement_definitions: {
+        title: 'Speed Demon',
+        description: 'Achieved 60+ WPM typing speed',
+        icon: '⚡',
+        color: '#ff6b6b',
+        rarity: 'legendary'
+      }
+    },
+    {
+      id: 2,
+      achievement_definitions: {
+        title: 'Perfectionist',
+        description: 'Completed challenges with 100% accuracy',
+        icon: '💎',
+        color: '#9c27b0',
+        rarity: 'epic'
+      }
+    },
+    {
+      id: 3,
+      achievement_definitions: {
+        title: 'Community Helper',
+        description: 'Made 10+ helpful community contributions',
+        icon: '🤝',
+        color: '#4ecdc4',
+        rarity: 'rare'
+      }
+    }
+  ];
+
+  const mockEnrolledCourses = [
+    {
+      id: 1,
+      title: 'Unity C# 101',
+      slug: 'unity-csharp-101',
+      description: 'Learn the fundamentals of C# programming in Unity',
+      language: 'csharp',
+      lessons_count: 12,
+      duration_hours: 8,
+      rating: 4.8
+    },
+    {
+      id: 2,
+      title: 'Advanced JavaScript',
+      slug: 'advanced-javascript',
+      description: 'Master advanced JavaScript concepts and patterns',
+      language: 'javascript',
+      lessons_count: 15,
+      duration_hours: 12,
+      rating: 4.9
+    }
+  ];
+
   React.useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
@@ -31,6 +109,9 @@ const ProfilePage = () => {
         setCourseAchievements(achievements);
       } catch (error) {
         console.error('Error fetching enrolled courses:', error);
+        // Use mock data if fetching fails
+        setEnrolledCourses(mockEnrolledCourses);
+        setCourseAchievements(['speed_demon', 'perfectionist']);
       }
     };
     fetchEnrolledCourses();
@@ -49,30 +130,27 @@ const ProfilePage = () => {
     portfolio: 'https://codeninja.dev'
   };
 
-  const stats = [
-    { value: profile?.overall_level || 1, label: 'LEVEL' },
-    { value: profile?.best_wpm || 0, label: 'BEST WPM' },
-    { value: profile?.total_challenges_completed || 0, label: 'CHALLENGES' },
-    { value: (achievements?.length || 0) + courseAchievements.length, label: 'ACHIEVEMENTS' }
-  ];
-
-  const handleNavigateToMarketplace = () => navigate('/marketplace');
-  const handleNavigateToCourse = (slug) => navigate(`/modules/${slug}`);
-
-  if (loading) {
-    return (
-      <PageLayout background="primary">
-        <PageHeader
-          title="👤 User Profile"
-          subtitle="Loading your progress..."
-          stats={[]}
-        />
-      </PageLayout>
-    );
-  }
+  // Use actual data if available, otherwise use mock data for demo
+  const displayProfile = profile || mockProfile;
+  const displayAchievements = achievements.length > 0 ? achievements : mockAchievements;
+  const displayEnrolledCourses = enrolledCourses.length > 0 ? enrolledCourses : mockEnrolledCourses;
 
   return (
     <PageLayout background="primary">
+      {!profile && (
+        <Box 
+          bg="rgba(255, 217, 61, 0.1)" 
+          border="1px solid #ffd93d" 
+          borderRadius="md" 
+          p={4} 
+          mb={6}
+          textAlign="center"
+        >
+          <CustomText color="#ffd93d" fontWeight="bold">
+            🎮 Demo Mode - This is a preview of the profile system. Log in to track your real progress!
+          </CustomText>
+        </Box>
+      )}
       <PageHeader
         title="👤 User Profile"
         subtitle="Track Your Coding Journey & Achievements"
@@ -89,7 +167,35 @@ const ProfilePage = () => {
           
           <TabPanels>
             <TabPanel p={0} pt={6}>
-              <ProgressionDashboard />
+              {profile ? (
+                <ProgressionDashboard />
+              ) : (
+                <Box textAlign="center" py={designSystem.spacing[8]}>
+                  <CustomText size="lg" color="secondary" mb={designSystem.spacing[4]}>
+                    📊 Progression Dashboard (Demo Mode)
+                  </CustomText>
+                  <CustomText color="muted" mb={designSystem.spacing[4]}>
+                    The full progression dashboard with XP tracking, achievements, and certifications will be available when you log in.
+                  </CustomText>
+                  <Box 
+                    bg={designSystem.colors.backgrounds.secondary}
+                    p={designSystem.spacing[6]}
+                    borderRadius="md"
+                    maxW="600px"
+                    mx="auto"
+                  >
+                    <CustomText color="brand" fontWeight="bold" mb={designSystem.spacing[2]}>
+                      Features Coming Soon:
+                    </CustomText>
+                    <VStack spacing={designSystem.spacing[2]} align="start">
+                      <CustomText size="sm" color="secondary">🏆 Real-time XP tracking and level progression</CustomText>
+                      <CustomText size="sm" color="secondary">📜 Professional certification system</CustomText>
+                      <CustomText size="sm" color="secondary">🎯 Achievement unlocking and display</CustomText>
+                      <CustomText size="sm" color="secondary">📈 Detailed activity history and analytics</CustomText>
+                    </VStack>
+                  </Box>
+                </Box>
+              )}
             </TabPanel>
             
             <TabPanel p={0} pt={6}>
@@ -100,10 +206,10 @@ const ProfilePage = () => {
               >
                 {/* Left Column - Profile Info */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
-                  <ProfileCard userData={userData} progress={profile || { level: 1 }} />
+                  <ProfileCard userData={userData} progress={displayProfile} />
                   <AchievementsSection 
                     achievements={[
-                      ...(achievements?.map(a => a.achievement_definitions?.title || a.achievement_key) || []), 
+                      ...(displayAchievements?.map(a => a.achievement_definitions?.title || a.achievement_key) || []), 
                       ...courseAchievements.map(a => a.replace('_', ' '))
                     ]} 
                   />
@@ -111,9 +217,9 @@ const ProfilePage = () => {
       
                 {/* Right Column - Progress & Courses */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
-                  <LanguageProgress languageProgress={profile?.language_progress || {}} />
+                  <LanguageProgress languageProgress={displayProfile?.language_progress || {}} />
                   <EnrolledCourses 
-                    enrolledCourses={enrolledCourses}
+                    enrolledCourses={displayEnrolledCourses}
                     onNavigateToMarketplace={handleNavigateToMarketplace}
                     onNavigateToCourse={handleNavigateToCourse}
                   />
@@ -124,7 +230,7 @@ const ProfilePage = () => {
             
             <TabPanel p={0} pt={6}>
               <EnrolledCourses 
-                enrolledCourses={enrolledCourses}
+                enrolledCourses={displayEnrolledCourses}
                 onNavigateToMarketplace={handleNavigateToMarketplace}
                 onNavigateToCourse={handleNavigateToCourse}
               />

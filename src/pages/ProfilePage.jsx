@@ -220,35 +220,13 @@ const ProfilePage = () => {
           
           <TabPanels>
             <TabPanel p={0} pt={6}>
-              {profile ? (
-                <ProgressionDashboard />
-              ) : (
-                <Box textAlign="center" py={designSystem.spacing[8]}>
-                  <CustomText size="lg" color="secondary" mb={designSystem.spacing[4]}>
-                    📊 Progression Dashboard (Demo Mode)
-                  </CustomText>
-                  <CustomText color="muted" mb={designSystem.spacing[4]}>
-                    The full progression dashboard with XP tracking, achievements, and certifications will be available when you log in.
-                  </CustomText>
-                  <Box 
-                    bg={designSystem.colors.backgrounds.secondary}
-                    p={designSystem.spacing[6]}
-                    borderRadius="md"
-                    maxW="600px"
-                    mx="auto"
-                  >
-                    <CustomText color="brand" fontWeight="bold" mb={designSystem.spacing[2]}>
-                      Features Coming Soon:
-                    </CustomText>
-                    <VStack spacing={designSystem.spacing[2]} align="start">
-                      <CustomText size="sm" color="secondary">🏆 Real-time XP tracking and level progression</CustomText>
-                      <CustomText size="sm" color="secondary">📜 Professional certification system</CustomText>
-                      <CustomText size="sm" color="secondary">🎯 Achievement unlocking and display</CustomText>
-                      <CustomText size="sm" color="secondary">📈 Detailed activity history and analytics</CustomText>
-                    </VStack>
-                  </Box>
-                </Box>
-              )}
+              <ProgressionDashboard 
+                profile={displayProfile}
+                achievements={displayAchievements}
+                certifications={certifications}
+                xpHistory={xpHistory}
+                isDemo={!profile}
+              />
             </TabPanel>
             
             <TabPanel p={0} pt={6}>

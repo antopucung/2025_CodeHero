@@ -15,8 +15,10 @@ const MotionBox = motion(Box);
 const LevelProgressCard = ({ profile }) => {
   if (!profile) return null;
   
-  const levelProgress = profile.xp_to_next_level > 0 
-    ? ((profile.total_xp % (profile.total_xp + profile.xp_to_next_level)) / (profile.total_xp + profile.xp_to_next_level)) * 100
+  const xpToNext = profile.xp_to_next_level || 100;
+  const currentXp = profile.total_xp || 0;
+  const levelProgress = xpToNext > 0 
+    ? ((currentXp % (currentXp + xpToNext)) / (currentXp + xpToNext)) * 100
     : 100;
   
   return (
@@ -24,20 +26,20 @@ const LevelProgressCard = ({ profile }) => {
       <VStack spacing={designSystem.spacing[4]} align="stretch">
         <HStack justify="space-between">
           <Heading level={3} size="lg" color="brand">
-            Level {profile.overall_level}
+            Level {profile.overall_level || 1}
           </Heading>
           <Badge bg={designSystem.colors.brand.primary} color={designSystem.colors.text.inverse}>
-            {profile.total_xp.toLocaleString()} XP
+            {(profile.total_xp || 0).toLocaleString()} XP
           </Badge>
         </HStack>
         
         <VStack spacing={designSystem.spacing[2]} align="stretch">
           <HStack justify="space-between">
             <CustomText size="sm" color="muted">
-              Progress to Level {profile.overall_level + 1}
+              Progress to Level {(profile.overall_level || 1) + 1}
             </CustomText>
             <CustomText size="sm" color="secondary">
-              {profile.xp_to_next_level} XP remaining
+              {profile.xp_to_next_level || 100} XP remaining
             </CustomText>
           </HStack>
           
@@ -53,13 +55,13 @@ const LevelProgressCard = ({ profile }) => {
         <Grid templateColumns="repeat(2, 1fr)" gap={designSystem.spacing[4]}>
           <VStack spacing={0}>
             <CustomText size="xl" color="accent" fontWeight={designSystem.typography.weights.bold}>
-              {profile.total_challenges_completed}
+              {profile.total_challenges_completed || 0}
             </CustomText>
             <CustomText size="xs" color="muted">Challenges</CustomText>
           </VStack>
           <VStack spacing={0}>
             <CustomText size="xl" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-              {profile.total_lessons_completed}
+              {profile.total_lessons_completed || 0}
             </CustomText>
             <CustomText size="xs" color="muted">Lessons</CustomText>
           </VStack>
@@ -82,51 +84,51 @@ const StatsOverviewCard = ({ profile }) => {
         <Grid templateColumns="repeat(2, 1fr)" gap={designSystem.spacing[4]}>
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="brand" fontWeight={designSystem.typography.weights.bold}>
-              {profile.best_wpm}
+              {profile.best_wpm || 0}
             </CustomText>
             <CustomText size="sm" color="muted">Best WPM</CustomText>
           </VStack>
           
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="accent" fontWeight={designSystem.typography.weights.bold}>
-              {profile.best_accuracy}%
+              {profile.best_accuracy || 0}%
             </CustomText>
             <CustomText size="sm" color="muted">Best Accuracy</CustomText>
           </VStack>
           
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-              {profile.streak_days}
+              {profile.streak_days || 0}
             </CustomText>
             <CustomText size="sm" color="muted">Current Streak</CustomText>
           </VStack>
           
           <VStack spacing={designSystem.spacing[2]}>
             <CustomText size="2xl" color="error" fontWeight={designSystem.typography.weights.bold}>
-              {profile.longest_streak}
+              {profile.longest_streak || 0}
             </CustomText>
             <CustomText size="sm" color="muted">Longest Streak</CustomText>
           </VStack>
         </Grid>
         
-        {profile.community_contributions > 0 && (
+        {(profile.community_contributions || 0) > 0 && (
           <Box mt={designSystem.spacing[4]} pt={designSystem.spacing[4]} borderTop={`1px solid ${designSystem.colors.borders.default}`}>
             <Grid templateColumns="repeat(3, 1fr)" gap={designSystem.spacing[3]}>
               <VStack spacing={0}>
                 <CustomText size="lg" color="brand" fontWeight={designSystem.typography.weights.bold}>
-                  {profile.community_contributions}
+                  {profile.community_contributions || 0}
                 </CustomText>
                 <CustomText size="xs" color="muted">Community</CustomText>
               </VStack>
               <VStack spacing={0}>
                 <CustomText size="lg" color="secondary" fontWeight={designSystem.typography.weights.bold}>
-                  {profile.mentorship_hours}
+                  {profile.mentorship_hours || 0}
                 </CustomText>
                 <CustomText size="xs" color="muted">Mentoring</CustomText>
               </VStack>
               <VStack spacing={0}>
                 <CustomText size="lg" color="accent" fontWeight={designSystem.typography.weights.bold}>
-                  {profile.total_projects_created}
+                  {profile.total_projects_created || 0}
                 </CustomText>
                 <CustomText size="xs" color="muted">Projects</CustomText>
               </VStack>
@@ -380,7 +382,7 @@ const XPHistoryCard = ({ xpHistory }) => {
 };
 
 const LanguageProgressCard = ({ profile }) => {
-  if (!profile?.language_progress) return null;
+  if (!profile?.language_progress || Object.keys(profile.language_progress).length === 0) return null;
   
   const languages = Object.entries(profile.language_progress);
   
@@ -405,21 +407,21 @@ const LanguageProgressCard = ({ profile }) => {
                   {language.toUpperCase()}
                 </CustomText>
                 <Badge bg={designSystem.colors.brand.primary} color={designSystem.colors.text.inverse}>
-                  Level {progress.level}
+                  Level {progress?.level || 1}
                 </Badge>
               </HStack>
               
               <HStack justify="space-between" mb={designSystem.spacing[1]}>
                 <CustomText size="xs" color="muted">
-                  {progress.xp} XP
+                  {progress?.xp || 0} XP
                 </CustomText>
                 <CustomText size="xs" color="muted">
-                  Next: {(progress.level * 50) - progress.xp} XP
+                  Next: {((progress?.level || 1) * 50) - (progress?.xp || 0)} XP
                 </CustomText>
               </HStack>
               
               <Progress
-                value={(progress.xp / (progress.level * 50)) * 100}
+                value={((progress?.xp || 0) / ((progress?.level || 1) * 50)) * 100}
                 size="sm"
                 colorScheme="blue"
                 bg={designSystem.colors.backgrounds.surface}

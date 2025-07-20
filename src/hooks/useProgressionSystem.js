@@ -69,7 +69,24 @@ export const useProgressionSystem = () => {
         // Profile doesn't exist, create it
         const { data: newProfile, error: createError } = await supabase
           .from('user_profiles')
-          .insert({ user_id: user.id })
+          .insert({ 
+            user_id: user.id,
+            overall_level: 1,
+            total_xp: 0,
+            xp_to_next_level: 100,
+            best_wpm: 0,
+            best_accuracy: 0,
+            total_challenges_completed: 0,
+            total_lessons_completed: 0,
+            streak_days: 0,
+            longest_streak: 0,
+            community_contributions: 0,
+            mentorship_hours: 0,
+            total_projects_created: 0,
+            language_progress: {},
+            profile_visibility: 'public',
+            last_activity_date: new Date().toISOString().split('T')[0]
+          })
           .select()
           .single();
         
@@ -90,14 +107,19 @@ export const useProgressionSystem = () => {
       setCertifications(userCertifications);
       
       // Load recent XP history
-      const recentXP = await XPService.getXPHistory(user.id, { limit: 20 });
-      setXpHistory(recentXP);
-      
-    } catch (err) {
-      console.error('Error loading progression data:', err);
-      setError(err.message);
+      // Handle auth session missing as normal state (user not authenticated)
+      if (err.message === 'Auth session missing!') {
+        setUser(null);
+        setError(null);
+      } else {
+        console.error('Error getting user:', err);
+        setError(err.message);
+      }
     } finally {
-      setLoading(false);
+      // Ensure loading is set to false even when not authenticated
+      if (!user) {
+        setLoading(false);
+      }
     }
   }, [user, migrationCompleted]);
 
@@ -105,6 +127,14 @@ export const useProgressionSystem = () => {
   useEffect(() => {
     if (user) {
       loadProgressionData();
+    } else {
+      // User not authenticated, stop loading
+      setLoading(false);
+      setProfile(null);
+      setAchievements([]);
+      setCertifications([]);
+      setXpHistory([]);
+      setError(null);
     }
   }, [user, loadProgressionData]);
 

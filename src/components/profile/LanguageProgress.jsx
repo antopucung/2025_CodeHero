@@ -22,8 +22,8 @@ export const LanguageProgress = ({ languageProgress }) => {
 
   const progressData = Object.entries(languageProgress || {}).map(([lang, data]) => ({
     language: lang,
-    level: data.level,
-    xp: data.xp,
+    level: data?.level || 1,
+    xp: data?.xp || 0,
     color: getLanguageColor(lang)
   }));
 
@@ -51,7 +51,7 @@ export const LanguageProgress = ({ languageProgress }) => {
                 </Badge>
               </HStack>
               <CustomText size="sm" color="muted">
-                {lang.xp} XP
+                {Math.min(((lang.xp || 0) / ((lang.level || 1) * 50)) * 100, 100)}% Complete
               </CustomText>
             </HStack>
             <Box
@@ -64,7 +64,7 @@ export const LanguageProgress = ({ languageProgress }) => {
               <Box
                 bg={lang.color}
                 h="100%"
-                w={`${Math.min((lang.xp / (lang.level * 50)) * 100, 100)}%`}
+                w={`${Math.min(((lang.xp || 0) / ((lang.level || 1) * 50)) * 100, 100)}%`}
                 transition="width 0.3s"
               />
             </Box>

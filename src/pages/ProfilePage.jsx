@@ -137,6 +137,22 @@ const ProfilePage = () => {
   const displayAchievements = achievements.length > 0 ? achievements : mockAchievements;
   const displayEnrolledCourses = enrolledCourses.length > 0 ? enrolledCourses : mockEnrolledCourses;
 
+  // Prepare stats with safe fallbacks
+  const stats = [
+    { value: displayProfile?.overall_level || 1, label: 'LEVEL' },
+    { value: displayProfile?.total_challenges_completed || 0, label: 'CHALLENGES' },
+    { value: displayProfile?.achievements?.length || displayAchievements?.length || 0, label: 'ACHIEVEMENTS' }
+  ];
+
+  // Functions for navigation
+  const handleNavigateToMarketplace = () => {
+    navigate('/marketplace');
+  };
+
+  const handleNavigateToCourse = (courseSlug) => {
+    navigate(`/modules/${courseSlug}`);
+  };
+
   return (
     <PageLayout background="primary">
       {!profile && (
@@ -160,6 +176,41 @@ const ProfilePage = () => {
       />
       
       <SectionLayout spacing="default">
+        {/* Show loading state only when actually loading and user is authenticated */}
+        {loading && user && (
+          <Box p={designSystem.spacing[8]} textAlign="center">
+            <CustomText color="muted">Loading your progress...</CustomText>
+          </Box>
+        )}
+        
+        {/* Show login prompt when not authenticated and not loading */}
+        {!loading && !user && (
+          <Box 
+            bg={designSystem.colors.backgrounds.secondary}
+            p={designSystem.spacing[8]}
+            borderRadius="md"
+            textAlign="center"
+            maxW="600px"
+            mx="auto"
+          >
+            <CustomText size="lg" color="secondary" mb={designSystem.spacing[4]}>
+              🔐 Login Required
+            </CustomText>
+            <CustomText color="muted" mb={designSystem.spacing[4]}>
+              Please log in to view your personalized profile and track your learning progress.
+            </CustomText>
+            <VStack spacing={designSystem.spacing[2]} align="start">
+              <CustomText size="sm" color="secondary">With an account you can:</CustomText>
+              <CustomText size="sm" color="muted">📊 Track XP and level progression</CustomText>
+              <CustomText size="sm" color="muted">🏆 Unlock achievements and badges</CustomText>
+              <CustomText size="sm" color="muted">📜 Earn professional certifications</CustomText>
+              <CustomText size="sm" color="muted">📈 View detailed learning analytics</CustomText>
+            </VStack>
+          </Box>
+        )}
+        
+        {/* Show profile content when not loading */}
+        {!loading && (
         <Tabs variant="soft-rounded" colorScheme="green">
           <TabList>
             <Tab>📊 Progression</Tab>
@@ -239,6 +290,7 @@ const ProfilePage = () => {
             </TabPanel>
           </TabPanels>
         </Tabs>
+        )}
       </SectionLayout>
     </PageLayout>
   );

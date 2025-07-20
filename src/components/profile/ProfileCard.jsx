@@ -28,7 +28,7 @@ export const ProfileCard = ({ userData, progress }) => {
             borderRadius="full"
             p={2}
           >
-            LV.{progress.level}
+            LV.{progress?.overall_level || progress?.level || 1}
           </Badge>
         </Box>
         

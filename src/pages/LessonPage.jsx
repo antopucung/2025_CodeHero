@@ -202,7 +202,7 @@ const LessonPage = () => {
     }
   };
 
-  const handleLessonComplete = (stats = {}) => {
+  const handleLessonComplete = async (stats = {}) => {
     // Calculate score based on completion stats
     let score = stats.totalScore || stats.score || 0;
     let achievements = [];

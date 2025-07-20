@@ -3,7 +3,7 @@ import { Box, Text, VStack, HStack, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import TypingChallenge from "../components/TypingChallenge";
 import GameStats from "../components/GameStats";
-import { useGameProgress } from "../hooks/useGameProgress";
+import { useProgressionSystem } from "../hooks/useProgressionSystem";
 import { getRandomChallenge, getChallengesByLanguage } from "../data/challenges";
 
 const MotionBox = motion(Box);
@@ -13,7 +13,7 @@ const TypingChallengePage = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [selectedDifficulty, setSelectedDifficulty] = useState("beginner");
   const [currentStats, setCurrentStats] = useState(null);
-  const { progress, completeChallenge } = useGameProgress();
+  const { profile, completeTypingChallenge } = useProgressionSystem();
 
   const languages = ["javascript", "python", "typescript", "java"];
   const difficulties = ["beginner", "intermediate", "advanced"];
@@ -24,8 +24,25 @@ const TypingChallengePage = () => {
     setCurrentStats(null);
   };
 
-  const handleChallengeComplete = (stats) => {
-    completeChallenge(stats, selectedLanguage);
+  const handleChallengeComplete = async (stats) => {
+    try {
+      const result = await completeTypingChallenge(stats, selectedLanguage, currentChallenge?.id);
+      
+      if (result?.levelUp) {
+        // Show level up notification
+        console.log(`Level up! New level: ${result.newLevel}`);
+      }
+      
+      if (result?.newAchievements?.length > 0) {
+        // Show achievement notifications
+        result.newAchievements.forEach(achievement => {
+          console.log(`Achievement unlocked: ${achievement.achievement_key}`);
+        });
+      }
+    } catch (error) {
+      console.error('Error completing typing challenge:', error);
+    }
+    
     setCurrentStats(stats);
     
     // Auto-start next challenge after 3 seconds
@@ -59,7 +76,7 @@ const TypingChallengePage = () => {
           
           <Box w={{ base: "200px", md: "250px" }} h="100%">
             <GameStats 
-              progress={progress} 
+              progress={profile || { level: 1, bestWpm: 0, bestAccuracy: 0, totalChallengesCompleted: 0, achievements: [] }} 
               currentStats={currentStats}
               compact={true}
             />

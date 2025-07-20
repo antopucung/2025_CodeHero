@@ -1,10 +1,11 @@
 import React from 'react';
-import { Grid } from "@chakra-ui/react";
+import { Grid, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import { useNavigate } from 'react-router-dom';
-import { useGameProgress } from '../hooks/useGameProgress';
+import { useProgressionSystem } from '../hooks/useProgressionSystem';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
 import { PageLayout, SectionLayout } from '../design/layouts/PageLayout';
 import { PageHeader } from '../design/components/PageHeader';
+import { ProgressionDashboard } from '../components/progression/ProgressionDashboard';
 import { ProfileCard } from '../components/profile/ProfileCard';
 import { AchievementsSection } from '../components/profile/AchievementsSection';
 import { LanguageProgress } from '../components/profile/LanguageProgress';
@@ -14,7 +15,7 @@ import { designSystem } from '../design/system/DesignSystem';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const { progress } = useGameProgress();
+  const { profile, achievements, loading } = useProgressionSystem();
   const { getEnrolledCourses, getAllAchievements } = useUserEnrollment();
   const [enrolledCourses, setEnrolledCourses] = React.useState([]);
   const [courseAchievements, setCourseAchievements] = React.useState([]);
@@ -49,14 +50,26 @@ const ProfilePage = () => {
   };
 
   const stats = [
-    { value: progress.level, label: 'LEVEL' },
-    { value: progress.bestWpm, label: 'BEST WPM' },
-    { value: progress.totalChallengesCompleted, label: 'CHALLENGES' },
-    { value: progress.achievements.length + courseAchievements.length, label: 'ACHIEVEMENTS' }
+    { value: profile?.overall_level || 1, label: 'LEVEL' },
+    { value: profile?.best_wpm || 0, label: 'BEST WPM' },
+    { value: profile?.total_challenges_completed || 0, label: 'CHALLENGES' },
+    { value: (achievements?.length || 0) + courseAchievements.length, label: 'ACHIEVEMENTS' }
   ];
 
   const handleNavigateToMarketplace = () => navigate('/marketplace');
   const handleNavigateToCourse = (slug) => navigate(`/modules/${slug}`);
+
+  if (loading) {
+    return (
+      <PageLayout background="primary">
+        <PageHeader
+          title="👤 User Profile"
+          subtitle="Loading your progress..."
+          stats={[]}
+        />
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout background="primary">
@@ -67,33 +80,57 @@ const ProfilePage = () => {
       />
       
       <SectionLayout spacing="default">
-        <Grid 
-          templateColumns={{ base: "1fr", lg: "1fr 2fr" }} 
-          gap={designSystem.spacing[6]} 
-          w="100%"
-        >
-          {/* Left Column - Profile Info */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
-            <ProfileCard userData={userData} progress={progress} />
-            <AchievementsSection 
-              achievements={[
-                ...progress.achievements, 
-                ...courseAchievements.map(a => a.replace('_', ' '))
-              ]} 
-            />
-          </div>
-
-          {/* Right Column - Progress & Courses */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
-            <LanguageProgress languageProgress={progress.languageProgress} />
-            <EnrolledCourses 
-              enrolledCourses={enrolledCourses}
-              onNavigateToMarketplace={handleNavigateToMarketplace}
-              onNavigateToCourse={handleNavigateToCourse}
-            />
-            <RecentActivity />
-          </div>
-        </Grid>
+        <Tabs variant="soft-rounded" colorScheme="green">
+          <TabList>
+            <Tab>📊 Progression</Tab>
+            <Tab>👤 Profile</Tab>
+            <Tab>📚 Courses</Tab>
+          </TabList>
+          
+          <TabPanels>
+            <TabPanel p={0} pt={6}>
+              <ProgressionDashboard />
+            </TabPanel>
+            
+            <TabPanel p={0} pt={6}>
+              <Grid 
+                templateColumns={{ base: "1fr", lg: "1fr 2fr" }} 
+                gap={designSystem.spacing[6]} 
+                w="100%"
+              >
+                {/* Left Column - Profile Info */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
+                  <ProfileCard userData={userData} progress={profile || { level: 1 }} />
+                  <AchievementsSection 
+                    achievements={[
+                      ...(achievements?.map(a => a.achievement_definitions?.title || a.achievement_key) || []), 
+                      ...courseAchievements.map(a => a.replace('_', ' '))
+                    ]} 
+                  />
+                </div>
+      
+                {/* Right Column - Progress & Courses */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: designSystem.spacing[6] }}>
+                  <LanguageProgress languageProgress={profile?.language_progress || {}} />
+                  <EnrolledCourses 
+                    enrolledCourses={enrolledCourses}
+                    onNavigateToMarketplace={handleNavigateToMarketplace}
+                    onNavigateToCourse={handleNavigateToCourse}
+                  />
+                  <RecentActivity />
+                </div>
+              </Grid>
+            </TabPanel>
+            
+            <TabPanel p={0} pt={6}>
+              <EnrolledCourses 
+                enrolledCourses={enrolledCourses}
+                onNavigateToMarketplace={handleNavigateToMarketplace}
+                onNavigateToCourse={handleNavigateToCourse}
+              />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </SectionLayout>
     </PageLayout>
   );

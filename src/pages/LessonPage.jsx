@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { supabase } from '../lib/supabase';
 import { useDisclosure } from "@chakra-ui/react";
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
+import { useProgressionSystem } from '../hooks/useProgressionSystem';
 import { InteractiveCodeExample } from '../components/learning/InteractiveCodeExample';
 import { EnhancedCodeExample } from '../components/learning/EnhancedCodeExample';
 import { ConceptExplainer } from '../components/learning/CodeConcepts';
@@ -18,6 +19,7 @@ const MotionBox = motion(Box);
 const LessonPage = () => {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
+  const { completeLesson } = useProgressionSystem();
   const [course, setCourse] = useState(null);
   const [lesson, setLesson] = useState(null);
   const [allLessons, setAllLessons] = useState([]);
@@ -389,7 +391,54 @@ public class Player : MonoBehaviour
     }
     
     // Mark lesson as completed
-    updateLessonProgress(courseId, lessonId, true, score);
+    try {
+      // Award XP through progression system
+      const progressionResult = await completeLesson(
+        {
+          accuracy: stats.accuracy || 100,
+          wpm: stats.wpm || 0,
+          timeElapsed: stats.timeElapsed || 60,
+          errors: stats.errors || 0,
+          attempts: stats.attempts || 1
+        },
+        course?.language || 'javascript',
+        lessonId
+      );
+      
+      // Update course progress
+      updateLessonProgress(courseId, lessonId, true, score);
+      
+      // Show progression feedback
+      if (progressionResult?.levelUp) {
+        toast({
+          title: "🎉 LEVEL UP!",
+          description: `You reached level ${progressionResult.newLevel}! +${progressionResult.xpAwarded} XP`,
+          status: "success",
+          duration: 8000,
+          isClosable: true,
+          position: "top-right"
+        });
+      }
+      
+      if (progressionResult?.newAchievements?.length > 0) {
+        progressionResult.newAchievements.forEach(achievement => {
+          toast({
+            title: "🏆 Achievement Unlocked!",
+            description: achievement.achievement_key.replace('_', ' ').toUpperCase(),
+            status: "success",
+            duration: 6000,
+            isClosable: true,
+            position: "top-right"
+          });
+        });
+      }
+      
+    } catch (error) {
+      console.error('Error awarding lesson XP:', error);
+      // Still update course progress even if XP fails
+      updateLessonProgress(courseId, lessonId, true, score);
+    }
+    
     setLessonCompleted(true);
     
     // Show success toast

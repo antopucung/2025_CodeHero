@@ -6,7 +6,7 @@ import LanguageSelector from "../components/LanguageSelector";
 import { CODE_SNIPPETS } from "../constants";
 import Output from "../components/Output";
 import GameStats from "../components/GameStats";
-import { useGameProgress } from "../hooks/useGameProgress";
+import { useProgressionSystem } from "../hooks/useProgressionSystem";
 
 const MotionBox = motion(Box);
 
@@ -14,7 +14,7 @@ const CodeEditorPage = () => {
   const editorRef = useRef();
   const [value, setValue] = useState("");
   const [language, setLanguage] = useState("javascript");
-  const { progress, completeChallenge } = useGameProgress();
+  const { profile, completeCodeExecution } = useProgressionSystem();
 
   const onMount = (editor) => {
     editorRef.current = editor;
@@ -26,14 +26,22 @@ const CodeEditorPage = () => {
     setValue(CODE_SNIPPETS[language]);
   };
 
-  const handleCodeExecution = (executionStats) => {
+  const handleCodeExecution = async (executionStats) => {
     if (executionStats && !executionStats.error) {
-      completeChallenge({
-        wpm: 0,
-        accuracy: 100,
-        errors: 0,
-        timeElapsed: 0
-      }, language);
+      try {
+        const result = await completeCodeExecution(language, {
+          timeToExecute: 1,
+          attempts: 1,
+          linesOfCode: value?.split('\n').length || 1,
+          codeHash: btoa(value || '')
+        });
+        
+        if (result?.levelUp) {
+          console.log(`Level up! New level: ${result.newLevel}`);
+        }
+      } catch (error) {
+        console.error('Error awarding code execution XP:', error);
+      }
     }
   };
 
@@ -62,7 +70,7 @@ const CodeEditorPage = () => {
           
           <Box w={{ base: "200px", md: "250px" }} h="100%">
             <GameStats 
-              progress={progress} 
+              progress={profile || { level: 1, bestWpm: 0, bestAccuracy: 0, totalChallengesCompleted: 0, achievements: [] }} 
               compact={true}
             />
           </Box>

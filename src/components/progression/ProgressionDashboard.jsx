@@ -1,7 +1,7 @@
 // Progression Dashboard Component
 import React, { useState, useEffect } from 'react';
 import { Box, VStack, HStack, Grid, Progress, Badge, Tooltip, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useProgressionSystem } from '../../hooks/useProgressionSystem';
 import { PublicProfileService } from '../../lib/progressionSystem';
 import { Card } from '../../design/components/Card';

@@ -154,7 +154,7 @@ export const CollaborationModal = ({
           
           {step === 'application' && (
             <VStack align="start" spacing={2}>
-              <Text size="lg" color="brand">🤝 Apply to Collaborate: {project.title}</Text>
+              <Text size="lg" color="brand">🤝 Apply to Collaborate: {project?.title || 'Project'}</Text>
               <Text size="sm" color="muted">Join the team and help build something amazing</Text>
             </VStack>
           )}
@@ -181,11 +181,19 @@ export const CollaborationModal = ({
           {/* Collaboration Application Form */}
           {step === 'application' && (
             <VStack spacing={6} align="stretch">
+              {!project && (
+                <Box p={4} bg="red.100" borderRadius="md" color="red.800">
+                  <Text>No project selected. Please close this modal and try again.</Text>
+                </Box>
+              )}
+              
+              {project && (
+              <>
               {/* Role Selection */}
               <VStack spacing={3} align="stretch">
                 <Text fontWeight="bold" color="secondary">Available Positions</Text>
                 <VStack spacing={2} align="stretch">
-                  {project.openRoles.map((role) => (
+                  {project.openRoles?.map((role) => (
                     <Button
                       key={role.role}
                       variant={selectedRole === role.role ? 'solid' : 'outline'}
@@ -315,6 +323,8 @@ export const CollaborationModal = ({
                   <Text>✓ Potential for future paid opportunities</Text>
                 </VStack>
               </Box>
+              </>
+              )}
             </VStack>
           )}
           

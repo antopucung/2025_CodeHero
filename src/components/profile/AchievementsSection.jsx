@@ -33,7 +33,7 @@ export function AchievementsSection({ achievements }) {
                 }}
                 animated
               />
-          ))
+            ))}
           </Grid>
         ) : (
           <Stack>

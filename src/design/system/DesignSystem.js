@@ -1,4 +1,14 @@
-// Centralized Design System - Single source of truth
+// Legacy Design System - Now bridges to new theme system
+// This file maintains backward compatibility while the new theme system takes over
+import { useThemeTokens } from '../../theme/hooks/useThemeTokens';
+
+// Hook to get current design system tokens
+export const useDesignSystem = () => {
+  const themeTokens = useThemeTokens();
+  return themeTokens.theme || designSystem;
+};
+
+// Legacy design system for backward compatibility
 export const designSystem = {
   // Color System - Semantic color assignments
   colors: {

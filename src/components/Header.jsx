@@ -1,10 +1,13 @@
 import React from 'react';
 import { Box, Flex, Text, HStack, Button, Spacer } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { ThemeSelector } from '../theme/components/ThemeSelector';
+import { useThemeTokens } from '../theme/hooks/useThemeTokens';
 
 function Header() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { getColor } = useThemeTokens();
 
   // Enhanced navigation handler with detailed logging
   const handleNavigation = (to) => {
@@ -38,15 +41,22 @@ function Header() {
   ];
 
   return (
-    <Box bg="#000000" borderBottom="1px solid #333" px={4} py={3}>
+    <Box 
+      bg={getColor('backgrounds.primary')} 
+      borderBottom={`1px solid ${getColor('borders.default')}`} 
+      px={4} 
+      py={3}
+    >
       <Flex alignItems="center" maxW="container.xl" mx="auto">
-        <Text fontSize="xl" fontWeight="bold" color="#00ff00">
+        <Text fontSize="xl" fontWeight="bold" color={getColor('brand.primary')}>
           Terminal IDE
         </Text>
         
         <Spacer />
         
-        <HStack spacing={4}>
+        <HStack spacing={4} align="center">
+          <ThemeSelector compact />
+          
           {navLinks.map((link) => (
             <Button
               key={link.to}
@@ -54,9 +64,12 @@ function Header() {
               variant={location.pathname === link.to ? "solid" : "ghost"}
               colorScheme="green"
               size="sm"
-              bg={location.pathname === link.to ? "#003300" : "transparent"}
-              color={location.pathname === link.to ? "#00ff00" : "#ccc"}
-              _hover={{ color: "#00ff00", bg: "#112211" }}
+              bg={location.pathname === link.to ? getColor('interactive.active') : "transparent"}
+              color={location.pathname === link.to ? getColor('brand.primary') : getColor('text.muted')}
+              _hover={{ 
+                color: getColor('brand.primary'), 
+                bg: getColor('backgrounds.surface') 
+              }}
               cursor="pointer"
               _active={{ transform: "none" }}
             >

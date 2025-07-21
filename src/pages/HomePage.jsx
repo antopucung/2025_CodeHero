@@ -3,35 +3,39 @@ import { Box, Grid, Text, VStack, HStack, Button, Badge } from '@chakra-ui/react
 import { motion } from 'framer-motion';
 import { Text as ChakraText } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { useThemeTokens } from '../theme/hooks/useThemeTokens';
 
 const MotionBox = motion(Box);
 
 // Feature card component for homepage
 const FeatureCard = ({ title, description, icon, color, route, comingSoon = false }) => {
   const navigate = useNavigate();
+  const { getColor, getBorderRadius, getSpacing, getShadow } = useThemeTokens();
   
   return (
     <MotionBox
-      bg="#111"
-      borderRadius="md"
-      border="1px solid #333"
-      p={6}
+      bg={getColor('backgrounds.surface')}
+      borderRadius={getBorderRadius('md')}
+      border={`1px solid ${getColor('borders.default')}`}
+      p={getSpacing(6)}
       whileHover={{ scale: 1.03, y: -5, borderColor: color }}
       whileTap={{ scale: 0.98 }}
       onClick={() => !comingSoon && navigate(route)}
       cursor={comingSoon ? "default" : "pointer"}
       position="relative"
     >
-      <VStack spacing={4} align="start">
+      <VStack spacing={getSpacing(4)} align="start">
         <HStack>
           <Text fontSize="2xl">{icon}</Text>
           <Text fontSize="xl" fontWeight="bold" color={color}>
             {title}
           </Text>
         </HStack>
-        <Text color="#ccc">{description}</Text>
+        <Text color={getColor('text.secondary')}>{description}</Text>
         {comingSoon ? (
-          <Badge bg="#333" color="#ccc">Coming Soon</Badge>
+          <Badge bg={getColor('backgrounds.secondary')} color={getColor('text.muted')}>
+            Coming Soon
+          </Badge>
         ) : (
           <Button size="sm" colorScheme="blue">
             Explore
@@ -47,13 +51,18 @@ const FeatureCard = ({ title, description, icon, color, route, comingSoon = fals
           left={0}
           right={0}
           bottom={0}
-          bg="rgba(0,0,0,0.5)"
+          bg={getColor('backgrounds.overlay')}
           display="flex"
           alignItems="center"
           justifyContent="center"
-          borderRadius="md"
+          borderRadius={getBorderRadius('md')}
         >
-          <Badge bg="#111" color="#ccc" p={2} fontSize="md">
+          <Badge 
+            bg={getColor('backgrounds.primary')} 
+            color={getColor('text.muted')} 
+            p={getSpacing(2)} 
+            fontSize="md"
+          >
             Coming Soon
           </Badge>
         </Box>
@@ -63,6 +72,8 @@ const FeatureCard = ({ title, description, icon, color, route, comingSoon = fals
 };
 
 const HomePage = () => {
+  const { getColor, getSpacing } = useThemeTokens();
+  
   // Define features for the homepage
   const features = [
     {

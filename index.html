@@ -7,12 +7,15 @@
     <title>Terminal IDE - Arnab's Code Executor</title>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
       * {
-        font-family: 'Courier New', 'Courier Prime', monospace !important;
+        /* Remove global font override - let theme system handle fonts */
       }
       body {
-        background: #000000 !important;
-        color: #00ff00 !important;
+        /* Remove global colors - let theme system handle colors */
         overflow-x: hidden;
       }
       /* Custom scrollbar for terminal feel */
@@ -20,14 +23,13 @@
         width: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #111;
+        /* Let theme system handle scrollbar colors */
       }
       ::-webkit-scrollbar-thumb {
-        background: #333;
         border-radius: 0;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #555;
+        /* Let theme system handle hover colors */
       }
     </style>
   </head>

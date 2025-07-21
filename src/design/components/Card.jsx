@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
-import { designSystem, createVariant } from '../system/DesignSystem';
+import { useThemeTokens } from '../../theme/hooks/useThemeTokens';
 
 const MotionBox = motion(Box);
 
@@ -13,20 +13,39 @@ export const Card = ({
   onClick,
   ...props 
 }) => {
-  const cardStyles = createVariant('card', variant);
+  const { getColor, getBorderRadius, getShadow } = useThemeTokens();
+  
+  const getVariantStyles = (variant) => {
+    const variants = {
+      default: {
+        bg: getColor('backgrounds.surface'),
+        border: `1px solid ${getColor('borders.default')}`,
+        borderRadius: getBorderRadius('md'),
+        p: 4
+      },
+      elevated: {
+        bg: getColor('backgrounds.elevated'),
+        border: `1px solid ${getColor('borders.subtle')}`,
+        borderRadius: getBorderRadius('lg'),
+        boxShadow: getShadow('md')
+      }
+    };
+    
+    return variants[variant] || variants.default;
+  };
   
   const hoverAnimation = hover ? {
     whileHover: { 
       scale: 1.02,
-      borderColor: designSystem.colors.borders.accent,
-      boxShadow: designSystem.shadows.glow
+      borderColor: getColor('borders.accent'),
+      boxShadow: getShadow('glow')
     },
     whileTap: { scale: 0.98 }
   } : {};
   
   return (
     <MotionBox
-      {...cardStyles}
+      {...getVariantStyles(variant)}
       onClick={onClick}
       cursor={onClick ? 'pointer' : 'default'}
       transition="all 0.2s ease"
@@ -48,13 +67,15 @@ export const CourseCard = ({
   isEnrolled = false,
   ...props 
 }) => {
+  const { getColor, getSpacing, getBorderRadius } = useThemeTokens();
+  
   const getDifficultyColor = (difficulty) => {
     const colors = {
-      beginner: designSystem.colors.status.success,
-      intermediate: designSystem.colors.status.warning,
-      advanced: designSystem.colors.status.error
+      beginner: getColor('status.success'),
+      intermediate: getColor('status.warning'),
+      advanced: getColor('status.error')
     };
-    return colors[difficulty] || designSystem.colors.status.info;
+    return colors[difficulty] || getColor('status.info');
   };
 
   const getLanguageIcon = (language) => {
@@ -83,13 +104,13 @@ export const CourseCard = ({
         position="relative" 
         h="200px" 
         overflow="hidden"
-        borderRadius={designSystem.radii.md}
-        mb={designSystem.spacing[4]}
+        borderRadius={getBorderRadius('md')}
+        mb={getSpacing(4)}
       >
         <Box
           w="100%"
           h="100%"
-          bg={designSystem.colors.backgrounds.secondary}
+          bg={getColor('backgrounds.secondary')}
           backgroundImage={course.thumbnail_url}
           backgroundSize="cover"
           backgroundPosition="center"
@@ -98,30 +119,30 @@ export const CourseCard = ({
         {/* Badges */}
         <Box
           position="absolute"
-          top={designSystem.spacing[2]}
-          left={designSystem.spacing[2]}
+          top={getSpacing(2)}
+          left={getSpacing(2)}
           display="flex"
-          gap={designSystem.spacing[2]}
+          gap={getSpacing(2)}
         >
           <Box
             bg={getDifficultyColor(course.difficulty)}
-            color={designSystem.colors.text.inverse}
-            px={designSystem.spacing[2]}
-            py={designSystem.spacing[1]}
-            borderRadius={designSystem.radii.sm}
-            fontSize={designSystem.typography.sizes.xs}
-            fontWeight={designSystem.typography.weights.bold}
+            color={getColor('text.inverse')}
+            px={getSpacing(2)}
+            py={getSpacing(1)}
+            borderRadius={getBorderRadius('sm')}
+            fontSize="xs"
+            fontWeight="bold"
           >
             {course.difficulty?.toUpperCase()}
           </Box>
           
           <Box
-            bg={designSystem.colors.backgrounds.overlay}
-            color={designSystem.colors.text.primary}
-            px={designSystem.spacing[2]}
-            py={designSystem.spacing[1]}
-            borderRadius={designSystem.radii.sm}
-            fontSize={designSystem.typography.sizes.xs}
+            bg={getColor('backgrounds.overlay')}
+            color={getColor('text.primary')}
+            px={getSpacing(2)}
+            py={getSpacing(1)}
+            borderRadius={getBorderRadius('sm')}
+            fontSize="xs"
           >
             {getLanguageIcon(course.language)} {course.language?.toUpperCase()}
           </Box>
@@ -130,15 +151,15 @@ export const CourseCard = ({
         {/* Price */}
         <Box
           position="absolute"
-          top={designSystem.spacing[2]}
-          right={designSystem.spacing[2]}
-          bg={designSystem.colors.backgrounds.overlay}
-          color={designSystem.colors.brand.accent}
-          px={designSystem.spacing[2]}
-          py={designSystem.spacing[1]}
-          borderRadius={designSystem.radii.sm}
-          fontSize={designSystem.typography.sizes.sm}
-          fontWeight={designSystem.typography.weights.bold}
+          top={getSpacing(2)}
+          right={getSpacing(2)}
+          bg={getColor('backgrounds.overlay')}
+          color={getColor('brand.accent')}
+          px={getSpacing(2)}
+          py={getSpacing(1)}
+          borderRadius={getBorderRadius('sm')}
+          fontSize="sm"
+          fontWeight="bold"
         >
           ${course.price}
         </Box>
@@ -149,14 +170,14 @@ export const CourseCard = ({
         display="flex" 
         flexDirection="column" 
         flex={1}
-        px={designSystem.spacing[4]}
-        pb={designSystem.spacing[4]}
+        px={getSpacing(4)}
+        pb={getSpacing(4)}
       >
         <Box
-          mb={designSystem.spacing[3]}
-          fontSize={designSystem.typography.sizes.lg}
-          fontWeight={designSystem.typography.weights.bold}
-          color={designSystem.colors.brand.primary}
+          mb={getSpacing(3)}
+          fontSize="lg"
+          fontWeight="bold"
+          color={getColor('brand.primary')}
           noOfLines={2}
           minH="48px"
         >
@@ -164,9 +185,9 @@ export const CourseCard = ({
         </Box>
 
         <Box
-          mb={designSystem.spacing[4]}
-          fontSize={designSystem.typography.sizes.sm}
-          color={designSystem.colors.text.secondary}
+          mb={getSpacing(4)}
+          fontSize="sm"
+          color={getColor('text.secondary')}
           noOfLines={3}
           flex={1}
         >
@@ -174,12 +195,12 @@ export const CourseCard = ({
         </Box>
 
         {/* Course Stats */}
-        <Box display="flex" flexDirection="column" gap={designSystem.spacing[3]} mb={designSystem.spacing[4]}>
+        <Box display="flex" flexDirection="column" gap={getSpacing(3)} mb={getSpacing(4)}>
           <Box 
             display="flex" 
             justifyContent="space-between" 
-            fontSize={designSystem.typography.sizes.xs} 
-            color={designSystem.colors.text.muted}
+            fontSize="xs"
+            color={getColor('text.muted')}
           >
             <Box>👨‍🏫 {course.instructor_name}</Box>
             <Box>⭐ {course.rating}</Box>
@@ -188,8 +209,8 @@ export const CourseCard = ({
           <Box 
             display="flex" 
             justifyContent="space-between" 
-            fontSize={designSystem.typography.sizes.xs} 
-            color={designSystem.colors.text.muted}
+            fontSize="xs"
+            color={getColor('text.muted')}
           >
             <Box>📚 {course.lessons_count} lessons</Box>
             <Box>⏱️ {course.duration_hours}h</Box>
@@ -198,8 +219,8 @@ export const CourseCard = ({
           <Box 
             display="flex" 
             justifyContent="space-between" 
-            fontSize={designSystem.typography.sizes.xs} 
-            color={designSystem.colors.text.muted}
+            fontSize="xs"
+            color={getColor('text.muted')}
           >
             <Box>👥 {course.students_count?.toLocaleString()} students</Box>
             <Box>🎯 Interactive</Box>
@@ -209,19 +230,19 @@ export const CourseCard = ({
         {/* Action Button */}
         <Box
           as="button"
-          bg={isEnrolled ? designSystem.colors.status.success : designSystem.colors.brand.primary}
-          color={designSystem.colors.text.inverse}
-          fontFamily={designSystem.typography.fonts.mono}
-          fontSize={designSystem.typography.sizes.sm}
-          fontWeight={designSystem.typography.weights.bold}
-          borderRadius={designSystem.radii.base}
-          p={designSystem.spacing[3]}
+          bg={isEnrolled ? getColor('status.success') : getColor('brand.primary')}
+          color={getColor('text.inverse')}
+          fontFamily="mono"
+          fontSize="sm"
+          fontWeight="bold"
+          borderRadius={getBorderRadius('base')}
+          p={getSpacing(3)}
           border="none"
           cursor="pointer"
           transition="all 0.2s ease"
           _hover={{
             transform: "translateY(-1px)",
-            boxShadow: designSystem.shadows.md
+            boxShadow: getShadow('md')
           }}
           onClick={(e) => {
             e.stopPropagation();

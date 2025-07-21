@@ -3,6 +3,7 @@ import React from 'react';
 import { Box, Text as ChakraText, Button as ChakraButton } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 import { useResponsive } from '../hooks/useResponsive';
+import { useThemeTokens } from '../../theme/hooks/useThemeTokens';
 import { 
   typographyVariants, 
   layoutVariants, 
@@ -10,7 +11,7 @@ import {
   statusVariants,
   animationVariants 
 } from '../system/ComponentSystem';
-import { designSystem } from '../system/DesignSystem';
+import { designSystem, useDesignSystem } from '../system/DesignSystem';
 import { responsiveSpacing } from '../system/ResponsiveSystem';
 
 // Motion wrapper for consistent animations
@@ -21,40 +22,65 @@ const MotionBox = motion(Box);
  * Replaces inline font styling with consistent variants
  */
 export function PageTitle({ children, ...props }) {
+  const { getColor } = useThemeTokens();
   return (
-    <ChakraText {...typographyVariants.pageTitle} {...props}>
+    <ChakraText 
+      {...typographyVariants.pageTitle} 
+      color={getColor('brand.primary')}
+      {...props}
+    >
       {children}
     </ChakraText>
   );
 }
 
 export function SectionTitle({ children, ...props }) {
+  const { getColor } = useThemeTokens();
   return (
-    <ChakraText {...typographyVariants.sectionTitle} {...props}>
+    <ChakraText 
+      {...typographyVariants.sectionTitle}
+      color={getColor('brand.secondary')}
+      {...props}
+    >
       {children}
     </ChakraText>
   );
 }
 
 export function CardTitle({ children, ...props }) {
+  const { getColor } = useThemeTokens();
   return (
-    <ChakraText {...typographyVariants.cardTitle} {...props}>
+    <ChakraText 
+      {...typographyVariants.cardTitle}
+      color={getColor('text.primary')}
+      {...props}
+    >
       {children}
     </ChakraText>
   );
 }
 
 export function BodyText({ children, ...props }) {
+  const { getColor } = useThemeTokens();
   return (
-    <ChakraText {...typographyVariants.bodyText} {...props}>
+    <ChakraText 
+      {...typographyVariants.bodyText}
+      color={getColor('text.secondary')}
+      {...props}
+    >
       {children}
     </ChakraText>
   );
 }
 
 export function Caption({ children, ...props }) {
+  const { getColor } = useThemeTokens();
   return (
-    <ChakraText {...typographyVariants.caption} {...props}>
+    <ChakraText 
+      {...typographyVariants.caption}
+      color={getColor('text.muted')}
+      {...props}
+    >
       {children}
     </ChakraText>
   );

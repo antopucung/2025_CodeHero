@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, ChakraProvider } from '@chakra-ui/react';
+import { Box, Container } from '@chakra-ui/react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
@@ -15,11 +15,11 @@ import MarketplacePage from './pages/MarketplacePage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import CommissionDetailPage from './pages/CommissionDetailPage';
-import theme from './theme';
+import { ThemeProvider } from './theme/ThemeContext';
 
 function App() {
   return (
-    <ChakraProvider theme={theme}>
+    <ThemeProvider>
       <ErrorBoundary>
         <Router>
           <Box minH="100vh" bg="#000">
@@ -43,7 +43,7 @@ function App() {
           </Box>
         </Router>
       </ErrorBoundary>
-    </ChakraProvider>
+    </ThemeProvider>
   );
 }
 

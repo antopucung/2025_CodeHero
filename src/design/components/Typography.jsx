@@ -1,7 +1,7 @@
 // Typography Components
 import React from 'react';
 import { Text as ChakraText, Heading as ChakraHeading } from '@chakra-ui/react';
-import { designSystem } from '../system/DesignSystem';
+import { useThemeTokens } from '../../theme/hooks/useThemeTokens';
 
 export const CustomText = ({ 
   variant = 'body', 
@@ -9,40 +9,46 @@ export const CustomText = ({
   color = 'primary',
   ...props 
 }) => {
-  const colorMap = {
-    primary: designSystem.colors.text.primary,
-    secondary: designSystem.colors.text.secondary,
-    muted: designSystem.colors.text.muted,
-    disabled: designSystem.colors.text.disabled,
-    brand: designSystem.colors.brand.primary,
-    accent: designSystem.colors.brand.accent,
-    error: designSystem.colors.brand.error,
-    success: designSystem.colors.brand.success
+  const { getColor, getTypography } = useThemeTokens();
+  
+  const getColorValue = (colorKey) => {
+    const colorMap = {
+      primary: 'text.primary',
+      secondary: 'text.secondary',
+      muted: 'text.muted',
+      disabled: 'text.disabled',
+      brand: 'brand.primary',
+      accent: 'brand.accent',
+      error: 'brand.error',
+      success: 'brand.success'
+    };
+    
+    return getColor(colorMap[colorKey] || colorKey);
   };
   
   const variantStyles = {
     body: {
-      fontFamily: designSystem.typography.fonts.mono,
-      lineHeight: designSystem.typography.lineHeights.normal
+      fontFamily: getTypography('fonts', 'mono'),
+      lineHeight: getTypography('lineHeights', 'normal')
     },
     caption: {
-      fontFamily: designSystem.typography.fonts.mono,
-      lineHeight: designSystem.typography.lineHeights.tight,
-      fontWeight: designSystem.typography.weights.normal
+      fontFamily: getTypography('fonts', 'mono'),
+      lineHeight: getTypography('lineHeights', 'tight'),
+      fontWeight: getTypography('weights', 'normal')
     },
     code: {
-      fontFamily: designSystem.typography.fonts.mono,
-      bg: designSystem.colors.backgrounds.secondary,
-      px: designSystem.spacing[1],
-      py: designSystem.spacing[1],
-      borderRadius: designSystem.radii.sm
+      fontFamily: getTypography('fonts', 'mono'),
+      bg: getColor('backgrounds.secondary'),
+      px: '0.25rem',
+      py: '0.25rem',
+      borderRadius: 'sm'
     }
   };
   
   return (
     <ChakraText
-      fontSize={designSystem.typography.sizes[size]}
-      color={colorMap[color]}
+      fontSize={size}
+      color={getColorValue(color)}
       {...variantStyles[variant]}
       {...props}
     />
@@ -55,20 +61,26 @@ export const Heading = ({
   color = 'primary',
   ...props 
 }) => {
-  const colorMap = {
-    primary: designSystem.colors.text.primary,
-    brand: designSystem.colors.brand.primary,
-    accent: designSystem.colors.brand.accent
+  const { getColor, getTypography } = useThemeTokens();
+  
+  const getColorValue = (colorKey) => {
+    const colorMap = {
+      primary: 'text.primary',
+      brand: 'brand.primary',
+      accent: 'brand.accent'
+    };
+    
+    return getColor(colorMap[colorKey] || colorKey);
   };
   
   return (
     <ChakraHeading
       as={`h${level}`}
-      fontSize={designSystem.typography.sizes[size]}
-      fontFamily={designSystem.typography.fonts.mono}
-      fontWeight={designSystem.typography.weights.bold}
-      lineHeight={designSystem.typography.lineHeights.tight}
-      color={colorMap[color]}
+      fontSize={size}
+      fontFamily={getTypography('fonts', 'mono')}
+      fontWeight={getTypography('weights', 'bold')}
+      lineHeight={getTypography('lineHeights', 'tight')}
+      color={getColorValue(color)}
       {...props}
     />
   );

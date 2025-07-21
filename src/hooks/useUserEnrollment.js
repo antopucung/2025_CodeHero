@@ -93,6 +93,15 @@ export const useUserEnrollment = () => {
     
     if (!enrollments.includes(courseId)) {
       try {
+        // Get course data to determine if it's free or paid
+        const { data: courseData, error: courseError } = await supabase
+          .from('courses')
+          .select('price, title')
+          .eq('id', courseId)
+          .single();
+        
+        if (courseError) throw courseError;
+        
         // Insert a new user_course_progress record
         const { error } = await supabase
           .from('user_course_progress')
@@ -107,11 +116,36 @@ export const useUserEnrollment = () => {
           
         if (error) throw error;
         
+        // Award XP for course enrollment
+        const enrollmentType = courseData.price > 0 ? 'course_purchased' : 'course_enrolled';
+        const { data: xpResult, error: xpError } = await supabase.rpc('award_marketplace_xp', {
+          p_user_id: user.id,
+          p_event_type: enrollmentType,
+          p_reference_type: 'course',
+          p_reference_id: courseId,
+          p_metadata: {
+            course_title: courseData.title,
+            course_price: courseData.price
+          }
+        });
+        
+        if (xpError) {
+          console.error('Error awarding enrollment XP:', xpError);
+        }
+        
         // Update local state
         await fetchUserEnrollments();
+        
+        return {
+          success: true,
+          xpAwarded: xpResult?.[0]?.xp_awarded || 0,
+          levelUp: xpResult?.[0]?.level_up || false,
+          newLevel: xpResult?.[0]?.new_level
+        };
       } catch (err) {
         console.error('Error enrolling in course:', err);
         setError(err.message);
+        throw err;
       }
     }
   };
@@ -135,9 +169,23 @@ export const useUserEnrollment = () => {
       
       // Update the progress
       let completedLessons = data.completed_lessons || [];
+      const wasAlreadyCompleted = completedLessons.includes(lessonId);
+      
       if (completed && !completedLessons.includes(lessonId)) {
         completedLessons = [...completedLessons, lessonId];
       }
+      
+      // Get total lesson count for milestone calculation
+      const { data: courseData, error: courseError } = await supabase
+        .from('courses')
+        .select('lessons_count, title')
+        .eq('id', courseId)
+        .single();
+      
+      if (courseError) throw courseError;
+      
+      const totalLessons = courseData.lessons_count || 1;
+      const completionPercentage = (completedLessons.length / totalLessons) * 100;
       
       const { error: updateError } = await supabase
         .from('user_course_progress')
@@ -151,6 +199,60 @@ export const useUserEnrollment = () => {
         .eq('course_id', courseId);
         
       if (updateError) throw updateError;
+      
+      // Award XP for lesson completion (only if not already completed)
+      if (completed && !wasAlreadyCompleted) {
+        // Award lesson completion XP
+        const { error: lessonXpError } = await supabase.rpc('award_marketplace_xp', {
+          p_user_id: user.id,
+          p_event_type: 'lesson_completed',
+          p_reference_type: 'lesson',
+          p_reference_id: lessonId,
+          p_metadata: {
+            course_id: courseId,
+            course_title: courseData.title,
+            lesson_score: score
+          }
+        });
+        
+        if (lessonXpError) {
+          console.error('Error awarding lesson XP:', lessonXpError);
+        }
+        
+        // Check for milestone achievements
+        const previousCompletionPercentage = ((completedLessons.length - 1) / totalLessons) * 100;
+        
+        // Award milestone XP
+        let milestoneEvent = null;
+        if (completionPercentage >= 100 && previousCompletionPercentage < 100) {
+          milestoneEvent = 'course_completed';
+        } else if (completionPercentage >= 75 && previousCompletionPercentage < 75) {
+          milestoneEvent = 'course_milestone_75';
+        } else if (completionPercentage >= 50 && previousCompletionPercentage < 50) {
+          milestoneEvent = 'course_milestone_50';
+        } else if (completionPercentage >= 25 && previousCompletionPercentage < 25) {
+          milestoneEvent = 'course_milestone_25';
+        }
+        
+        if (milestoneEvent) {
+          const { error: milestoneXpError } = await supabase.rpc('award_marketplace_xp', {
+            p_user_id: user.id,
+            p_event_type: milestoneEvent,
+            p_reference_type: 'course',
+            p_reference_id: courseId,
+            p_metadata: {
+              course_title: courseData.title,
+              completion_percentage: completionPercentage,
+              lessons_completed: completedLessons.length,
+              total_lessons: totalLessons
+            }
+          });
+          
+          if (milestoneXpError) {
+            console.error('Error awarding milestone XP:', milestoneXpError);
+          }
+        }
+      }
       
       // Local state will be updated via the subscription
     } catch (err) {

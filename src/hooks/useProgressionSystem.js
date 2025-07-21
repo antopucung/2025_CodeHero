@@ -271,6 +271,153 @@ export const useProgressionSystem = () => {
   }, [user, profile, awardXP]);
 
   /**
+   * Complete a marketplace purchase and award XP
+   * @param {string} itemType - 'course' or 'asset'
+   * @param {string} itemId - Item identifier
+   * @param {number} price - Purchase price
+   * @param {Object} metadata - Additional purchase data
+   * @returns {Promise<Object>} Purchase completion result
+   */
+  const completeMarketplacePurchase = useCallback(async (itemType, itemId, price, metadata = {}) => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    try {
+      const eventType = itemType === 'course' ? 'course_purchased' : 'asset_purchased';
+      
+      const result = await awardXP('marketplace_activity', 'marketplace_purchase', {
+        sourceReference: itemId,
+        performanceData: {
+          item_type: itemType,
+          purchase_price: price,
+          accuracy: 100, // Required field
+          time_taken: 1, // Required field
+          attempts: 1 // Required field
+        },
+        description: `Purchased ${itemType}: ${metadata.title || itemId}`
+      });
+      
+      // Also record via marketplace XP function for detailed tracking
+      const { data: marketplaceResult, error: marketplaceError } = await supabase.rpc('award_marketplace_xp', {
+        p_user_id: user.id,
+        p_event_type: eventType,
+        p_reference_type: itemType,
+        p_reference_id: itemId,
+        p_metadata: {
+          ...metadata,
+          purchase_price: price,
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+      if (marketplaceError) {
+        console.error('Error recording marketplace purchase:', marketplaceError);
+      }
+      
+      return {
+        ...result,
+        marketplaceXP: marketplaceResult?.[0]?.xp_awarded || 0
+      };
+    } catch (err) {
+      console.error('Error completing marketplace purchase:', err);
+      throw err;
+    }
+  }, [user, awardXP]);
+
+  /**
+   * Complete an asset download and award engagement XP
+   * @param {string} assetId - Asset identifier
+   * @param {boolean} isFirstDownload - Whether this is the first download
+   * @param {Object} metadata - Additional download data
+   * @returns {Promise<Object>} Download completion result
+   */
+  const completeAssetDownload = useCallback(async (assetId, isFirstDownload = false, metadata = {}) => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    try {
+      const { data: result, error } = await supabase.rpc('award_marketplace_xp', {
+        p_user_id: user.id,
+        p_event_type: 'asset_downloaded',
+        p_reference_type: 'asset',
+        p_reference_id: assetId,
+        p_metadata: {
+          ...metadata,
+          first_download: isFirstDownload,
+          timestamp: new Date().toISOString()
+        },
+        p_custom_xp: isFirstDownload ? 25 : 5
+      });
+      
+      if (error) throw error;
+      
+      return {
+        success: true,
+        xpAwarded: result?.[0]?.xp_awarded || 0,
+        levelUp: result?.[0]?.level_up || false,
+        newLevel: result?.[0]?.new_level
+      };
+    } catch (err) {
+      console.error('Error completing asset download:', err);
+      throw err;
+    }
+  }, [user]);
+
+  /**
+   * Record course milestone completion
+   * @param {string} courseId - Course identifier
+   * @param {number} completionPercentage - Completion percentage (25, 50, 75, 100)
+   * @param {Object} metadata - Additional milestone data
+   * @returns {Promise<Object>} Milestone completion result
+   */
+  const completeCourseMillestone = useCallback(async (courseId, completionPercentage, metadata = {}) => {
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+    
+    try {
+      let eventType;
+      if (completionPercentage >= 100) {
+        eventType = 'course_completed';
+      } else if (completionPercentage >= 75) {
+        eventType = 'course_milestone_75';
+      } else if (completionPercentage >= 50) {
+        eventType = 'course_milestone_50';
+      } else if (completionPercentage >= 25) {
+        eventType = 'course_milestone_25';
+      } else {
+        return { success: false, error: 'Invalid completion percentage' };
+      }
+      
+      const { data: result, error } = await supabase.rpc('award_marketplace_xp', {
+        p_user_id: user.id,
+        p_event_type: eventType,
+        p_reference_type: 'course',
+        p_reference_id: courseId,
+        p_metadata: {
+          ...metadata,
+          completion_percentage: completionPercentage,
+          timestamp: new Date().toISOString()
+        }
+      });
+      
+      if (error) throw error;
+      
+      return {
+        success: true,
+        xpAwarded: result?.[0]?.xp_awarded || 0,
+        levelUp: result?.[0]?.level_up || false,
+        newLevel: result?.[0]?.new_level,
+        milestone: eventType
+      };
+    } catch (err) {
+      console.error('Error completing course milestone:', err);
+      throw err;
+    }
+  }, [user]);
+  /**
    * Complete a typing challenge and award XP
    * @param {Object} stats - Challenge stats
    * @param {string} language - Programming language
@@ -517,6 +664,9 @@ export const useProgressionSystem = () => {
     completeLesson,
     completeTypingChallenge,
     completeCodeExecution,
+    completeMarketplacePurchase,
+    completeAssetDownload,
+    completeCourseMillestone,
     updateDailyActivity,
     checkAvailableCertifications,
     generateCertificate,

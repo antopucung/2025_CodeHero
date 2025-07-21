@@ -2,6 +2,7 @@
 import React from 'react';
 import { Box, Text as ChakraText, Button as ChakraButton } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
+import { useResponsive } from '../hooks/useResponsive';
 import { 
   typographyVariants, 
   layoutVariants, 
@@ -10,6 +11,7 @@ import {
   animationVariants 
 } from '../system/ComponentSystem';
 import { designSystem } from '../system/DesignSystem';
+import { responsiveSpacing } from '../system/ResponsiveSystem';
 
 // Motion wrapper for consistent animations
 const MotionBox = motion(Box);
@@ -70,44 +72,101 @@ export function Label({ children, ...props }) {
  * Standardized Layout Components
  * Ensures consistent spacing and structure
  */
-export function PageContainer({ children, ...props }) {
+export function PageContainer({ children, maxWidth = 'adaptive', ...props }) {
+  const { isMobile, getResponsiveValue } = useResponsive();
+  
+  const containerMaxWidth = getResponsiveValue({
+    base: '100%',
+    sm: '640px',
+    md: '768px',
+    lg: '1024px',
+    xl: '1280px',
+    '2xl': '1536px'
+  });
+  
   return (
-    <Box {...layoutVariants.page} {...props}>
+    <Box 
+      {...layoutVariants.page} 
+      maxW={maxWidth === 'adaptive' ? containerMaxWidth : maxWidth}
+      px={getResponsiveValue({
+        base: designSystem.spacing[4],
+        md: designSystem.spacing[6],
+        lg: designSystem.spacing[8]
+      })}
+      {...props}
+    >
       {children}
     </Box>
   );
 }
 
 export function Section({ children, animated = false, ...props }) {
+  const { getResponsiveValue } = useResponsive();
   const Component = animated ? MotionBox : Box;
   const animationProps = animated ? animationVariants.slideUp : {};
   
   return (
-    <Component {...layoutVariants.section} {...animationProps} {...props}>
+    <Component 
+      {...layoutVariants.section} 
+      p={getResponsiveValue({
+        base: designSystem.spacing[4],
+        md: designSystem.spacing[6],
+        lg: designSystem.spacing[8]
+      })}
+      {...animationProps} 
+      {...props}
+    >
       {children}
     </Component>
   );
 }
 
 export function Card({ children, animated = false, hover = false, ...props }) {
+  const { isMobile, isTouch, getResponsiveValue } = useResponsive();
   const Component = animated ? MotionBox : Box;
+  
   const animationProps = {
     ...(animated ? animationVariants.fadeIn : {}),
-    ...(hover ? animationVariants.hover : {})
+    ...(hover && !isTouch ? animationVariants.hover : {})
   };
   
   return (
-    <Component {...layoutVariants.card} {...animationProps} {...props}>
+    <Component 
+      {...layoutVariants.card} 
+      p={getResponsiveValue({
+        base: isMobile ? designSystem.spacing[4] : designSystem.spacing[6],
+        md: designSystem.spacing[6],
+        lg: designSystem.spacing[8]
+      })}
+      {...animationProps} 
+      {...props}
+    >
       {children}
     </Component>
   );
 }
 
-export function Grid({ children, columns, ...props }) {
+export function Grid({ children, columns, adaptive = true, ...props }) {
+  const { isMobile, isTablet, getResponsiveValue } = useResponsive();
+  
+  // Adaptive column logic
+  const gridColumns = adaptive ? getResponsiveValue({
+    base: '1fr',
+    sm: columns?.sm || 'repeat(2, 1fr)',
+    md: columns?.md || 'repeat(2, 1fr)',
+    lg: columns?.lg || 'repeat(3, 1fr)',
+    xl: columns?.xl || 'repeat(4, 1fr)'
+  }) : columns || layoutVariants.grid.gridTemplateColumns;
+  
   return (
     <Box 
       {...layoutVariants.grid} 
-      gridTemplateColumns={columns || layoutVariants.grid.gridTemplateColumns}
+      gridTemplateColumns={gridColumns}
+      gap={getResponsiveValue({
+        base: designSystem.spacing[4],
+        md: designSystem.spacing[6],
+        lg: designSystem.spacing[8]
+      })}
       {...props}
     >
       {children}
@@ -116,9 +175,17 @@ export function Grid({ children, columns, ...props }) {
 }
 
 export function Stack({ children, horizontal = false, ...props }) {
+  const { isMobile, getResponsiveValue } = useResponsive();
   const variant = horizontal ? layoutVariants.hstack : layoutVariants.stack;
+  
+  const stackGap = getResponsiveValue({
+    base: designSystem.spacing[3],
+    md: designSystem.spacing[4],
+    lg: designSystem.spacing[6]
+  });
+  
   return (
-    <Box {...variant} {...props}>
+    <Box {...variant} gap={stackGap} {...props}>
       {children}
     </Box>
   );
@@ -129,12 +196,21 @@ export function Stack({ children, horizontal = false, ...props }) {
  * Consistent button and input patterns
  */
 export function StandardButton({ variant = 'primary', children, animated = false, ...props }) {
+  const { isTouch, getResponsiveValue } = useResponsive();
   const Component = animated ? motion(ChakraButton) : ChakraButton;
-  const animationProps = animated ? animationVariants.hover : {};
+  
+  // Disable hover animations on touch devices
+  const animationProps = animated && !isTouch ? animationVariants.hover : {};
+  
+  const buttonPadding = getResponsiveValue({
+    base: { px: designSystem.spacing[4], py: designSystem.spacing[3] },
+    md: { px: designSystem.spacing[6], py: designSystem.spacing[3] }
+  });
   
   return (
     <Component 
       {...interactiveVariants.button[variant]} 
+      {...buttonPadding}
       {...animationProps}
       {...props}
     >
@@ -188,12 +264,25 @@ export function ProgressBar({ value = 0, animated = false, ...props }) {
  * Specialized components for profile features
  */
 export function ProfileStatCard({ label, value, icon, color, animated = false, ...props }) {
+  const { isMobile, getResponsiveValue } = useResponsive();
+  
+  const cardPadding = getResponsiveValue({
+    base: designSystem.spacing[4],
+    md: designSystem.spacing[6]
+  });
+  
   return (
-    <Card animated={animated} hover={true} {...props}>
+    <Card animated={animated} hover={!isMobile} p={cardPadding} {...props}>
       <Stack>
         <Stack horizontal>
           {icon && (
-            <Box fontSize={designSystem.typography.sizes.xl} color={color}>
+            <Box 
+              fontSize={getResponsiveValue({
+                base: designSystem.typography.sizes.lg,
+                md: designSystem.typography.sizes.xl
+              })} 
+              color={color}
+            >
               {icon}
             </Box>
           )}
@@ -208,12 +297,24 @@ export function ProfileStatCard({ label, value, icon, color, animated = false, .
 }
 
 export function AchievementCard({ achievement, animated = false, ...props }) {
+  const { isMobile, getResponsiveValue } = useResponsive();
   const color = achievement?.color || designSystem.colors.brand.primary;
   
+  const cardPadding = getResponsiveValue({
+    base: designSystem.spacing[3],
+    md: designSystem.spacing[4]
+  });
+  
   return (
-    <Card animated={animated} hover={true} {...props}>
+    <Card animated={animated} hover={!isMobile} p={cardPadding} {...props}>
       <Stack>
-        <Box textAlign="center" fontSize={designSystem.typography.sizes['2xl']}>
+        <Box 
+          textAlign="center" 
+          fontSize={getResponsiveValue({
+            base: designSystem.typography.sizes.xl,
+            md: designSystem.typography.sizes['2xl']
+          })}
+        >
           {achievement?.icon || '🏆'}
         </Box>
         <CardTitle textAlign="center">
@@ -231,11 +332,19 @@ export function AchievementCard({ achievement, animated = false, ...props }) {
 }
 
 export function CourseCard({ course, animated = false, onNavigate, ...props }) {
+  const { isMobile, isTouch, getResponsiveValue } = useResponsive();
+  
+  const cardPadding = getResponsiveValue({
+    base: designSystem.spacing[4],
+    md: designSystem.spacing[6]
+  });
+  
   return (
     <Card 
       animated={animated} 
-      hover={true} 
+      hover={!isTouch} 
       cursor="pointer"
+      p={cardPadding}
       onClick={() => onNavigate?.(course)}
       {...props}
     >
@@ -278,18 +387,20 @@ export function ProfilePageLayout({
   actions = [],
   ...props 
 }) {
+  const { isMobile, getResponsiveValue } = useResponsive();
+  
   return (
     <PageContainer {...props}>
       {/* Page Header */}
       <Section animated>
         <Stack>
-          <Stack horizontal>
+          <Stack horizontal={!isMobile}>
             <Box flex={1}>
               <PageTitle>{title}</PageTitle>
               {subtitle && <BodyText>{subtitle}</BodyText>}
             </Box>
             {actions.length > 0 && (
-              <Stack horizontal>
+              <Stack horizontal={!isMobile}>
                 {actions.map((action, index) => (
                   <StandardButton 
                     key={index}
@@ -305,7 +416,13 @@ export function ProfilePageLayout({
           </Stack>
           
           {stats.length > 0 && (
-            <Grid columns={{ base: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
+            <Grid 
+              columns={{ 
+                base: isMobile ? '1fr' : 'repeat(auto-fit, minmax(120px, 1fr))',
+                sm: 'repeat(auto-fit, minmax(140px, 1fr))',
+                md: 'repeat(auto-fit, minmax(160px, 1fr))'
+              }}
+            >
               {stats.map((stat, index) => (
                 <ProfileStatCard
                   key={index}
@@ -328,28 +445,42 @@ export function ProfilePageLayout({
 }
 
 export function TwoColumnLayout({ leftContent, rightContent, ...props }) {
+  const { isMobile } = useResponsive();
+  
   return (
     <Grid 
-      columns={{ base: '1fr', lg: '1fr 1fr' }}
-      gap={designSystem.spacing[8]}
+      columns={{ base: '1fr', lg: isMobile ? '1fr' : '1fr 1fr' }}
+      gap={{
+        base: designSystem.spacing[6],
+        md: designSystem.spacing[8]
+      }}
       {...props}
     >
       <Stack>{leftContent}</Stack>
-      <Stack>{rightContent}</Stack>
+      {!isMobile && <Stack>{rightContent}</Stack>}
     </Grid>
   );
 }
 
 export function ThreeColumnLayout({ leftContent, centerContent, rightContent, ...props }) {
+  const { isMobile, isTablet } = useResponsive();
+  
   return (
     <Grid 
-      columns={{ base: '1fr', md: '1fr 1fr', lg: '1fr 2fr 1fr' }}
-      gap={designSystem.spacing[6]}
+      columns={{ 
+        base: '1fr', 
+        md: isMobile ? '1fr' : (isTablet ? '1fr 1fr' : '1fr 2fr 1fr')
+      }}
+      gap={{
+        base: designSystem.spacing[4],
+        md: designSystem.spacing[6],
+        lg: designSystem.spacing[8]
+      }}
       {...props}
     >
       <Stack>{leftContent}</Stack>
-      <Stack>{centerContent}</Stack>
-      <Stack>{rightContent}</Stack>
+      {!isMobile && <Stack>{centerContent}</Stack>}
+      {!isMobile && !isTablet && <Stack>{rightContent}</Stack>}
     </Grid>
   );
 }

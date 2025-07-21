@@ -1,5 +1,6 @@
 // Component System - Standardized component patterns and variants
 import { designSystem } from './DesignSystem';
+import { responsiveBreakpoints, responsiveSpacing } from './ResponsiveSystem';
 
 /**
  * Standardized component variants and styling patterns
@@ -55,49 +56,56 @@ const typographyVariants = {
 // Layout variants - standardizes spacing and structure
 const layoutVariants = {
   page: {
-    maxW: '1200px',
+    maxW: { base: '100%', xl: '1200px' },
     mx: 'auto',
-    p: designSystem.spacing[6],
+    p: responsiveSpacing.dynamic(6),
     bg: designSystem.colors.backgrounds.primary,
-    minH: '100vh'
+    minH: '100vh',
+    position: 'relative'
   },
   
   section: {
-    mb: designSystem.spacing[8],
-    p: designSystem.spacing[6],
+    mb: responsiveSpacing.dynamic(8),
+    p: responsiveSpacing.dynamic(6),
     bg: designSystem.colors.backgrounds.secondary,
     borderRadius: designSystem.radii.lg,
-    border: `1px solid ${designSystem.colors.borders.default}`
+    border: `1px solid ${designSystem.colors.borders.default}`,
+    width: '100%'
   },
   
   card: {
     bg: designSystem.colors.backgrounds.elevated,
     borderRadius: designSystem.radii.md,
     border: `1px solid ${designSystem.colors.borders.default}`,
-    p: designSystem.spacing[6],
-    boxShadow: designSystem.shadows.md
+    p: responsiveSpacing.dynamic(6),
+    boxShadow: designSystem.shadows.md,
+    width: '100%'
   },
   
   grid: {
     display: 'grid',
-    gap: designSystem.spacing[6],
+    gap: responsiveSpacing.dynamic(6),
     gridTemplateColumns: {
       base: '1fr',
       md: 'repeat(2, 1fr)',
-      lg: 'repeat(3, 1fr)'
-    }
+      lg: 'repeat(3, 1fr)',
+      xl: 'repeat(4, 1fr)'
+    },
+    width: '100%'
   },
   
   stack: {
     display: 'flex',
     flexDirection: 'column',
-    gap: designSystem.spacing[4]
+    gap: responsiveSpacing.dynamic(4),
+    width: '100%'
   },
   
   hstack: {
     display: 'flex',
     alignItems: 'center',
-    gap: designSystem.spacing[4]
+    gap: responsiveSpacing.dynamic(4),
+    flexWrap: { base: 'wrap', md: 'nowrap' }
   }
 };
 
@@ -109,13 +117,14 @@ const interactiveVariants = {
       color: designSystem.colors.text.inverse,
       border: 'none',
       borderRadius: designSystem.radii.base,
-      px: designSystem.spacing[6],
-      py: designSystem.spacing[3],
-      fontSize: designSystem.typography.sizes.base,
+      px: responsiveSpacing.dynamic(6),
+      py: responsiveSpacing.dynamic(3),
+      fontSize: { base: designSystem.typography.sizes.sm, md: designSystem.typography.sizes.base },
       fontWeight: designSystem.typography.weights.bold,
       fontFamily: designSystem.typography.fonts.mono,
       cursor: 'pointer',
       transition: 'all 0.2s ease',
+      minHeight: responsiveSpacing.touchFriendly.minTouchTarget,
       _hover: {
         bg: designSystem.colors.interactive.hover,
         transform: 'translateY(-1px)',
@@ -132,13 +141,14 @@ const interactiveVariants = {
       color: designSystem.colors.text.primary,
       border: `1px solid ${designSystem.colors.borders.default}`,
       borderRadius: designSystem.radii.base,
-      px: designSystem.spacing[6],
-      py: designSystem.spacing[3],
-      fontSize: designSystem.typography.sizes.base,
+      px: responsiveSpacing.dynamic(6),
+      py: responsiveSpacing.dynamic(3),
+      fontSize: { base: designSystem.typography.sizes.sm, md: designSystem.typography.sizes.base },
       fontWeight: designSystem.typography.weights.bold,
       fontFamily: designSystem.typography.fonts.mono,
       cursor: 'pointer',
       transition: 'all 0.2s ease',
+      minHeight: responsiveSpacing.touchFriendly.minTouchTarget,
       _hover: {
         borderColor: designSystem.colors.brand.primary,
         color: designSystem.colors.brand.primary,
@@ -151,12 +161,13 @@ const interactiveVariants = {
       color: designSystem.colors.text.secondary,
       border: 'none',
       borderRadius: designSystem.radii.base,
-      px: designSystem.spacing[4],
-      py: designSystem.spacing[2],
+      px: responsiveSpacing.dynamic(4),
+      py: responsiveSpacing.dynamic(2),
       fontSize: designSystem.typography.sizes.sm,
       fontFamily: designSystem.typography.fonts.mono,
       cursor: 'pointer',
       transition: 'all 0.2s ease',
+      minHeight: responsiveSpacing.touchFriendly.minTouchTarget,
       _hover: {
         bg: designSystem.colors.backgrounds.surface,
         color: designSystem.colors.text.primary
@@ -180,13 +191,15 @@ const interactiveVariants = {
     bg: designSystem.colors.backgrounds.surface,
     border: `1px solid ${designSystem.colors.borders.default}`,
     borderRadius: designSystem.radii.base,
-    px: designSystem.spacing[4],
-    py: designSystem.spacing[3],
-    fontSize: designSystem.typography.sizes.base,
+    px: responsiveSpacing.dynamic(4),
+    py: responsiveSpacing.dynamic(3),
+    fontSize: { base: designSystem.typography.sizes.sm, md: designSystem.typography.sizes.base },
     fontFamily: designSystem.typography.fonts.mono,
     color: designSystem.colors.text.primary,
     outline: 'none',
     transition: 'all 0.2s ease',
+    minHeight: responsiveSpacing.touchFriendly.minTouchTarget,
+    width: '100%',
     _focus: {
       borderColor: designSystem.colors.brand.primary,
       boxShadow: `0 0 0 1px ${designSystem.colors.brand.primary}`,
@@ -204,45 +217,53 @@ const statusVariants = {
     success: {
       bg: designSystem.colors.status.success,
       color: designSystem.colors.text.inverse,
-      px: designSystem.spacing[3],
-      py: designSystem.spacing[1],
+      px: responsiveSpacing.dynamic(3),
+      py: responsiveSpacing.dynamic(1),
       borderRadius: designSystem.radii.base,
       fontSize: designSystem.typography.sizes.xs,
       fontWeight: designSystem.typography.weights.bold,
-      fontFamily: designSystem.typography.fonts.mono
+      fontFamily: designSystem.typography.fonts.mono,
+      display: 'inline-block',
+      whiteSpace: 'nowrap'
     },
     
     warning: {
       bg: designSystem.colors.status.warning,
       color: designSystem.colors.text.inverse,
-      px: designSystem.spacing[3],
-      py: designSystem.spacing[1],
+      px: responsiveSpacing.dynamic(3),
+      py: responsiveSpacing.dynamic(1),
       borderRadius: designSystem.radii.base,
       fontSize: designSystem.typography.sizes.xs,
       fontWeight: designSystem.typography.weights.bold,
-      fontFamily: designSystem.typography.fonts.mono
+      fontFamily: designSystem.typography.fonts.mono,
+      display: 'inline-block',
+      whiteSpace: 'nowrap'
     },
     
     error: {
       bg: designSystem.colors.status.error,
       color: designSystem.colors.text.inverse,
-      px: designSystem.spacing[3],
-      py: designSystem.spacing[1],
+      px: responsiveSpacing.dynamic(3),
+      py: responsiveSpacing.dynamic(1),
       borderRadius: designSystem.radii.base,
       fontSize: designSystem.typography.sizes.xs,
       fontWeight: designSystem.typography.weights.bold,
-      fontFamily: designSystem.typography.fonts.mono
+      fontFamily: designSystem.typography.fonts.mono,
+      display: 'inline-block',
+      whiteSpace: 'nowrap'
     },
     
     info: {
       bg: designSystem.colors.status.info,
       color: designSystem.colors.text.inverse,
-      px: designSystem.spacing[3],
-      py: designSystem.spacing[1],
+      px: responsiveSpacing.dynamic(3),
+      py: responsiveSpacing.dynamic(1),
       borderRadius: designSystem.radii.base,
       fontSize: designSystem.typography.sizes.xs,
       fontWeight: designSystem.typography.weights.bold,
-      fontFamily: designSystem.typography.fonts.mono
+      fontFamily: designSystem.typography.fonts.mono,
+      display: 'inline-block',
+      whiteSpace: 'nowrap'
     }
   },
   
@@ -250,7 +271,9 @@ const statusVariants = {
     bg: designSystem.colors.backgrounds.surface,
     h: '8px',
     borderRadius: designSystem.radii.base,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    width: '100%',
+    position: 'relative'
   }
 };
 

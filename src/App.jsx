@@ -18,16 +18,27 @@ import ProjectDetailPage from './pages/ProjectDetailPage';
 import CommissionDetailPage from './pages/CommissionDetailPage';
 import { ThemeProvider } from './theme/ThemeContext';
 
+// 🎯 NAVIGATION CONFIGURATION
+// ===========================
+// Easy configuration for navigation system
+// Change this value to switch between navigation modes:
+//
+// HEADER_ONLY: Traditional top navigation bar only
+// SIDEBAR_ONLY: Modern sidebar navigation only  
+// BOTH: Header + Sidebar combined (header becomes compact)
+//
+const USE_SIDEBAR = true; // 👈 CHANGE THIS TO false FOR HEADER-ONLY MODE
+
 function App() {
-  // Configure navigation mode - easily switchable
-  const navigationMode = NAVIGATION_MODES.BOTH; // Change to HEADER_ONLY or SIDEBAR_ONLY as needed
+  // Automatically configure navigation mode based on USE_SIDEBAR setting
+  const navigationMode = USE_SIDEBAR ? NAVIGATION_MODES.BOTH : NAVIGATION_MODES.HEADER_ONLY;
 
   return (
     <ThemeProvider>
       <ErrorBoundary>
         <Router>
           <MainLayout navigationMode={navigationMode}>
-            <Box p={{ base: 4, md: 8 }}>
+            <Box p={{ base: 4, md: USE_SIDEBAR ? 6 : 8 }}>
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/quiz-gallery" element={<QuizGalleryPage />} />

@@ -1,4 +1,18 @@
 // Navigation Configuration - Data-driven navigation system
+
+/**
+ * 🎯 NAVIGATION SYSTEM CONFIGURATION
+ * ===================================
+ * 
+ * This file contains all navigation structure and modes.
+ * 
+ * USAGE:
+ * - To switch between Sidebar and Header-only navigation, 
+ *   change the USE_SIDEBAR constant in App.jsx
+ * - To modify navigation items, update the arrays below
+ * - Icons should be emoji for consistency
+ */
+
 export const NAVIGATION_CONFIG = {
   // Primary navigation items
   primary: [
@@ -100,13 +114,17 @@ export const NAVIGATION_MODES = {
   BOTH: 'both'
 };
 
+// Quick access functions for easier navigation management
+export const getMainNavigationItems = () => NAVIGATION_CONFIG.primary;
+export const getSecondaryNavigationItems = () => NAVIGATION_CONFIG.secondary;
+export const getAllNavigationItems = () => [
+  ...NAVIGATION_CONFIG.primary,
+  ...NAVIGATION_CONFIG.secondary,
+  ...NAVIGATION_CONFIG.footer
+];
 // Get navigation item by path
 export const getNavigationItem = (path) => {
-  const allItems = [
-    ...NAVIGATION_CONFIG.primary,
-    ...NAVIGATION_CONFIG.secondary,
-    ...NAVIGATION_CONFIG.footer
-  ];
+  const allItems = getAllNavigationItems();
   
   // Check main items
   let found = allItems.find(item => item.path === path);

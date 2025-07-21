@@ -43,19 +43,20 @@ function Header({
 
   // Reduced nav links when sidebar is present to avoid duplication
   const getNavLinks = () => {
-    if (hasSidebar && isCompact) {
-      // Show only essential items in header when sidebar is present
+    if (hasSidebar) {
+      // Show minimal navigation when sidebar is present to avoid duplication
       return [
-        { to: '/profile', label: 'Profile' }
+        { to: '/profile', label: 'Profile', icon: '👤' }
       ];
     }
     
-    // Full navigation when no sidebar
+    // Full navigation when no sidebar - show all primary navigation
     return [
-      { to: '/', label: 'Home' },
-      { to: '/marketplace', label: 'Marketplace' },
-      { to: '/community', label: 'Community' },
-      { to: '/profile', label: 'Profile' }
+      { to: '/', label: 'Home', icon: '🏠' },
+      { to: '/marketplace', label: 'Marketplace', icon: '🛒' },
+      { to: '/typing-challenge', label: 'Learning', icon: '📚' },
+      { to: '/community', label: 'Community', icon: '🌐' },
+      { to: '/profile', label: 'Profile', icon: '👤' }
     ];
   };
   
@@ -82,12 +83,12 @@ function Header({
       {...props}
     >
       <Flex alignItems="center" maxW={hasSidebar ? '100%' : 'container.xl'} mx={hasSidebar ? 0 : 'auto'}>
-        {/* Logo - Hide when sidebar is present to avoid duplication */}
-        {!hasSidebar && (
+        {/* Logo - Always show but adjust size based on layout */}
+        <Box>
           <Text fontSize="xl" fontWeight="bold" color={getColor('brand.primary')}>
             Terminal IDE
           </Text>
-        )}
+        </Box>
         
         <Spacer />
         
@@ -101,7 +102,7 @@ function Header({
               onClick={() => handleNavigation(link.to)}
               variant={location.pathname === link.to ? "solid" : "ghost"}
               colorScheme="green"
-              size="sm"
+              size={hasSidebar ? "sm" : "md"}
               bg={location.pathname === link.to ? getColor('interactive.active') : "transparent"}
               color={location.pathname === link.to ? getColor('brand.primary') : getColor('text.muted')}
               _hover={{ 
@@ -110,6 +111,7 @@ function Header({
               }}
               cursor="pointer"
               _active={{ transform: "none" }}
+              leftIcon={hasSidebar ? null : <Box fontSize="sm">{link.icon}</Box>}
             >
               {link.label}
             </Button>

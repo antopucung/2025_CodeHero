@@ -11,6 +11,7 @@ import { NAVIGATION_MODES } from '../components/navigation/NavigationConfig';
 export const MainLayout = ({ 
   children, 
   navigationMode = NAVIGATION_MODES.BOTH,
+  showNavigationModeInfo = false,
   ...props 
 }) => {
   const location = useLocation();
@@ -62,6 +63,25 @@ export const MainLayout = ({
   
   return (
     <Box {...layoutStyles} {...props}>
+      {/* Navigation Mode Info - Development Helper */}
+      {showNavigationModeInfo && (
+        <Box
+          position="fixed"
+          top="10px"
+          right="10px"
+          bg={getColor('backgrounds.overlay')}
+          color={getColor('text.primary')}
+          px={3}
+          py={1}
+          borderRadius="md"
+          fontSize="xs"
+          zIndex={9999}
+          border={`1px solid ${getColor('borders.default')}`}
+        >
+          Mode: {navigationMode.replace('-', ' ').toUpperCase()}
+        </Box>
+      )}
+      
       {/* Header */}
       {showHeader && (
         <Header 

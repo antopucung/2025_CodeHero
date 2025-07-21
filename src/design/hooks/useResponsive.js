@@ -1,6 +1,56 @@
 // Enhanced Responsive Hook - Dynamic screen adaptation
 import { useState, useEffect, useCallback } from 'react';
-import { responsiveBreakpoints, viewportUtils } from '../system/ResponsiveSystem';
+
+// Simple responsive breakpoints for the hook
+const responsiveBreakpoints = {
+  base: '0px',
+  sm: '640px',
+  md: '768px', 
+  lg: '1024px',
+  xl: '1280px',
+  '2xl': '1536px'
+};
+
+// Viewport utilities
+const viewportUtils = {
+  getCurrentBreakpoint: () => {
+    if (typeof window === 'undefined') return 'base';
+    
+    const width = window.innerWidth;
+    if (width >= 1536) return '2xl';
+    if (width >= 1280) return 'xl';
+    if (width >= 1024) return 'lg';
+    if (width >= 768) return 'md';
+    if (width >= 640) return 'sm';
+    return 'base';
+  },
+  
+  getOrientation: () => {
+    if (typeof window === 'undefined') return 'landscape';
+    return window.innerHeight > window.innerWidth ? 'portrait' : 'landscape';
+  },
+  
+  getDeviceType: () => {
+    if (typeof window === 'undefined') return 'desktop';
+    
+    const width = window.innerWidth;
+    if (width < 768) return 'mobile';
+    if (width < 1024) return 'tablet';
+    return 'desktop';
+  },
+  
+  isTouchDevice: () => {
+    if (typeof window === 'undefined') return false;
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  },
+  
+  getSafeAreaInsets: () => ({
+    top: 'env(safe-area-inset-top)',
+    right: 'env(safe-area-inset-right)',
+    bottom: 'env(safe-area-inset-bottom)',
+    left: 'env(safe-area-inset-left)'
+  })
+};
 
 /**
  * Comprehensive responsive hook for adaptive UI/UX

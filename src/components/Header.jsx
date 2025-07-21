@@ -1,13 +1,21 @@
 import React from 'react';
-import { Box, Flex, Text, HStack, Button, Spacer } from '@chakra-ui/react';
+import { Box, Flex, Text, HStack, Button, Spacer, IconButton } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { ThemeSelector } from '../theme/components/ThemeSelector';
 import { useThemeTokens } from '../theme/hooks/useThemeTokens';
+import { useResponsive } from '../design/hooks/useResponsive';
 
-function Header() {
+function Header({ 
+  hasSidebar = false, 
+  sidebarWidth = '0px', 
+  isCompact = false,
+  onToggleSidebar,
+  ...props 
+}) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { getColor } = useThemeTokens();
+  const { getColor, getSpacing, getShadow } = useThemeTokens();
+  const { isMobile } = useResponsive();
 
   // Enhanced navigation handler with detailed logging
   const handleNavigation = (to) => {
@@ -33,31 +41,61 @@ function Header() {
     console.log('=== END NAVIGATION DEBUG ===');
   };
 
-  const navLinks = [
-    { to: '/', label: 'Home' },
-    { to: '/marketplace', label: 'Marketplace' },
-    { to: '/community', label: 'Community' },
-    { to: '/profile', label: 'Profile' }
-  ];
+  // Reduced nav links when sidebar is present to avoid duplication
+  const getNavLinks = () => {
+    if (hasSidebar && isCompact) {
+      // Show only essential items in header when sidebar is present
+      return [
+        { to: '/profile', label: 'Profile' }
+      ];
+    }
+    
+    // Full navigation when no sidebar
+    return [
+      { to: '/', label: 'Home' },
+      { to: '/marketplace', label: 'Marketplace' },
+      { to: '/community', label: 'Community' },
+      { to: '/profile', label: 'Profile' }
+    ];
+  };
+  
+  const navLinks = getNavLinks();
+  
+  const headerStyles = {
+    position: hasSidebar ? 'fixed' : 'static',
+    top: hasSidebar ? 0 : 'auto',
+    left: hasSidebar ? sidebarWidth : 0,
+    right: hasSidebar ? 0 : 'auto',
+    w: hasSidebar ? `calc(100% - ${sidebarWidth})` : '100%',
+    bg: getColor('backgrounds.primary'),
+    borderBottom: `1px solid ${getColor('borders.default')}`,
+    px: getSpacing(4),
+    py: getSpacing(3),
+    zIndex: 999,
+    transition: 'all 0.3s ease',
+    boxShadow: hasSidebar ? getShadow('sm') : 'none'
+  };
 
   return (
     <Box 
-      bg={getColor('backgrounds.primary')} 
-      borderBottom={`1px solid ${getColor('borders.default')}`} 
-      px={4} 
-      py={3}
+      {...headerStyles}
+      {...props}
     >
-      <Flex alignItems="center" maxW="container.xl" mx="auto">
-        <Text fontSize="xl" fontWeight="bold" color={getColor('brand.primary')}>
-          Terminal IDE
-        </Text>
+      <Flex alignItems="center" maxW={hasSidebar ? '100%' : 'container.xl'} mx={hasSidebar ? 0 : 'auto'}>
+        {/* Logo - Hide when sidebar is present to avoid duplication */}
+        {!hasSidebar && (
+          <Text fontSize="xl" fontWeight="bold" color={getColor('brand.primary')}>
+            Terminal IDE
+          </Text>
+        )}
         
         <Spacer />
         
-        <HStack spacing={4} align="center">
+        <HStack spacing={getSpacing(4)} align="center">
           <ThemeSelector compact />
           
-          {navLinks.map((link) => (
+          {/* Navigation Links */}
+          {!isMobile && navLinks.map((link) => (
             <Button
               key={link.to}
               onClick={() => handleNavigation(link.to)}
@@ -76,6 +114,18 @@ function Header() {
               {link.label}
             </Button>
           ))}
+          
+          {/* Mobile menu button when no sidebar */}
+          {isMobile && !hasSidebar && (
+            <IconButton
+              icon="☰"
+              size="sm"
+              variant="ghost"
+              color={getColor('text.muted')}
+              _hover={{ color: getColor('text.primary') }}
+              aria-label="Menu"
+            />
+          )}
         </HStack>
       </Flex>
     </Box>

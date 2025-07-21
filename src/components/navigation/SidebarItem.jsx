@@ -17,7 +17,7 @@ export const SidebarItem = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { getColor, getSpacing, getBorderRadius, getTypography } = useThemeTokens();
+  const { getColor, getSpacing, getBorderRadius, getTypography, getShadow } = useThemeTokens();
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   
   // Check if this item or any submenu item is active

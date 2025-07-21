@@ -316,6 +316,5 @@ export {
   typographyVariants,
   layoutVariants,
   interactiveVariants,
-  statusVariants,
-  animationVariants
+  statusVariants
 };

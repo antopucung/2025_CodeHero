@@ -17,44 +17,32 @@ function Header({
   const { getColor, getSpacing, getShadow } = useThemeTokens();
   const { isMobile } = useResponsive();
 
-  // Enhanced navigation handler with detailed logging
+  // Enhanced navigation handler
   const handleNavigation = (to) => {
-    console.log('=== HEADER NAVIGATION DEBUG ===');
-    console.log('Current location.pathname:', location.pathname);
-    console.log('Target navigation path:', to);
-    console.log('Navigate function available:', typeof navigate);
-    console.log('Button clicked at:', new Date().toISOString());
-    
     try {
       navigate(to);
-      console.log('Navigate function called successfully');
-      
-      // Check if navigation actually happened (delayed check)
-      setTimeout(() => {
-        console.log('After navigation - Current pathname:', window.location.pathname);
-        console.log('React Router location:', location.pathname);
-      }, 100);
     } catch (error) {
       console.error('Navigation error:', error);
     }
-    
-    console.log('=== END NAVIGATION DEBUG ===');
   };
 
   // Reduced nav links when sidebar is present to avoid duplication
   const getNavLinks = () => {
     if (hasSidebar) {
-      // Show minimal navigation when sidebar is present to avoid duplication
+      // Show minimal navigation when sidebar is present
       return [
-        { to: '/profile', label: 'Profile', icon: '👤' }
+        { to: '/profile', label: 'Profile', icon: '👤' },
+        { to: '/marketplace', label: 'Marketplace', icon: '🛒' }
       ];
     }
     
-    // Full navigation when no sidebar - show all primary navigation
+    // Full navigation when no sidebar
     return [
       { to: '/', label: 'Home', icon: '🏠' },
       { to: '/marketplace', label: 'Marketplace', icon: '🛒' },
-      { to: '/typing-challenge', label: 'Learning', icon: '📚' },
+      { to: '/typing-challenge', label: 'Learning', icon: '⌨️' },
+      { to: '/quiz-gallery', label: 'Quizzes', icon: '🎮' },
+      { to: '/code-editor', label: 'Editor', icon: '💻' },
       { to: '/community', label: 'Community', icon: '🌐' },
       { to: '/profile', label: 'Profile', icon: '👤' }
     ];

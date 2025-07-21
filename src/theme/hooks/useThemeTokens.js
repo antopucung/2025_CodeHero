@@ -19,29 +19,41 @@ export const useThemeTokens = () => {
       if (value === undefined) break;
     }
     
-    return value || chakraTheme.colors[path] || path;
+    // Fallback chain: custom theme -> chakra theme -> path as literal value
+    return value || 
+           (chakraTheme.colors && typeof chakraTheme.colors === 'object' ? 
+            keys.reduce((obj, key) => obj?.[key], chakraTheme.colors) : null) || 
+           path;
   };
   
   const getSpacing = (size) => {
-    return currentThemeConfig.spacing?.[size] || chakraTheme.space[size] || size;
+    return currentThemeConfig.spacing?.[size] || 
+           (chakraTheme.space && chakraTheme.space[size]) || 
+           size;
   };
   
   const getTypography = (category, property) => {
     return currentThemeConfig.typography?.[category]?.[property] || 
-           chakraTheme[category]?.[property] || 
+           (chakraTheme[category] && chakraTheme[category][property]) || 
            property;
   };
   
   const getBorderRadius = (size) => {
-    return currentThemeConfig.radii?.[size] || chakraTheme.radii[size] || size;
+    return currentThemeConfig.radii?.[size] || 
+           (chakraTheme.radii && chakraTheme.radii[size]) || 
+           size;
   };
   
   const getShadow = (type) => {
-    return currentThemeConfig.shadows?.[type] || chakraTheme.shadows[type] || type;
+    return currentThemeConfig.shadows?.[type] || 
+           (chakraTheme.shadows && chakraTheme.shadows[type]) || 
+           type;
   };
   
   const getBreakpoint = (size) => {
-    return currentThemeConfig.breakpoints?.[size] || chakraTheme.breakpoints[size] || size;
+    return currentThemeConfig.breakpoints?.[size] || 
+           (chakraTheme.breakpoints && chakraTheme.breakpoints[size]) || 
+           size;
   };
   
   // Responsive helper

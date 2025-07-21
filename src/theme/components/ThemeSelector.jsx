@@ -200,6 +200,30 @@ export const ThemeSelector = ({ compact = false }) => {
         >
           Reset Customizations
         </Button>
+        {/* Quick theme switch buttons */}
+        <HStack spacing={2}>
+          {['terminal', 'rundown', 'cyberpunk', 'minimal'].map((themeId) => {
+            const themeData = availableThemes.find(t => t.id === themeId);
+            if (!themeData) return null;
+            
+            return (
+              <Button
+                key={themeId}
+                size="sm"
+                variant={currentTheme === themeId ? "solid" : "outline"}
+                onClick={() => handleThemeSelect(themeId)}
+                bg={currentTheme === themeId ? getColor('brand.primary') : 'transparent'}
+                color={currentTheme === themeId ? getColor('text.inverse') : getColor('text.secondary')}
+                _hover={{
+                  color: getColor('brand.primary'),
+                  borderColor: getColor('brand.primary')
+                }}
+              >
+                {themeData.name}
+              </Button>
+            );
+          })}
+        </HStack>
       </HStack>
       
       {/* Current Theme Info */}

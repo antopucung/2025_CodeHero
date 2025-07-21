@@ -690,115 +690,143 @@ export const THEME_PRESETS = {
   }
 }
 `,
-
-  // The Rundown AI Theme
-  'rundown-ai': {
-    id: 'rundown-ai',
+  
+  // The Rundown AI Theme - Professional data-focused design
+  rundown: {
+    id: 'rundown',
     name: 'The Rundown AI',
-    description: 'Mimics the clean, data-focused aesthetic of The Rundown AI platform.',
+    description: 'Clean, professional data-focused design inspired by modern AI platforms',
     colorMode: 'dark',
-
+    
     colors: {
       brand: {
-        primary: '#1890ff', // Blueprint's default blue
-        secondary: '#2f54eb', // A darker blue
-        accent: '#52c41a', // A subtle green for success/highlight
+        primary: '#1890ff', // Blueprint blue - professional and trustworthy
+        secondary: '#2f54eb', // Deeper blue for hierarchy
+        accent: '#52c41a', // Success green - sparingly used
         error: '#ff4d4f',
         warning: '#faad14',
-        success: '#52c41a',
+        success: '#52c41a'
       },
-
+      
       backgrounds: {
-        primary: '#141414', // Very dark, almost black
-        secondary: '#1f1f1f', // Slightly lighter for sections
-        surface: '#262626', // For cards/panels
-        elevated: '#303030', // For modals/popovers
-        overlay: 'rgba(0, 0, 0, 0.7)',
+        primary: '#0f1419', // Very dark blue-black - reduces eye strain
+        secondary: '#1c2128', // Slightly lighter for sections
+        surface: '#21262d', // Card/panel background
+        elevated: '#30363d', // Modal/popover background
+        overlay: 'rgba(15, 20, 25, 0.8)'
       },
-
+      
       text: {
-        primary: '#ffffff',
-        secondary: '#d9d9d9',
-        muted: '#a6a6a6',
-        disabled: '#595959',
-        inverse: '#000000',
+        primary: '#f0f6fc', // Soft white - easier on eyes than pure white
+        secondary: '#c9d1d9', // Muted white for secondary content
+        muted: '#8b949e', // Gray for less important text
+        disabled: '#484f58', // Darker gray for disabled states
+        inverse: '#0d1117'
       },
-
+      
       interactive: {
-        default: '#434343',
-        hover: '#1890ff', // Primary brand color
-        active: '#096dd9',
+        default: '#21262d',
+        hover: '#1890ff', // Brand blue for hover
+        active: '#0969da', // Darker blue for active
         focus: '#1890ff',
-        disabled: '#262626',
+        disabled: '#21262d'
       },
-
+      
       borders: {
-        default: '#303030',
-        subtle: '#434343',
-        strong: '#595959',
-        accent: '#1890ff',
+        default: '#30363d', // Subtle borders
+        subtle: '#21262d', // Very subtle
+        strong: '#484f58', // More prominent borders
+        accent: '#1890ff' // Brand color borders
       },
-
+      
       status: {
         info: '#1890ff',
-        success: '#52c41a',
-        warning: '#faad14',
-        error: '#ff4d4f',
-      },
+        success: '#238636',
+        warning: '#f85149',
+        error: '#da3633'
+      }
     },
-
+    
     typography: {
       fonts: {
-        mono: `'Roboto Mono', monospace`, // A clean monospace
-        sans: `'Inter', sans-serif`, // A modern sans-serif
+        mono: "'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace",
+        sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif"
       },
-
+      
       sizes: {
-        xs: '0.75rem',
-        sm: '0.875rem',
-        base: '1rem',
-        lg: '1.125rem',
-        xl: '1.25rem',
-        '2xl': '1.5rem',
-        '3xl': '1.875rem',
-        '4xl': '2.25rem',
-        '5xl': '3rem',
+        xs: '0.75rem',   // 12px
+        sm: '0.875rem',  // 14px
+        base: '1rem',    // 16px
+        lg: '1.125rem',  // 18px
+        xl: '1.25rem',   // 20px
+        '2xl': '1.5rem', // 24px
+        '3xl': '1.875rem', // 30px
+        '4xl': '2.25rem',  // 36px
+        '5xl': '3rem'      // 48px
       },
-
+      
       weights: {
         normal: 400,
         medium: 500,
         semibold: 600,
-        bold: 700,
+        bold: 700
       },
-
+      
       lineHeights: {
-        tight: 1.2,
+        tight: 1.25,
         normal: 1.5,
-        relaxed: 1.7,
-      },
+        relaxed: 1.625
+      }
     },
-
+    
     spacing: {
-      0: '0', 1: '0.25rem', 2: '0.5rem', 3: '0.75rem', 4: '1rem', 5: '1.25rem',
-      6: '1.5rem', 8: '2rem', 10: '2.5rem', 12: '3rem', 16: '4rem', 20: '5rem', 24: '6rem',
+      0: '0',
+      1: '0.25rem', // 4px
+      2: '0.5rem',  // 8px
+      3: '0.75rem', // 12px
+      4: '1rem',    // 16px
+      5: '1.25rem', // 20px
+      6: '1.5rem',  // 24px
+      8: '2rem',    // 32px
+      10: '2.5rem', // 40px
+      12: '3rem',   // 48px
+      16: '4rem',   // 64px
+      20: '5rem',   // 80px
+      24: '6rem'    // 96px
     },
-
+    
     radii: {
-      none: '0', sm: '0.125rem', base: '0.25rem', md: '0.375rem', lg: '0.5rem', xl: '0.75rem', full: '9999px',
+      none: '0',
+      sm: '0.25rem',  // 4px - slightly larger for modern feel
+      base: '0.375rem', // 6px
+      md: '0.5rem',   // 8px
+      lg: '0.75rem',  // 12px
+      xl: '1rem',     // 16px
+      full: '9999px'
     },
-
+    
     shadows: {
-      sm: '0 1px 2px rgba(0, 0, 0, 0.1)', base: '0 4px 6px rgba(0, 0, 0, 0.1)',
-      md: '0 8px 15px rgba(0, 0, 0, 0.15)', lg: '0 15px 25px rgba(0, 0, 0, 0.2)',
-      glow: '0 0 20px rgba(24, 144, 255, 0.3)', // Blue glow
+      sm: '0 1px 2px rgba(0, 0, 0, 0.3)',
+      base: '0 2px 4px rgba(0, 0, 0, 0.4)',
+      md: '0 4px 8px rgba(0, 0, 0, 0.5)',
+      lg: '0 8px 16px rgba(0, 0, 0, 0.6)',
+      glow: '0 0 20px rgba(24, 144, 255, 0.4)'
     },
-
+    
     animations: {
-      duration: { fast: '0.1s', normal: '0.2s', slow: '0.3s' },
-      easing: { ease: 'ease', easeIn: 'ease-in', easeOut: 'ease-out', easeInOut: 'ease-in-out' },
-    },
-  },
+      duration: {
+        fast: '0.15s',
+        normal: '0.2s',
+        slow: '0.3s'
+      },
+      easing: {
+        ease: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        easeIn: 'cubic-bezier(0.4, 0, 1, 1)',
+        easeOut: 'cubic-bezier(0, 0, 0.2, 1)',
+        easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)'
+      }
+    }
+  }
 };
 
 export default THEME_PRESETS;

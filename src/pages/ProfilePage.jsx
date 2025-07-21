@@ -33,8 +33,8 @@ function ProfilePage() {
   const { getEnrolledCourses, getAllAchievements } = useUserEnrollment();
   const [enrolledCourses, setEnrolledCourses] = React.useState([]);
   const [courseAchievements, setCourseAchievements] = React.useState([]);
+  const [isInitialized, setIsInitialized] = React.useState(false);
 
-  // Ensure navigation isn't blocked by preventing any global event interference
   // Mock data for demo when user is not logged in
   const mockProfile = {
     overall_level: 7,
@@ -151,32 +151,33 @@ function ProfilePage() {
     }
   ];
 
+  // Initialize data only once when component mounts
   React.useEffect(() => {
-    const fetchEnrolledCourses = async () => {
+    if (isInitialized) return;
+    
+    const initializeData = async () => {
       try {
         if (user) {
           const courses = await getEnrolledCourses();
           setEnrolledCourses(courses || []);
-        } else {
-          setEnrolledCourses(mockEnrolledCourses);
-        }
-        
-        // Get achievements from courses
-        if (user) {
+          
           const achievements = getAllAchievements();
           setCourseAchievements(achievements || []);
         } else {
+          setEnrolledCourses(mockEnrolledCourses);
           setCourseAchievements(['speed_demon', 'perfectionist']);
         }
       } catch (error) {
         console.error('Error fetching enrolled courses:', error);
-        // Use mock data if fetching fails
         setEnrolledCourses(mockEnrolledCourses);
         setCourseAchievements(['speed_demon', 'perfectionist']);
+      } finally {
+        setIsInitialized(true);
       }
     };
-    fetchEnrolledCourses();
-  }, [user, getEnrolledCourses, getAllAchievements]);
+    
+    initializeData();
+  }, [user, isInitialized]);
 
   // Mock user data - in a real app this would come from authentication
   const userData = {

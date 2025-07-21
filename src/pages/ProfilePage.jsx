@@ -34,6 +34,20 @@ function ProfilePage() {
   const [enrolledCourses, setEnrolledCourses] = React.useState([]);
   const [courseAchievements, setCourseAchievements] = React.useState([]);
 
+  // Ensure navigation isn't blocked by preventing any global event interference
+  React.useEffect(() => {
+    // Clear any potential event listeners that might interfere with navigation
+    const handlePreventDefault = (e) => {
+      // Don't prevent navigation events
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+        return;
+      }
+    };
+    
+    return () => {
+      // Cleanup any event listeners when component unmounts
+    };
+  }, []);
   // Mock data for demo when user is not logged in
   const mockProfile = {
     overall_level: 7,

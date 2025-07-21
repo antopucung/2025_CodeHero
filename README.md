@@ -20,7 +20,7 @@ To switch between Sidebar and Header-only navigation:
    - `false` for Header-only navigation
 
 ```javascript
-const USE_SIDEBAR = true; // 👈 Change this to false for header-only mode
+const USE_SIDEBAR = false; // 👈 Change this to false for header-only mode
 ```
 
 ### Navigation Features

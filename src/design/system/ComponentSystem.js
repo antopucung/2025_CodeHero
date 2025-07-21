@@ -315,5 +315,7 @@ export const createStyledComponent = (baseComponent, variants) => {
 export {
   typographyVariants,
   layoutVariants,
- interactiveVariants
+  interactiveVariants,
+  statusVariants,
+  animationVariants
 };

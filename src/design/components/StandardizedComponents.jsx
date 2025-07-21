@@ -388,3 +388,4 @@ export default {
   ProfilePageLayout,
   TwoColumnLayout,
   ThreeColumnLayout
+};

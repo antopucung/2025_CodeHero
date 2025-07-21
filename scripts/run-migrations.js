@@ -6,10 +6,12 @@ import crypto from 'crypto';
 
 // Load Supabase environment variables
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('Supabase URL or Key is not set in environment variables.');
+  console.error('Supabase URL or Service Role Key is not set in environment variables.');
+  console.error('Please add SUPABASE_SERVICE_ROLE_KEY to your .env file.');
+  console.error('You can find this key in your Supabase project settings under API Keys.');
   process.exit(1);
 }
 

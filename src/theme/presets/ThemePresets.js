@@ -688,6 +688,7 @@ export const THEME_PRESETS = {
       }
     }
   }
+}
 `,
 
   // The Rundown AI Theme

@@ -7,7 +7,7 @@ import { designSystem } from './DesignSystem';
  */
 
 // Typography variants - removes need for inline font styling
-export const typographyVariants = {
+const typographyVariants = {
   pageTitle: {
     fontSize: designSystem.typography.sizes['3xl'],
     fontWeight: designSystem.typography.weights.bold,
@@ -53,7 +53,7 @@ export const typographyVariants = {
 };
 
 // Layout variants - standardizes spacing and structure
-export const layoutVariants = {
+const layoutVariants = {
   page: {
     maxW: '1200px',
     mx: 'auto',
@@ -102,7 +102,7 @@ export const layoutVariants = {
 };
 
 // Interactive variants - standardizes interactive elements
-export const interactiveVariants = {
+const interactiveVariants = {
   button: {
     primary: {
       bg: designSystem.colors.brand.primary,
@@ -199,7 +199,7 @@ export const interactiveVariants = {
 };
 
 // Status variants - standardizes status indicators
-export const statusVariants = {
+const statusVariants = {
   badge: {
     success: {
       bg: designSystem.colors.status.success,

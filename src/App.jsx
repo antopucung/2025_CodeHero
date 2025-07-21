@@ -27,7 +27,7 @@ import { ThemeProvider } from './theme/ThemeContext';
 // SIDEBAR_ONLY: Modern sidebar navigation only  
 // BOTH: Header + Sidebar combined (header becomes compact)
 //
-const USE_SIDEBAR = true; // 👈 CHANGE THIS TO false FOR HEADER-ONLY MODE
+const USE_SIDEBAR = false; // 👈 CHANGE THIS TO false FOR HEADER-ONLY MODE
 
 function App() {
   // Automatically configure navigation mode based on USE_SIDEBAR setting

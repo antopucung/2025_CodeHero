@@ -525,7 +525,7 @@ const RealTimeXPTracker = ({ profile, isDemo }) => {
               rotate: [0, 360, 0]
             }}
             exit={{ scale: 0, opacity: 0 }}
-            transition={{ duration: 1, type: "spring" }}
+            transition={{ duration: 1, type: "tween" }}
             position="fixed"
             top="50%"
             left="50%"

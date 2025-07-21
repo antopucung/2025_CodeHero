@@ -18,6 +18,7 @@ import { AchievementsSection } from '../components/profile/AchievementsSection';
 import { LanguageProgress } from '../components/profile/LanguageProgress';
 import { EnrolledCourses } from '../components/profile/EnrolledCourses';
 import { RecentActivity } from '../components/profile/RecentActivity';
+import { designSystem } from '../design/system/DesignSystem';
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -65,7 +66,8 @@ function ProfilePage() {
         description: 'Achieved 60+ WPM typing speed',
         icon: '⚡',
         color: '#ff6b6b',
-        rarity: 'legendary'
+        rarity: 'legendary',
+        achievement_key: 'speed_demon'
       }
     },
     {
@@ -75,7 +77,8 @@ function ProfilePage() {
         description: 'Completed challenges with 100% accuracy',
         icon: '💎',
         color: '#9c27b0',
-        rarity: 'epic'
+        rarity: 'epic',
+        achievement_key: 'perfectionist'
       }
     },
     {
@@ -85,7 +88,30 @@ function ProfilePage() {
         description: 'Made 10+ helpful community contributions',
         icon: '🤝',
         color: '#4ecdc4',
-        rarity: 'rare'
+        rarity: 'rare',
+        achievement_key: 'community_helper'
+      }
+    },
+    {
+      id: 4,
+      achievement_definitions: {
+        title: 'Code Master',
+        description: 'Mastered multiple programming languages',
+        icon: '🎯',
+        color: '#ffd93d',
+        rarity: 'epic',
+        achievement_key: 'code_master'
+      }
+    },
+    {
+      id: 5,
+      achievement_definitions: {
+        title: 'Combo King',
+        description: 'Achieved 50+ combo in typing challenges',
+        icon: '🔥',
+        color: '#ff6b6b',
+        rarity: 'rare',
+        achievement_key: 'combo_king'
       }
     }
   ];
@@ -99,7 +125,24 @@ function ProfilePage() {
       expires_at: '2025-01-15T10:00:00Z',
       certification_types: {
         title: 'JavaScript Fundamentals',
-        description: 'Demonstrates proficiency in JavaScript programming'
+        description: 'Demonstrates proficiency in JavaScript programming',
+        cert_type_key: 'javascript_fundamentals',
+        icon: '🟨',
+        color: '#f7df1e'
+      }
+    },
+    {
+      id: 2,
+      certificate_number: 'TI-2024-002',
+      status: 'active',
+      issued_at: '2024-02-10T10:00:00Z',
+      expires_at: '2025-02-10T10:00:00Z',
+      certification_types: {
+        title: 'Unity C# Developer',
+        description: 'Certified Unity C# game developer',
+        cert_type_key: 'unity_csharp',
+        icon: '🔵',
+        color: '#239120'
       }
     }
   ];
@@ -198,6 +241,84 @@ function ProfilePage() {
   const displayCertifications = (certifications && certifications.length > 0) ? certifications : mockCertifications;
   const displayXpHistory = (xpHistory && xpHistory.length > 0) ? xpHistory : mockXpHistory;
   const displayEnrolledCourses = enrolledCourses.length > 0 ? enrolledCourses : mockEnrolledCourses;
+
+  // Create user badges from progression data
+  const createUserBadges = () => {
+    const badges = [];
+    
+    // Level Badge (always present)
+    if (displayProfile?.overall_level) {
+      badges.push({
+        type: 'level',
+        value: displayProfile.overall_level,
+        icon: '⭐',
+        color: '#ffd93d',
+        tooltipText: `Level ${displayProfile.overall_level} - ${displayProfile.total_xp || 0} XP`
+      });
+    }
+    
+    // Certification Badges (top 2 most recent)
+    if (displayCertifications && displayCertifications.length > 0) {
+      const activeCerts = displayCertifications
+        .filter(cert => cert.status === 'active')
+        .slice(0, 2); // Limit to 2 most recent
+      
+      activeCerts.forEach(cert => {
+        badges.push({
+          type: 'cert',
+          value: cert.certification_types.cert_type_key || cert.id,
+          icon: cert.certification_types.icon || '📜',
+          color: cert.certification_types.color || '#4ecdc4',
+          tooltipText: `Certified: ${cert.certification_types.title}`
+        });
+      });
+    }
+    
+    // Achievement Badges (prominent ones only)
+    if (displayAchievements && displayAchievements.length > 0) {
+      const prominentAchievements = displayAchievements
+        .filter(ach => {
+          const key = ach.achievement_definitions?.achievement_key;
+          return ['speed_demon', 'perfectionist', 'combo_king', 'code_master'].includes(key);
+        })
+        .slice(0, 2); // Limit to 2 prominent achievements
+      
+      prominentAchievements.forEach(ach => {
+        badges.push({
+          type: 'achievement',
+          value: ach.achievement_definitions.achievement_key,
+          icon: ach.achievement_definitions.icon,
+          color: ach.achievement_definitions.color,
+          tooltipText: `${ach.achievement_definitions.title}: ${ach.achievement_definitions.description}`
+        });
+      });
+    }
+    
+    // Special Performance Badges
+    if (displayProfile?.best_wpm >= 60) {
+      badges.push({
+        type: 'achievement',
+        value: 'high_speed',
+        icon: '🏎️',
+        color: '#ff6b6b',
+        tooltipText: `Speed Racer - ${displayProfile.best_wpm} WPM`
+      });
+    }
+    
+    if (displayProfile?.streak_days >= 10) {
+      badges.push({
+        type: 'achievement',
+        value: 'streak_master',
+        icon: '🔥',
+        color: '#ff9500',
+        tooltipText: `Streak Master - ${displayProfile.streak_days} days`
+      });
+    }
+    
+    return badges;
+  };
+  
+  const userBadges = createUserBadges();
 
   // Prepare stats with safe fallbacks
   const stats = [
@@ -314,7 +435,13 @@ function ProfilePage() {
             <TabPanel p={0} pt={6}>
               <TwoColumnLayout
                 leftContent={<>
-                  {displayProfile && <ProfileCard userData={userData} progress={displayProfile} />}
+                  {displayProfile && (
+                    <ProfileCard 
+                      userData={userData} 
+                      progress={displayProfile}
+                      badges={userBadges}
+                    />
+                  )}
                   <AchievementsSection 
                     achievements={[
                       ...(displayAchievements?.map(a => a.achievement_definitions?.title || a.achievement_key) || []), 

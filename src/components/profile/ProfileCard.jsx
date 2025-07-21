@@ -1,5 +1,6 @@
 import React from 'react';
 import { Image } from "@chakra-ui/react";
+import { UserBadgeGroup } from './UserBadge';
 import {
   Card,
   Stack,
@@ -10,7 +11,7 @@ import {
   StandardButton
 } from '../../design/components/StandardizedComponents';
 
-export function ProfileCard({ userData, progress }) {
+export function ProfileCard({ userData, progress, badges = [] }) {
   // Provide safe fallbacks for all data
   const safeUserData = userData || {
     name: 'User',
@@ -27,15 +28,22 @@ export function ProfileCard({ userData, progress }) {
     <Card animated hover>
       <Stack>
         <Stack horizontal justify="center">
-          <Image
-            src={safeUserData.avatar}
-            alt={safeUserData.name}
-            w="120px"
-            h="120px"
-            borderRadius="full"
-            objectFit="cover"
-            border="4px solid #00ff00"
-          />
+          <UserBadgeGroup 
+            badges={badges}
+            layout="corner"
+            maxBadges={4}
+            size="md"
+          >
+            <Image
+              src={safeUserData.avatar}
+              alt={safeUserData.name}
+              w="120px"
+              h="120px"
+              borderRadius="full"
+              objectFit="cover"
+              border="4px solid #00ff00"
+            />
+          </UserBadgeGroup>
         </Stack>
         
         <StatusBadge variant="success">

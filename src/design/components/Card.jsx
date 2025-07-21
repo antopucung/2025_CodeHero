@@ -67,7 +67,7 @@ export const CourseCard = ({
   isEnrolled = false,
   ...props 
 }) => {
-  const { getColor, getSpacing, getBorderRadius } = useThemeTokens();
+  const { getColor, getSpacing, getBorderRadius, getShadow } = useThemeTokens();
   
   const getDifficultyColor = (difficulty) => {
     const colors = {

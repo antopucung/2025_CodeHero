@@ -15,9 +15,9 @@ const ACTIVE_COLOR = "#00ff00";
 const LanguageSelector = ({ language, onSelect }) => {
   return (
     <Box mb={4}>
-      <ChakraText mb={2} fontSize="xs" color="#666" fontFamily="'Courier New', monospace">
+      <Text mb={2} fontSize="xs" color="#666" fontFamily="'Courier New', monospace">
         ├─ COMPILER/INTERPRETER:
-      </ChakraText>
+      </Text>
       <Menu isLazy>
         <MenuButton 
           as={Button}

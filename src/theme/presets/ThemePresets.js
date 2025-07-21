@@ -688,6 +688,116 @@ export const THEME_PRESETS = {
       }
     }
   }
+`,
+
+  // The Rundown AI Theme
+  'rundown-ai': {
+    id: 'rundown-ai',
+    name: 'The Rundown AI',
+    description: 'Mimics the clean, data-focused aesthetic of The Rundown AI platform.',
+    colorMode: 'dark',
+
+    colors: {
+      brand: {
+        primary: '#1890ff', // Blueprint's default blue
+        secondary: '#2f54eb', // A darker blue
+        accent: '#52c41a', // A subtle green for success/highlight
+        error: '#ff4d4f',
+        warning: '#faad14',
+        success: '#52c41a',
+      },
+
+      backgrounds: {
+        primary: '#141414', // Very dark, almost black
+        secondary: '#1f1f1f', // Slightly lighter for sections
+        surface: '#262626', // For cards/panels
+        elevated: '#303030', // For modals/popovers
+        overlay: 'rgba(0, 0, 0, 0.7)',
+      },
+
+      text: {
+        primary: '#ffffff',
+        secondary: '#d9d9d9',
+        muted: '#a6a6a6',
+        disabled: '#595959',
+        inverse: '#000000',
+      },
+
+      interactive: {
+        default: '#434343',
+        hover: '#1890ff', // Primary brand color
+        active: '#096dd9',
+        focus: '#1890ff',
+        disabled: '#262626',
+      },
+
+      borders: {
+        default: '#303030',
+        subtle: '#434343',
+        strong: '#595959',
+        accent: '#1890ff',
+      },
+
+      status: {
+        info: '#1890ff',
+        success: '#52c41a',
+        warning: '#faad14',
+        error: '#ff4d4f',
+      },
+    },
+
+    typography: {
+      fonts: {
+        mono: `'Roboto Mono', monospace`, // A clean monospace
+        sans: `'Inter', sans-serif`, // A modern sans-serif
+      },
+
+      sizes: {
+        xs: '0.75rem',
+        sm: '0.875rem',
+        base: '1rem',
+        lg: '1.125rem',
+        xl: '1.25rem',
+        '2xl': '1.5rem',
+        '3xl': '1.875rem',
+        '4xl': '2.25rem',
+        '5xl': '3rem',
+      },
+
+      weights: {
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 700,
+      },
+
+      lineHeights: {
+        tight: 1.2,
+        normal: 1.5,
+        relaxed: 1.7,
+      },
+    },
+
+    spacing: {
+      0: '0', 1: '0.25rem', 2: '0.5rem', 3: '0.75rem', 4: '1rem', 5: '1.25rem',
+      6: '1.5rem', 8: '2rem', 10: '2.5rem', 12: '3rem', 16: '4rem', 20: '5rem', 24: '6rem',
+    },
+
+    radii: {
+      none: '0', sm: '0.125rem', base: '0.25rem', md: '0.375rem', lg: '0.5rem', xl: '0.75rem', full: '9999px',
+    },
+
+    shadows: {
+      sm: '0 1px 2px rgba(0, 0, 0, 0.1)', base: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      md: '0 8px 15px rgba(0, 0, 0, 0.15)', lg: '0 15px 25px rgba(0, 0, 0, 0.2)',
+      glow: '0 0 20px rgba(24, 144, 255, 0.3)', // Blue glow
+    },
+
+    animations: {
+      duration: { fast: '0.1s', normal: '0.2s', slow: '0.3s' },
+      easing: { ease: 'ease', easeIn: 'ease-in', easeOut: 'ease-out', easeInOut: 'ease-in-out' },
+    },
+  },
 };
 
 export default THEME_PRESETS;

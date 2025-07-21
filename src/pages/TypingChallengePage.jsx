@@ -119,9 +119,9 @@ const TypingChallengePage = () => {
 
               {/* Language Selection */}
               <VStack spacing={3} w="100%">
-                <ChakraText fontSize="md" color="#00ff00" fontWeight="bold">
+                <Text fontSize="md" color="#00ff00" fontWeight="bold">
                   Language
-                </ChakraText>
+                </Text>
                 <HStack spacing={2} flexWrap="wrap" justify="center">
                   {languages.map((lang) => (
                     <MotionBox

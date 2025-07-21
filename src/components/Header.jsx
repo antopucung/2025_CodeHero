@@ -6,6 +6,30 @@ function Header() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Enhanced navigation handler with detailed logging
+  const handleNavigation = (to) => {
+    console.log('=== HEADER NAVIGATION DEBUG ===');
+    console.log('Current location.pathname:', location.pathname);
+    console.log('Target navigation path:', to);
+    console.log('Navigate function available:', typeof navigate);
+    console.log('Button clicked at:', new Date().toISOString());
+    
+    try {
+      navigate(to);
+      console.log('Navigate function called successfully');
+      
+      // Check if navigation actually happened (delayed check)
+      setTimeout(() => {
+        console.log('After navigation - Current pathname:', window.location.pathname);
+        console.log('React Router location:', location.pathname);
+      }, 100);
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
+    
+    console.log('=== END NAVIGATION DEBUG ===');
+  };
+
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/marketplace', label: 'Marketplace' },
@@ -13,11 +37,6 @@ function Header() {
     { to: '/profile', label: 'Profile' }
   ];
 
-  // Handle navigation with explicit navigate function
-  const handleNavigation = (to) => {
-    console.log('Navigating to:', to); // Debug log
-    navigate(to);
-  };
   return (
     <Box bg="#000000" borderBottom="1px solid #333" px={4} py={3}>
       <Flex alignItems="center" maxW="container.xl" mx="auto">

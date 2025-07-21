@@ -1,52 +1,45 @@
-@@ .. @@
-+/* Anti-stretching styles for draggable elements */
-+.draggable-block,
-+[role="button"],
-+button,
-+.interactive,
-+.clickable {
-+  /* Disable default stretching behaviors */
-+  -webkit-transform: translate3d(0, 0, 0);
-+  transform: translate3d(0, 0, 0);
-+  
-+  /* Prevent unwanted text selection */
-+  -webkit-user-select: none;
-+  user-select: none;
-+  
-+  /* Disable default tap highlight on mobile */
-+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-+  
-+  /* Maintain dimensions during interaction */
-+  -webkit-transform-style: preserve-3d;
-+  transform-style: preserve-3d;
-+}
-+
-+/* Prevent squishing on active state */
-+.draggable-block:active,
-+[role="button"]:active,
-+button:active,
-+.interactive:active,
-+.clickable:active {
-+  -webkit-transform: none !important;
-+  transform: none !important;
-+  /* Preserve intended visual feedback but prevent stretching */
-+  filter: brightness(0.95);
-+}
-+
-+/* Fix for drag overlay elements */
-+[data-draggable-id] {
-+  transform-origin: center center !important;
-+  touch-action: none;
-+}
-+
-+/* Additional fix for iOS devices */
-+@media (pointer: coarse) {
-+  .draggable-block,
-+  [role="button"],
-+  button,
-+  .interactive,
-+  .clickable {
-+    touch-action: manipulation;
-+  }
-+}
-+
+/* Anti-stretching styles for draggable elements */
+.draggable-block,
+[role="button"],
+button,
+.interactive,
+.clickable {
+  /* Disable default stretching behaviors */
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  
+  /* Disable default tap highlight on mobile */
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  
+  /* Maintain dimensions during interaction */
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+}
+
+/* Prevent squishing on active state */
+.draggable-block:active,
+[role="button"]:active,
+button:active,
+.interactive:active,
+.clickable:active {
+  -webkit-transform: none !important;
+  transform: none !important;
+  /* Preserve intended visual feedback but prevent stretching */
+  filter: brightness(0.95);
+}
+
+/* Fix for drag overlay elements */
+[data-draggable-id] {
+  transform-origin: center center !important;
+  touch-action: none;
+}
+
+/* Additional fix for iOS devices */
+@media (pointer: coarse) {
+  .draggable-block,
+  [role="button"],
+  button,
+  .interactive,
+  .clickable {
+  }
+}

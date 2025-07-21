@@ -255,7 +255,7 @@ export const statusVariants = {
 };
 
 // Animation variants - standardizes motion patterns
-export const animationVariants = {
+const animationVariants = {
   fadeIn: {
     initial: { opacity: 0 },
     animate: { opacity: 1 },

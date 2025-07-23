@@ -219,12 +219,20 @@ function Header({
               <IconButton
                 icon={isMobileMenuOpen ? "✕" : "☰"}
                 size="md"
-                variant="ghost"
-                color={getColor('text.secondary')}
+               variant="outline"
+               bg={getColor('backgrounds.surface')}
+               border={`1px solid ${getColor('borders.default')}`}
+               color={getColor('text.primary')}
                 _hover={{ 
                   color: getColor('brand.primary'),
-                  bg: getColor('backgrounds.surface')
+                 bg: getColor('backgrounds.elevated'),
+                 borderColor: getColor('brand.primary'),
+                 transform: 'scale(1.05)'
                 }}
+               _active={{
+                 transform: 'scale(0.95)',
+                 bg: getColor('backgrounds.secondary')
+               }}
                 onClick={toggleMobileMenu}
                 aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               />

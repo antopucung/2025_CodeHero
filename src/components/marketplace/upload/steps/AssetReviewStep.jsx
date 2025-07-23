@@ -75,12 +75,12 @@ export const AssetReviewStep = ({
   const isValid = validationIssues.length === 0;
   
   return (
-    <VStack spacing={getSpacing(6)} align="stretch">
-      <MotionBox
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <MotionBox
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <VStack spacing={getSpacing(6)} align="stretch">
         <Card variant="elevated" p={getSpacing(6)}>
           <VStack spacing={getSpacing(6)} align="stretch">
             {/* Header */}
@@ -377,7 +377,7 @@ export const AssetReviewStep = ({
             </HStack>
           </VStack>
         </Card>
-      </MotionBox>
+      </VStack>
       
       {/* Success Preview */}
       {isValid && (
@@ -398,6 +398,6 @@ export const AssetReviewStep = ({
           </Alert>
         </MotionBox>
       )}
-    </VStack>
+    </MotionBox>
   );
 };

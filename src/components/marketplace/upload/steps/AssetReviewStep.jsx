@@ -287,6 +287,7 @@ export const AssetReviewStep = ({
                     </CustomText>
                   </HStack>
                 </VStack>
+              </VStack>
               </Card>
             </Card>
             

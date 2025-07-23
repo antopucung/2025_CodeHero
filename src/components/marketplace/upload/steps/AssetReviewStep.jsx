@@ -235,6 +235,7 @@ export const AssetReviewStep = ({
                 </Grid>
               </VStack>
             </Card>
+          </VStack>
             
             {/* Links Summary */}
             <Card variant="default" p={getSpacing(4)}>

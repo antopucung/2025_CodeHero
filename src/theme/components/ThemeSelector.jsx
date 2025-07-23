@@ -143,22 +143,33 @@ export const ThemeSelector = ({ compact = false }) => {
     return (
       <>
         <Tooltip label="Change Theme" placement="top">
-          <IconButton
-            icon="⚙"
+          <Button
             size="sm"
-            variant="ghost"
-            fontSize="md"
-            fontWeight="bold"
+            variant="outline"
             onClick={onOpen}
             aria-label="Change Theme"
+            bg={getColor('backgrounds.surface')}
+            border={`1px solid ${getColor('borders.default')}`}
             color={getColor('text.primary')}
+            fontSize="lg"
+            fontWeight="bold"
+            fontFamily="monospace"
+            minW="40px"
+            h="40px"
+            p={0}
             _hover={{ 
               color: getColor('brand.primary'),
-              transform: 'scale(1.1)',
-              bg: getColor('backgrounds.surface')
+              borderColor: getColor('brand.primary'),
+              transform: 'scale(1.05)',
+              bg: getColor('backgrounds.elevated')
             }}
-            _active={{ transform: 'scale(0.95)' }}
-          />
+            _active={{ 
+              transform: 'scale(0.95)',
+              bg: getColor('backgrounds.secondary')
+            }}
+          >
+            ⚙
+          </Button>
         </Tooltip>
         
         <Modal isOpen={isOpen} onClose={onClose} size="xl">

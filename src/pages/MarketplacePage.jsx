@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Box, VStack, HStack, Badge, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
+import { Box, VStack, HStack, Badge, Tabs, TabList, TabPanels, Tab, TabPanel, Grid } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useGameProgress } from '../hooks/useGameProgress';
 import { useUserEnrollment } from '../hooks/useUserEnrollment';
+import { useDigitalAssets } from '../hooks/useDigitalAssets';
 import { PageLayout, SectionLayout, GridLayout } from '../design/layouts/PageLayout';
 import { PageHeader } from '../design/components/PageHeader';
 import { CourseCard } from '../design/components/Card';
 import { CustomText } from '../design/components/Typography';
 import { Button } from '../design/components/Button';
+import { DigitalAssetCard } from '../components/marketplace/DigitalAssetCard';
+import { AssetTypeFilter } from '../components/marketplace/AssetTypeFilter';
 import { designSystem } from '../design/system/DesignSystem';
 
 const MotionBox = motion(Box);
@@ -18,9 +21,19 @@ const MarketplacePage = () => {
   const navigate = useNavigate();
   const { progress } = useGameProgress();
   const { getEnrolledCourses } = useUserEnrollment();
+  const { 
+    assets, 
+    loading: assetsLoading, 
+    doesUserOwnAsset, 
+    purchaseAsset, 
+    downloadAsset,
+    getAssetsByType,
+    getUserAssetStats
+  } = useDigitalAssets();
   const [courses, setCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedAssetType, setSelectedAssetType] = useState('all');
 
   useEffect(() => {
     fetchCourses();
@@ -51,6 +64,57 @@ const MarketplacePage = () => {
     } catch (error) {
       console.error('Error fetching enrolled courses:', error);
     }
+  };
+
+  // Handle asset purchase
+  const handleAssetPurchase = async (asset) => {
+    try {
+      // In a real implementation, you'd integrate with Stripe here
+      // For now, we'll simulate a successful purchase
+      const mockStripeTransactionId = `txn_${Date.now()}`;
+      
+      const result = await purchaseAsset(asset.id, mockStripeTransactionId, asset.price);
+      
+      if (result.success) {
+        console.log('Asset purchased successfully:', result);
+        // You could show a success toast here
+      }
+    } catch (error) {
+      console.error('Error purchasing asset:', error);
+      // You could show an error toast here
+    }
+  };
+
+  // Handle asset download
+  const handleAssetDownload = async (asset) => {
+    try {
+      const result = await downloadAsset(asset.id);
+      
+      if (result.success && result.downloadUrl) {
+        // Open download URL in new tab
+        window.open(result.downloadUrl, '_blank');
+        console.log('Asset download initiated:', result);
+      }
+    } catch (error) {
+      console.error('Error downloading asset:', error);
+      // You could show an error toast here
+    }
+  };
+
+  // Get filtered assets
+  const getFilteredAssets = () => {
+    if (selectedAssetType === 'all') {
+      return assets;
+    }
+    return getAssetsByType(selectedAssetType);
+  };
+
+  // Get asset counts by type
+  const getAssetCounts = () => {
+    return assets.reduce((counts, asset) => {
+      counts[asset.asset_type] = (counts[asset.asset_type] || 0) + 1;
+      return counts;
+    }, {});
   };
 
   const handleCourseClick = (courseId) => {
@@ -213,128 +277,85 @@ const MarketplacePage = () => {
             
             {/* Digital Assets Tab */}
             <TabPanel p={0}>
-              <VStack spacing={designSystem.spacing[8]} align="stretch">
-                {/* Digital Assets Header */}
-                <Box textAlign="center">
-                  <CustomText size="xl" color="accent" fontWeight="bold" mb={designSystem.spacing[2]}>
-                    🛍️ Official Digital Asset Store
-                  </CustomText>
-                  <CustomText size="md" color="muted">
-                    Premium code templates, UI kits, and development resources
-                  </CustomText>
-                </Box>
-                
-                {/* Asset Categories */}
-                <Box>
-                  <CustomText size="lg" color="secondary" fontWeight="bold" mb={designSystem.spacing[4]}>
-                    Browse by Category
-                  </CustomText>
-                  <GridLayout 
-                    columns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
-                    gap="default"
+              {assetsLoading ? (
+                <VStack spacing={4}>
+                  <MotionBox
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                    color={designSystem.colors.brand.primary}
+                    fontSize={designSystem.typography.sizes['3xl']}
                   >
-                    {[
-                      { name: "Code Templates", icon: "📝", count: "Coming Soon", color: "#4ecdc4" },
-                      { name: "UI Kits", icon: "🎨", count: "Coming Soon", color: "#ffd93d" },
-                      { name: "Project Starters", icon: "🚀", count: "Coming Soon", color: "#ff6b6b" },
-                      { name: "Asset Packs", icon: "📦", count: "Coming Soon", color: "#a374db" }
-                    ].map((category, index) => (
-                      <MotionBox
-                        key={category.name}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: index * 0.1 }}
-                      >
-                        <Box
-                          bg={designSystem.colors.backgrounds.secondary}
-                          border={`1px solid ${designSystem.colors.borders.default}`}
-                          borderRadius={designSystem.radii.md}
-                          p={designSystem.spacing[6]}
-                          textAlign="center"
-                          _hover={{
-                            borderColor: category.color,
-                            transform: "translateY(-2px)",
-                            boxShadow: `0 4px 20px ${category.color}33`
-                          }}
-                          transition="all 0.2s ease"
-                          cursor="pointer"
-                        >
-                          <Box fontSize="3xl" mb={designSystem.spacing[2]}>
-                            {category.icon}
-                          </Box>
-                          <CustomText 
-                            size="md" 
-                            color={category.color} 
-                            fontWeight="bold" 
-                            mb={designSystem.spacing[1]}
-                          >
-                            {category.name}
-                          </CustomText>
-                          <CustomText size="sm" color="muted">
-                            {category.count}
-                          </CustomText>
-                        </Box>
-                      </MotionBox>
-                    ))}
-                  </GridLayout>
-                </Box>
-                
-                {/* Digital Assets Coming Soon */}
-                <MotionBox
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 1 }}
-                  bg={designSystem.colors.backgrounds.secondary}
-                  border={`1px solid ${designSystem.colors.borders.default}`}
-                  borderRadius={designSystem.radii.lg}
-                  p={designSystem.spacing[8]}
-                  w="100%"
-                  textAlign="center"
-                >
-                  <Box mb={designSystem.spacing[4]}>
-                    <CustomText size="2xl" color="accent" fontWeight="bold" mb={designSystem.spacing[2]}>
-                      🎯 Digital Asset Marketplace
+                    ⚡
+                  </MotionBox>
+                  <CustomText color="brand">
+                    Loading Digital Assets...
+                  </CustomText>
+                </VStack>
+              ) : (
+                <VStack spacing={designSystem.spacing[8]} align="stretch">
+                  {/* Digital Assets Header */}
+                  <Box textAlign="center">
+                    <CustomText size="xl" color="accent" fontWeight="bold" mb={designSystem.spacing[2]}>
+                      🛍️ Digital Asset Marketplace
                     </CustomText>
-                    <CustomText size="lg" color="secondary" mb={designSystem.spacing[4]}>
-                      Professional development resources, coming soon!
+                    <CustomText size="md" color="muted">
+                      {assets.length} premium assets available for download
                     </CustomText>
                   </Box>
                   
-                  <GridLayout 
-                    columns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-                    gap="default"
-                    maxW="600px"
-                    mx="auto"
-                  >
-                    <VStack spacing={designSystem.spacing[2]} align="start">
-                      <CustomText size="sm" color="brand" fontWeight="bold">📝 Code Templates</CustomText>
-                      <CustomText size="xs" color="muted">• React component libraries</CustomText>
-                      <CustomText size="xs" color="muted">• Unity C# script collections</CustomText>
-                      <CustomText size="xs" color="muted">• TypeScript utility functions</CustomText>
-                    </VStack>
-                    
-                    <VStack spacing={designSystem.spacing[2]} align="start">
-                      <CustomText size="sm" color="accent" fontWeight="bold">🎨 Design Assets</CustomText>
-                      <CustomText size="xs" color="muted">• UI component kits</CustomText>
-                      <CustomText size="xs" color="muted">• Icon packs & illustrations</CustomText>
-                      <CustomText size="xs" color="muted">• Game asset bundles</CustomText>
-                    </VStack>
-                  </GridLayout>
+                  {/* Asset Type Filter */}
+                  <AssetTypeFilter
+                    selectedType={selectedAssetType}
+                    onTypeChange={setSelectedAssetType}
+                    assetCounts={getAssetCounts()}
+                  />
                   
-                  <Box mt={designSystem.spacing[6]}>
-                    <Badge 
-                      bg="#4ecdc4" 
-                      color="#000" 
-                      px={4} 
-                      py={2} 
-                      borderRadius="full"
-                      fontSize="sm"
+                  {/* Assets Grid */}
+                  {getFilteredAssets().length > 0 ? (
+                    <GridLayout 
+                      columns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" }}
+                      gap="default"
                     >
-                      🚀 Launching Soon - Stay Tuned!
-                    </Badge>
-                  </Box>
-                </MotionBox>
-              </VStack>
+                      {getFilteredAssets().map((asset, index) => (
+                        <MotionBox
+                          key={asset.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: index * 0.1 }}
+                        >
+                          <DigitalAssetCard
+                            asset={asset}
+                            isOwned={doesUserOwnAsset(asset.id)}
+                            onPurchase={handleAssetPurchase}
+                            onDownload={handleAssetDownload}
+                          />
+                        </MotionBox>
+                      ))}
+                    </GridLayout>
+                  ) : (
+                    <Box 
+                      textAlign="center" 
+                      p={designSystem.spacing[12]}
+                      bg={designSystem.colors.backgrounds.secondary}
+                      borderRadius={designSystem.radii.lg}
+                      border={`1px solid ${designSystem.colors.borders.default}`}
+                    >
+                      <CustomText size="xl" color="muted" mb={designSystem.spacing[2]}>
+                        📦
+                      </CustomText>
+                      <CustomText size="lg" color="secondary" fontWeight="bold" mb={designSystem.spacing[2]}>
+                        No Assets Found
+                      </CustomText>
+                      <CustomText size="md" color="muted">
+                        {selectedAssetType === 'all' 
+                          ? 'No digital assets have been uploaded yet.'
+                          : `No ${selectedAssetType.replace('_', ' ')} assets available.`
+                        }
+                      </CustomText>
+                    </Box>
+                  )}
+                </VStack>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>

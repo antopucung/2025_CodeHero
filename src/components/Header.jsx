@@ -12,11 +12,11 @@ const MotionBox = motion(Box);
 
 // Navigation configuration - clean and centralized
 const NAVIGATION_ITEMS = [
-  { id: 'home', label: 'Home', icon: '🏠', path: '/' },
-  { id: 'marketplace', label: 'Marketplace', icon: '🛒', path: '/marketplace' },
-  { id: 'editor', label: 'Editor', icon: '💻', path: '/code-editor' },
-  { id: 'community', label: 'Community', icon: '🌐', path: '/community' },
-  { id: 'profile', label: 'Profile', icon: '👤', path: '/profile' }
+  { id: 'home', label: 'Home', icon: '⌂', path: '/' },
+  { id: 'marketplace', label: 'Marketplace', icon: '⊞', path: '/marketplace' },
+  { id: 'editor', label: 'Editor', icon: '⌨', path: '/code-editor' },
+  { id: 'community', label: 'Community', icon: '◉', path: '/community' },
+  { id: 'profile', label: 'Profile', icon: '◎', path: '/profile' }
 ];
 
 // Responsive Navigation Item Component
@@ -54,7 +54,14 @@ const NavItem = ({ item, isActive, onClick, variant = 'desktop' }) => {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
     >
-      <Box fontSize={iconSize}>{item.icon}</Box>
+      <Box 
+        fontSize={iconSize} 
+        fontWeight="bold"
+        color="inherit"
+        fontFamily="monospace"
+      >
+        {item.icon}
+      </Box>
       <CustomText 
         size={textSize} 
         fontWeight={isActive ? 'bold' : 'medium'}
@@ -217,12 +224,14 @@ function Header({
             {/* Mobile Menu Button */}
             {isMobile && (
               <IconButton
-                icon={isMobileMenuOpen ? "✕" : "☰"}
+              icon={isMobileMenuOpen ? "×" : "≡"}
                 size="md"
                variant="outline"
                bg={getColor('backgrounds.surface')}
                border={`1px solid ${getColor('borders.default')}`}
-               color={getColor('text.primary')}
+              color={getColor('text.primary')}
+              fontSize="lg"
+              fontWeight="bold"
                 _hover={{ 
                   color: getColor('brand.primary'),
                  bg: getColor('backgrounds.elevated'),

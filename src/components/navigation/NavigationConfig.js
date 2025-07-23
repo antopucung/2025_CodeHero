@@ -4,11 +4,11 @@
  * Header-specific navigation items (simplified for header use)
  */
 export const HEADER_NAVIGATION_ITEMS = [
-  { id: 'home', label: 'Home', icon: '🏠', path: '/' },
-  { id: 'marketplace', label: 'Marketplace', icon: '🛒', path: '/marketplace' },
-  { id: 'editor', label: 'Editor', icon: '💻', path: '/code-editor' },
-  { id: 'community', label: 'Community', icon: '🌐', path: '/community' },
-  { id: 'profile', label: 'Profile', icon: '👤', path: '/profile' }
+  { id: 'home', label: 'Home', icon: '⌂', path: '/' },
+  { id: 'marketplace', label: 'Marketplace', icon: '⊞', path: '/marketplace' },
+  { id: 'editor', label: 'Editor', icon: '⌨', path: '/code-editor' },
+  { id: 'community', label: 'Community', icon: '◉', path: '/community' },
+  { id: 'profile', label: 'Profile', icon: '◎', path: '/profile' }
 ];
 
 /**

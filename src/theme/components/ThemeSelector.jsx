@@ -144,13 +144,20 @@ export const ThemeSelector = ({ compact = false }) => {
       <>
         <Tooltip label="Change Theme" placement="top">
           <IconButton
-            icon="🎨"
+            icon="⚙"
             size="sm"
             variant="ghost"
+            fontSize="md"
+            fontWeight="bold"
             onClick={onOpen}
             aria-label="Change Theme"
-            color={getColor('text.muted')}
-            _hover={{ color: getColor('text.primary') }}
+            color={getColor('text.primary')}
+            _hover={{ 
+              color: getColor('brand.primary'),
+              transform: 'scale(1.1)',
+              bg: getColor('backgrounds.surface')
+            }}
+            _active={{ transform: 'scale(0.95)' }}
           />
         </Tooltip>
         

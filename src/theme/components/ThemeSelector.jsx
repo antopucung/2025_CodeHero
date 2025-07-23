@@ -125,7 +125,7 @@ const ThemePreviewCard = ({ theme, isActive, onSelect }) => {
 export const ThemeSelector = ({ compact = false }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { currentTheme, availableThemes, switchTheme } = useTheme();
-  const { getColor } = useThemeTokens();
+  const { getColor, getBorderRadius, getSpacing } = useThemeTokens();
   const [selectedTheme, setSelectedTheme] = useState(currentTheme);
   
   const handleThemeSelect = (themeId) => {
@@ -142,33 +142,48 @@ export const ThemeSelector = ({ compact = false }) => {
   if (compact) {
     return (
       <>
-        <Tooltip label="Change Theme" placement="top">
+        <Tooltip 
+          label="Change Theme" 
+          placement="bottom"
+          bg={getColor('backgrounds.elevated')}
+          color={getColor('text.primary')}
+          border={`1px solid ${getColor('borders.default')}`}
+          hasArrow
+        >
           <Button
-            size="sm"
+            size="md"
             variant="outline"
             onClick={onOpen}
             aria-label="Change Theme"
-            bg={getColor('backgrounds.surface')}
-            border={`1px solid ${getColor('borders.default')}`}
-            color={getColor('text.primary')}
-            fontSize="lg"
+            bg={getColor('backgrounds.elevated')}
+            border={`2px solid ${getColor('brand.primary')}`}
+            color={getColor('brand.primary')}
+            fontSize="xl"
             fontWeight="bold"
-            fontFamily="monospace"
-            minW="40px"
-            h="40px"
-            p={0}
+            fontFamily="'Courier New', monospace"
+            minW="44px"
+            h="44px"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            borderRadius={getBorderRadius('md')}
+            boxShadow={`0 0 10px ${getColor('brand.primary')}33`}
             _hover={{ 
-              color: getColor('brand.primary'),
+              color: getColor('text.inverse'),
+              bg: getColor('brand.primary'),
               borderColor: getColor('brand.primary'),
               transform: 'scale(1.05)',
-              bg: getColor('backgrounds.elevated')
+              boxShadow: `0 0 15px ${getColor('brand.primary')}66`
             }}
             _active={{ 
               transform: 'scale(0.95)',
-              bg: getColor('backgrounds.secondary')
+              boxShadow: `0 0 8px ${getColor('brand.primary')}33`
             }}
+            transition="all 0.2s ease"
           >
-            ⚙
+            <Box as="span" lineHeight="1">
+              ⚙
+            </Box>
           </Button>
         </Tooltip>
         

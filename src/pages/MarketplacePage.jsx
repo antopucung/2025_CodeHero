@@ -9,6 +9,7 @@ import { useDigitalAssets } from '../hooks/useDigitalAssets';
 import { PageLayout, SectionLayout, GridLayout } from '../design/layouts/PageLayout';
 import { PageHeader } from '../design/components/PageHeader';
 import { CourseCard } from '../design/components/Card';
+import { UploadAssetWizard } from '../components/marketplace/upload/UploadAssetWizard';
 import { CustomText } from '../design/components/Typography';
 import { Button } from '../design/components/Button';
 import { DigitalAssetCard } from '../components/marketplace/DigitalAssetCard';
@@ -33,6 +34,7 @@ const MarketplacePage = () => {
   const [courses, setCourses] = useState([]);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showUploadWizard, setShowUploadWizard] = useState(false);
   const [selectedAssetType, setSelectedAssetType] = useState('all');
 
   useEffect(() => {
@@ -101,6 +103,13 @@ const MarketplacePage = () => {
     }
   };
 
+  // Handle upload wizard success
+  const handleUploadSuccess = (asset) => {
+    console.log('Asset uploaded successfully:', asset);
+    setShowUploadWizard(false);
+    // Refresh assets list
+    // The useDigitalAssets hook should handle this automatically
+  };
   // Get filtered assets
   const getFilteredAssets = () => {
     if (selectedAssetType === 'all') {
@@ -242,14 +251,31 @@ const MarketplacePage = () => {
                             py={1}
                             fontSize="sm"
                             boxShadow="0 0 15px rgba(255, 107, 107, 0.6)"
-                          >
-                            🎮 NEW QUEST!
-                          </Badge>
-                        )}
-                      </MotionBox>
-                    ))}
-                  </GridLayout>
-                </Box>
+                <HStack justify="space-between" align="start">
+                  <Box>
+                    <CustomText size="xl" color="accent" fontWeight="bold" mb={designSystem.spacing[2]}>
+                      🛍️ Digital Asset Marketplace
+                    </CustomText>
+                    <CustomText size="md" color="muted">
+                      {assets.length} premium assets available for download
+                    </CustomText>
+                  </Box>
+                  
+                  <Button
+                    bg={designSystem.colors.brand.primary}
+                    color={designSystem.colors.text.inverse}
+                    onClick={() => setShowUploadWizard(true)}
+                    leftIcon={<Box>🚀</Box>}
+                    size="lg"
+                    _hover={{
+                      bg: designSystem.colors.interactive.hover,
+                      transform: 'translateY(-2px)',
+                      boxShadow: designSystem.shadows.lg
+                    }}
+                  >
+                    Upload Asset
+                  </Button>
+                </HStack>
 
                 {/* Course Development Pipeline Info */}
                 <MotionBox
@@ -360,6 +386,13 @@ const MarketplacePage = () => {
           </TabPanels>
         </Tabs>
       </SectionLayout>
+      
+      {/* Upload Asset Wizard */}
+      <UploadAssetWizard
+        isOpen={showUploadWizard}
+        onClose={() => setShowUploadWizard(false)}
+        onSuccess={handleUploadSuccess}
+      />
     </PageLayout>
   );
 };

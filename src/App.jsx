@@ -16,6 +16,8 @@ import MarketplacePage from './pages/MarketplacePage';
 import ModuleDetailPage from './pages/ModuleDetailPage';
 import ProjectDetailPage from './pages/ProjectDetailPage';
 import CommissionDetailPage from './pages/CommissionDetailPage';
+import CreatorDashboardPage from './pages/CreatorDashboardPage';
+import UserLibraryPage from './pages/UserLibraryPage';
 import { ThemeProvider } from './theme/ThemeContext';
 
 // 🎯 NAVIGATION CONFIGURATION
@@ -52,6 +54,8 @@ function App() {
                 <Route path="/modules/:id" element={<ModuleDetailPage />} />
                 <Route path="/project/:id" element={<ProjectDetailPage />} />
                 <Route path="/commission/:id" element={<CommissionDetailPage />} />
+                <Route path="/creator-dashboard" element={<CreatorDashboardPage />} />
+                <Route path="/my-library" element={<UserLibraryPage />} />
               </Routes>
             </Box>
           </MainLayout>

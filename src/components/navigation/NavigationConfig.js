@@ -95,6 +95,20 @@ export const NAVIGATION_CONFIG = {
       icon: '👤',
       path: '/profile',
       description: 'Your learning progress'
+    },
+    {
+      id: 'creator-dashboard',
+      label: 'Creator Dashboard',
+      icon: '🎨',
+      path: '/creator-dashboard',
+      description: 'Manage your digital assets'
+    },
+    {
+      id: 'my-library',
+      label: 'My Library',
+      icon: '📚',
+      path: '/my-library',
+      description: 'Your purchased assets'
     }
   ],
   

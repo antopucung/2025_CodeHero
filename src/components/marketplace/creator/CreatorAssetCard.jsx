@@ -1,26 +1,23 @@
 import React from 'react';
-import { Box, VStack, HStack, Badge, Image } from "@chakra-ui/react";
+import { Box, VStack, HStack, Badge, Image, Menu, MenuButton, MenuList, MenuItem, IconButton } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
-import { designSystem } from '../../design/system/DesignSystem';
-import { CustomText } from '../../design/components/Typography';
-import { Button } from '../../design/components/Button';
-import { Card } from '../../design/components/Card';
-import { PurchaseModal } from './purchase/PurchaseModal';
-import { useDisclosure } from '@chakra-ui/react';
+import { designSystem } from '../../../design/system/DesignSystem';
+import { CustomText } from '../../../design/components/Typography';
+import { Button } from '../../../design/components/Button';
+import { Card } from '../../../design/components/Card';
 
 const MotionBox = motion(Box);
 
-export const DigitalAssetCard = ({ 
+export const CreatorAssetCard = ({ 
   asset, 
-  onPurchase, 
-  onDownload, 
-  isOwned = false,
-  showCreator = true,
+  onEdit, 
+  onDelete, 
+  onTogglePublish,
+  compact = false,
   ...props 
 }) => {
   const navigate = useNavigate();
-  const { isOpen: isPurchaseOpen, onOpen: onPurchaseOpen, onClose: onPurchaseClose } = useDisclosure();
 
   const getAssetTypeColor = (assetType) => {
     const colors = {
@@ -62,34 +59,120 @@ export const DigitalAssetCard = ({
     navigate(`/marketplace/assets/${asset.slug}`);
   };
 
-  const handleActionClick = (e, action) => {
-    e.stopPropagation();
-    if (action === 'purchase') {
-      onPurchaseOpen();
-    } else if (action === 'download') {
-      onDownload?.(asset);
-    }
-  };
-
-  const handlePurchaseSuccess = (result) => {
-    onPurchase?.(asset, result);
-    onPurchaseClose();
-  };
-
   const isFree = asset.price === 0;
-  const canDownload = isFree || isOwned;
+
+  if (compact) {
+    return (
+      <Card variant="default" p={4} cursor="pointer" onClick={handleCardClick}>
+        <HStack spacing={4}>
+          {/* Thumbnail */}
+          <Box
+            w="80px"
+            h="60px"
+            borderRadius="md"
+            overflow="hidden"
+            flexShrink={0}
+            bg={designSystem.colors.backgrounds.surface}
+          >
+            {asset.thumbnail_url ? (
+              <Image
+                src={asset.thumbnail_url}
+                alt={asset.title}
+                w="100%"
+                h="100%"
+                objectFit="cover"
+                fallback={
+                  <Box
+                    w="100%"
+                    h="100%"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    bg={designSystem.colors.backgrounds.secondary}
+                    color={designSystem.colors.text.muted}
+                    fontSize="xl"
+                  >
+                    {getAssetTypeIcon(asset.asset_type)}
+                  </Box>
+                }
+              />
+            ) : (
+              <Box
+                w="100%"
+                h="100%"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                bg={designSystem.colors.backgrounds.secondary}
+                color={designSystem.colors.text.muted}
+                fontSize="xl"
+              >
+                {getAssetTypeIcon(asset.asset_type)}
+              </Box>
+            )}
+          </Box>
+          
+          {/* Content */}
+          <VStack align="start" spacing={1} flex={1}>
+            <HStack spacing={2} w="100%">
+              <CustomText size="md" fontWeight="bold" color="brand" flex={1} noOfLines={1}>
+                {asset.title}
+              </CustomText>
+              <Badge
+                bg={asset.is_published ? designSystem.colors.status.success : designSystem.colors.status.warning}
+                color={designSystem.colors.text.inverse}
+                fontSize="xs"
+              >
+                {asset.is_published ? 'PUBLISHED' : 'DRAFT'}
+              </Badge>
+            </HStack>
+            
+            <HStack spacing={4} fontSize="xs" color={designSystem.colors.text.muted}>
+              <Box>💰 {isFree ? 'FREE' : `$${asset.price}`}</Box>
+              <Box>📥 {asset.downloads_count || 0}</Box>
+              <Box>⭐ {asset.rating?.toFixed(1) || '0.0'}</Box>
+            </HStack>
+          </VStack>
+          
+          {/* Actions */}
+          <Menu>
+            <MenuButton
+              as={IconButton}
+              icon="⋯"
+              size="sm"
+              variant="ghost"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <MenuList>
+              <MenuItem onClick={(e) => { e.stopPropagation(); onEdit?.(asset); }}>
+                ✏️ Edit
+              </MenuItem>
+              <MenuItem onClick={(e) => { e.stopPropagation(); onTogglePublish?.(asset); }}>
+                {asset.is_published ? '📤 Unpublish' : '📢 Publish'}
+              </MenuItem>
+              <MenuItem 
+                onClick={(e) => { e.stopPropagation(); onDelete?.(asset.id); }}
+                color="red.400"
+              >
+                🗑️ Delete
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </HStack>
+      </Card>
+    );
+  }
 
   return (
     <Card
       variant="elevated"
-      onClick={handleCardClick}
-      cursor="pointer"
       overflow="hidden"
       h="100%"
       display="flex"
       flexDirection="column"
+      position="relative"
       _hover={{
-        transform: 'translateY(-4px)',
+        transform: 'translateY(-2px)',
         boxShadow: `0 8px 25px ${getAssetTypeColor(asset.asset_type)}33`
       }}
       transition="all 0.3s ease"
@@ -101,6 +184,8 @@ export const DigitalAssetCard = ({
         h="200px" 
         overflow="hidden"
         bg={designSystem.colors.backgrounds.surface}
+        cursor="pointer"
+        onClick={handleCardClick}
       >
         {asset.thumbnail_url ? (
           <Image
@@ -139,6 +224,22 @@ export const DigitalAssetCard = ({
           </Box>
         )}
         
+        {/* Status Badge */}
+        <Badge
+          position="absolute"
+          top={designSystem.spacing[2]}
+          right={designSystem.spacing[2]}
+          bg={asset.is_published ? designSystem.colors.status.success : designSystem.colors.status.warning}
+          color={designSystem.colors.text.inverse}
+          px={designSystem.spacing[2]}
+          py={designSystem.spacing[1]}
+          borderRadius={designSystem.radii.sm}
+          fontSize="xs"
+          fontWeight="bold"
+        >
+          {asset.is_published ? 'PUBLISHED' : 'DRAFT'}
+        </Badge>
+        
         {/* Asset Type Badge */}
         <Badge
           position="absolute"
@@ -154,40 +255,6 @@ export const DigitalAssetCard = ({
         >
           {asset.asset_type.replace('_', ' ').toUpperCase()}
         </Badge>
-        
-        {/* Price Badge */}
-        <Badge
-          position="absolute"
-          top={designSystem.spacing[2]}
-          right={designSystem.spacing[2]}
-          bg={isFree ? designSystem.colors.status.success : designSystem.colors.backgrounds.overlay}
-          color={designSystem.colors.text.inverse}
-          px={designSystem.spacing[2]}
-          py={designSystem.spacing[1]}
-          borderRadius={designSystem.radii.sm}
-          fontSize="sm"
-          fontWeight="bold"
-        >
-          {isFree ? 'FREE' : `$${asset.price}`}
-        </Badge>
-        
-        {/* Owned Indicator */}
-        {isOwned && (
-          <Badge
-            position="absolute"
-            bottom={designSystem.spacing[2]}
-            right={designSystem.spacing[2]}
-            bg={designSystem.colors.status.success}
-            color={designSystem.colors.text.inverse}
-            px={designSystem.spacing[2]}
-            py={designSystem.spacing[1]}
-            borderRadius={designSystem.radii.sm}
-            fontSize="xs"
-            fontWeight="bold"
-          >
-            ✓ OWNED
-          </Badge>
-        )}
       </Box>
 
       {/* Asset Content */}
@@ -205,6 +272,8 @@ export const DigitalAssetCard = ({
             color="brand"
             noOfLines={2}
             minH="48px"
+            cursor="pointer"
+            onClick={handleCardClick}
           >
             {asset.title}
           </CustomText>
@@ -212,7 +281,7 @@ export const DigitalAssetCard = ({
           <CustomText
             size="sm"
             color="secondary"
-            noOfLines={3}
+            noOfLines={2}
             flex={1}
           >
             {asset.description}
@@ -223,19 +292,17 @@ export const DigitalAssetCard = ({
         <VStack spacing={designSystem.spacing[2]}>
           <HStack justify="space-between" w="100%" fontSize="xs" color={designSystem.colors.text.muted}>
             <HStack>
-              <Box>⭐ {asset.rating?.toFixed(1) || '0.0'}</Box>
+              <Box>💰 {isFree ? 'FREE' : `$${asset.price}`}</Box>
               <Box>•</Box>
               <Box>📥 {asset.downloads_count || 0}</Box>
             </HStack>
-            {asset.file_size_mb && (
-              <Box>{asset.file_size_mb}MB</Box>
-            )}
+            <Box>⭐ {asset.rating?.toFixed(1) || '0.0'}</Box>
           </HStack>
           
-          {showCreator && asset.creator_id && (
+          {asset.created_at && (
             <HStack justify="space-between" w="100%" fontSize="xs" color={designSystem.colors.text.muted}>
-              <Box>👤 Creator</Box>
-              <Box>{asset.created_at ? new Date(asset.created_at).toLocaleDateString() : 'Unknown'}</Box>
+              <Box>📅 {new Date(asset.created_at).toLocaleDateString()}</Box>
+              {asset.file_size_mb && <Box>📦 {asset.file_size_mb}MB</Box>}
             </HStack>
           )}
         </VStack>
@@ -273,32 +340,28 @@ export const DigitalAssetCard = ({
           </HStack>
         )}
         
-        {/* Action Button */}
-        <Button
-          bg={canDownload ? designSystem.colors.status.success : designSystem.colors.brand.primary}
-          color={designSystem.colors.text.inverse}
-          w="100%"
-          onClick={(e) => handleActionClick(e, canDownload ? 'download' : 'purchase')}
-          _hover={{
-            bg: canDownload ? designSystem.colors.status.success : designSystem.colors.interactive.hover,
-            transform: 'translateY(-1px)'
-          }}
-        >
-          {canDownload ? (
-            <>📥 {isOwned ? 'DOWNLOAD AGAIN' : 'DOWNLOAD'}</>
-          ) : (
-            <>🛒 BUY NOW - ${asset.price}</>
-          )}
-        </Button>
+        {/* Action Buttons */}
+        <HStack spacing={designSystem.spacing[2]}>
+          <Button
+            variant="secondary"
+            size="sm"
+            flex={1}
+            onClick={() => onEdit?.(asset)}
+          >
+            ✏️ Edit
+          </Button>
+          
+          <Button
+            bg={asset.is_published ? designSystem.colors.status.warning : designSystem.colors.status.success}
+            color={designSystem.colors.text.inverse}
+            size="sm"
+            flex={1}
+            onClick={() => onTogglePublish?.(asset)}
+          >
+            {asset.is_published ? '📤 Unpublish' : '📢 Publish'}
+          </Button>
+        </HStack>
       </VStack>
-      
-      {/* Purchase Modal */}
-      <PurchaseModal
-        isOpen={isPurchaseOpen}
-        onClose={onPurchaseClose}
-        asset={asset}
-        onPurchaseSuccess={handlePurchaseSuccess}
-      />
     </Card>
   );
 };

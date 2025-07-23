@@ -251,31 +251,14 @@ const MarketplacePage = () => {
                             py={1}
                             fontSize="sm"
                             boxShadow="0 0 15px rgba(255, 107, 107, 0.6)"
-                <HStack justify="space-between" align="start">
-                  <Box>
-                    <CustomText size="xl" color="accent" fontWeight="bold" mb={designSystem.spacing[2]}>
-                      🛍️ Digital Asset Marketplace
-                    </CustomText>
-                    <CustomText size="md" color="muted">
-                      {assets.length} premium assets available for download
-                    </CustomText>
-                  </Box>
-                  
-                  <Button
-                    bg={designSystem.colors.brand.primary}
-                    color={designSystem.colors.text.inverse}
-                    onClick={() => setShowUploadWizard(true)}
-                    leftIcon={<Box>🚀</Box>}
-                    size="lg"
-                    _hover={{
-                      bg: designSystem.colors.interactive.hover,
-                      transform: 'translateY(-2px)',
-                      boxShadow: designSystem.shadows.lg
-                    }}
-                  >
-                    Upload Asset
-                  </Button>
-                </HStack>
+                          >
+                            🔥 HOT
+                          </Badge>
+                        )}
+                      </MotionBox>
+                    ))}
+                  </GridLayout>
+                </Box>
 
                 {/* Course Development Pipeline Info */}
                 <MotionBox
@@ -320,14 +303,31 @@ const MarketplacePage = () => {
               ) : (
                 <VStack spacing={designSystem.spacing[8]} align="stretch">
                   {/* Digital Assets Header */}
-                  <Box textAlign="center">
-                    <CustomText size="xl" color="accent" fontWeight="bold" mb={designSystem.spacing[2]}>
-                      🛍️ Digital Asset Marketplace
-                    </CustomText>
-                    <CustomText size="md" color="muted">
-                      {assets.length} premium assets available for download
-                    </CustomText>
-                  </Box>
+                  <HStack justify="space-between" align="start">
+                    <Box>
+                      <CustomText size="xl" color="accent" fontWeight="bold" mb={designSystem.spacing[2]}>
+                        🛍️ Digital Asset Marketplace
+                      </CustomText>
+                      <CustomText size="md" color="muted">
+                        {assets.length} premium assets available for download
+                      </CustomText>
+                    </Box>
+                    
+                    <Button
+                      bg={designSystem.colors.brand.primary}
+                      color={designSystem.colors.text.inverse}
+                      onClick={() => setShowUploadWizard(true)}
+                      leftIcon={<Box>🚀</Box>}
+                      size="lg"
+                      _hover={{
+                        bg: designSystem.colors.interactive.hover,
+                        transform: 'translateY(-2px)',
+                        boxShadow: designSystem.shadows.lg
+                      }}
+                    >
+                      Upload Asset
+                    </Button>
+                  </HStack>
                   
                   {/* Asset Type Filter */}
                   <AssetTypeFilter

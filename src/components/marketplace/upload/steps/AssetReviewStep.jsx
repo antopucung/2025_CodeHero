@@ -377,6 +377,7 @@ export const AssetReviewStep = ({
             </HStack>
           </VStack>
         </Card>
+      </MotionBox>
       </VStack>
       
       {/* Success Preview */}

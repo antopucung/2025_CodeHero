@@ -32,7 +32,7 @@ export const useDigitalAssets = () => {
     getCurrentUser();
   }, []);
 
-  // Fetch digital assets
+  // Fetch digital assets from Supabase
   const fetchDigitalAssets = async () => {
     try {
       setLoading(true);
@@ -113,6 +113,119 @@ export const useDigitalAssets = () => {
     }
   }, [user]);
 
+  // Create a new digital asset
+  const createAsset = async (assetData) => {
+    if (!user) {
+      throw new Error('User must be logged in to create assets');
+    }
+    
+    try {
+      // Generate slug from title
+      const slug = assetData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      
+      const { data, error } = await supabase
+        .from('digital_assets')
+        .insert([{
+          ...assetData,
+          creator_id: user.id,
+          slug: `${slug}-${Date.now()}` // Add timestamp to ensure uniqueness
+        }])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Award XP for asset upload
+      const { data: xpResult, error: xpError } = await supabase.rpc('award_marketplace_xp', {
+        p_user_id: user.id,
+        p_event_type: 'asset_uploaded',
+        p_reference_type: 'asset',
+        p_reference_id: data.id,
+        p_metadata: {
+          asset_title: data.title,
+          asset_type: data.asset_type,
+          asset_price: data.price
+        }
+      });
+      
+      if (xpError) {
+        console.error('Error awarding upload XP:', xpError);
+      }
+      
+      // Refresh assets list
+      await fetchDigitalAssets();
+      
+      return {
+        success: true,
+        asset: data,
+        xpAwarded: xpResult?.[0]?.xp_awarded || 0,
+        levelUp: xpResult?.[0]?.level_up || false,
+        newLevel: xpResult?.[0]?.new_level
+      };
+    } catch (err) {
+      console.error('Error creating asset:', err);
+      throw err;
+    }
+  };
+
+  // Update an existing digital asset
+  const updateAsset = async (assetId, updates) => {
+    if (!user) {
+      throw new Error('User must be logged in to update assets');
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('digital_assets')
+        .update(updates)
+        .eq('id', assetId)
+        .eq('creator_id', user.id) // Ensure only creator can update
+        .select()
+        .single();
+      
+      if (error) throw error;
+      
+      // Refresh assets list
+      await fetchDigitalAssets();
+      
+      return {
+        success: true,
+        asset: data
+      };
+    } catch (err) {
+      console.error('Error updating asset:', err);
+      throw err;
+    }
+  };
+
+  // Delete a digital asset
+  const deleteAsset = async (assetId) => {
+    if (!user) {
+      throw new Error('User must be logged in to delete assets');
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('digital_assets')
+        .delete()
+        .eq('id', assetId)
+        .eq('creator_id', user.id); // Ensure only creator can delete
+      
+      if (error) throw error;
+      
+      // Refresh assets list
+      await fetchDigitalAssets();
+      
+      return { success: true };
+    } catch (err) {
+      console.error('Error deleting asset:', err);
+      throw err;
+    }
+  };
+
   // Check if user owns an asset
   const doesUserOwnAsset = (assetId) => {
     return userPurchasedAssets.some(purchase => purchase.asset_id === assetId);
@@ -184,8 +297,14 @@ export const useDigitalAssets = () => {
       throw new Error('User must be logged in to download assets');
     }
     
-    // Check if user owns the asset
-    if (!doesUserOwnAsset(assetId)) {
+    // Get the asset to check if it's free or if user owns it
+    const asset = getAssetById(assetId);
+    if (!asset) {
+      throw new Error('Asset not found');
+    }
+    
+    // Check if user can download (owns it or it's free)
+    if (asset.price > 0 && !doesUserOwnAsset(assetId)) {
       throw new Error('User does not own this asset');
     }
     
@@ -213,7 +332,8 @@ export const useDigitalAssets = () => {
           p_reference_type: 'asset',
           p_reference_id: assetId,
           p_metadata: {
-            first_download: true
+            first_download: true,
+            asset_title: asset.title
           },
           p_custom_xp: 25 // First download bonus
         });
@@ -250,9 +370,6 @@ export const useDigitalAssets = () => {
       // Refresh download history
       await fetchUserDownloads();
       
-      // Get the asset for download URL
-      const asset = getAssetById(assetId);
-      
       return {
         success: true,
         downloadUrl: asset.download_url,
@@ -260,34 +377,6 @@ export const useDigitalAssets = () => {
       };
     } catch (err) {
       console.error('Error downloading asset:', err);
-      throw err;
-    }
-  };
-
-  // Record asset project creation (when user creates something with the asset)
-  const recordAssetProjectCreation = async (assetId, projectMetadata = {}) => {
-    if (!user || !doesUserOwnAsset(assetId)) return;
-    
-    try {
-      const { data: xpResult, error: xpError } = await supabase.rpc('award_marketplace_xp', {
-        p_user_id: user.id,
-        p_event_type: 'asset_project_created',
-        p_reference_type: 'asset',
-        p_reference_id: assetId,
-        p_metadata: projectMetadata,
-        p_custom_xp: 150
-      });
-      
-      if (xpError) {
-        console.error('Error awarding project creation XP:', xpError);
-      }
-      
-      return {
-        success: true,
-        xpAwarded: xpResult?.[0]?.xp_awarded || 0
-      };
-    } catch (err) {
-      console.error('Error recording asset project creation:', err);
       throw err;
     }
   };
@@ -327,6 +416,31 @@ export const useDigitalAssets = () => {
       .slice(0, limit);
   };
 
+  // Get assets by creator
+  const getAssetsByCreator = (creatorId) => {
+    return assets.filter(asset => asset.creator_id === creatorId);
+  };
+
+  // Get user's created assets
+  const getUserCreatedAssets = async () => {
+    if (!user) return [];
+    
+    try {
+      const { data, error } = await supabase
+        .from('digital_assets')
+        .select('*')
+        .eq('creator_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      
+      return data || [];
+    } catch (err) {
+      console.error('Error fetching user created assets:', err);
+      return [];
+    }
+  };
+
   return {
     // State
     assets,
@@ -336,17 +450,23 @@ export const useDigitalAssets = () => {
     error,
     user,
     
+    // Asset management (CRUD)
+    createAsset,
+    updateAsset,
+    deleteAsset,
+    
     // Asset queries
     getAssetById,
     getAssetBySlug,
     getAssetsByType,
+    getAssetsByCreator,
     getFeaturedAssets,
+    getUserCreatedAssets,
     doesUserOwnAsset,
     
     // User actions
     purchaseAsset,
     downloadAsset,
-    recordAssetProjectCreation,
     
     // Statistics
     getUserAssetStats,

@@ -55,7 +55,7 @@ export const MainLayout = ({
   const mainContentStyles = {
     flex: 1,
     marginLeft: showSidebar ? sidebarWidth : 0,
-    marginTop: showHeader ? headerHeight : 0,
+    paddingTop: showHeader ? headerHeight : 0,
     transition: 'margin 0.3s ease',
     overflow: 'auto',
     position: 'relative'
